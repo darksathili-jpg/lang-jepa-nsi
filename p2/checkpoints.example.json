@@ -1,0 +1,13 @@
+{
+  "upstream_revision": "f6e29a53760e631f12e16922c7300588c61c61d8",
+  "encoder": {
+    "sha256": "<empreinte publiée ou calculée à réception>",
+    "provenance": "<auteur et référence du run d'entraînement>",
+    "encoder_config_sha256": "<empreinte du YAML de ce run>"
+  },
+  "decoder": {
+    "sha256": "<empreinte publiée ou calculée à réception>",
+    "provenance": "<auteur et référence du run du décodeur>",
+    "encoder_sha256": "<empreinte de l'encodeur utilisé pour entraîner ce décodeur>"
+  }
+}

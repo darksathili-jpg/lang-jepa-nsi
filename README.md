@@ -1,20 +1,22 @@
-# LANG-JEPA NSI — V0.1
+# LANG-JEPA NSI
 
-Prototype pédagogique local pour Première et Terminale NSI.
+Laboratoire pédagogique hors ligne pour Première et Terminale NSI. Il comprend une présentation interactive, un quiz et un espace pour saisir un énoncé, du code Python et une question.
 
 ## Démarrage Windows
+
+Prérequis du laboratoire : Python 3 et son lanceur Windows `py`. Depuis la racine du dépôt, dans PowerShell :
+
 ```powershell
 .\scripts\dev.ps1
 ```
-Ouvrir http://127.0.0.1:8765. Tests : `.\scripts\check.ps1`.
 
-Cette V0.1 est une interface statique hors ligne : **aucun modèle LANG-JEPA n'est encore connecté**. L'exécution Python élève n'est pas disponible.
+Ouvrir [le laboratoire](http://127.0.0.1:8765). Exécuter `.\scripts\check.ps1` pour les tests. Le serveur écoute uniquement sur l’interface locale. Le formulaire garde la saisie dans l’onglet et traite le code Python comme du texte.
 
-## Règles de production
-- Dépôt unique, branche `main`, pas de branches temporaires.
-- Tests ciblés avant commit, recette complète aux jalons.
-- Poids et jeux de données exclus du dépôt.
-- Ne jamais présenter une réponse simulée comme issue de LANG-JEPA.
-- Ne jamais exécuter le code élève dans le processus serveur.
+## Mission P2
 
-Amont scientifique : https://github.com/jerber/lang-jepa — l'inférence requiert un checkpoint d'encodeur ; décodeur facultatif. Audit de licence, checkpoints et CPU à réaliser.
+La révision amont est figée. Le lanceur d’expérimentation CPU fonctionne séparément du laboratoire et exige des poids d’entraînement compatibles. Au 21 novembre 2026, la recherche publique n’a identifié aucun checkpoint d’encodeur ni de décodeur compatible. Le tuteur reste indisponible.
+
+- [Installation, expérimentation et restauration hors ligne](docs/INSTALLATION-P2.md)
+- [Audit des checkpoints, estimation CPU et bilan de validation](docs/RAPPORT-P2.md)
+- [Architecture et protocole d’évaluation pédagogique](docs/ARCHITECTURE-P2.md)
+- [Règles permanentes de développement](AGENTS.md)

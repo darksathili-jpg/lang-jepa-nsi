@@ -1,0 +1,10 @@
+Énoncé : trouver la plus grande valeur d’une liste d’entiers non vide.
+Code Python :
+def maximum(tab):
+    m = 0
+    for valeur in tab:
+        if valeur > m:
+            m = valeur
+    return m
+
+Question : comment comprendre l’erreur quand les valeurs sont toutes négatives ?

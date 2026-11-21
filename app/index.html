@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="fr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LANG-JEPA NSI — Découvrir</title><link rel="stylesheet" href="style.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'"><title>LANG-JEPA NSI — Découvrir</title><link rel="stylesheet" href="style.css"></head>
 <body>
 <header><strong>LANG-JEPA <span>NSI</span></strong><nav><a href="#comprendre">Comprendre</a><a href="#quiz">Quiz</a><a href="#laboratoire">Laboratoire</a></nav><button id="theme">Mode sombre</button></header>
 <main>
@@ -10,10 +10,23 @@
 <article><p class="eyebrow">ARCHITECTURE PRÉDICTIVE</p><h3>LANG-JEPA : le prochain vecteur</h3><div class="diagram">Phrases de contexte<br><b>↓</b><br><strong>[0,42 ; −0,18 ; …]</strong><br><b>↓</b><br>Décodeur éventuel</div><p>LANG-JEPA apprend à prédire une représentation de la phrase suivante. La génération de texte nécessite un décodeur entraîné.</p></article>
 </div><p class="note">Les vecteurs affichés sont illustratifs. Une prédiction vectorielle ne garantit pas une meilleure compréhension ni la capacité à enseigner.</p></section>
 <section id="quiz"><h2>Vérifie ta compréhension</h2><div id="questions"></div><p id="score" role="status"></p></section>
-<section id="laboratoire"><h2>Laboratoire Python — état expérimental</h2><p>Cette première livraison prépare l'interface. Le moteur LANG-JEPA réel n'est pas encore connecté : aucune réponse simulée n'est présentée comme une sortie du modèle.</p><label for="code">Code de l'élève</label><textarea id="code" spellcheck="false">def maximum(tab):
+<section id="laboratoire">
+<h2>Laboratoire Python</h2>
+<p>Prépare ton énoncé, ton code et ta question. Le tuteur est indisponible. Ta saisie reste dans cet onglet.</p>
+<form id="tutor-request">
+<label for="statement">Énoncé</label>
+<textarea id="statement" rows="3" placeholder="Écris l’objectif de ton exercice."></textarea>
+<label for="code">Code Python</label>
+<textarea id="code" rows="8" spellcheck="false">def maximum(tab):
     m = 0
     for valeur in tab:
         if valeur > m:
             m = valeur
-    return m</textarea><button id="diagnostic">Vérifier la disponibilité du tuteur</button><p id="status" role="status">Moteur LANG-JEPA : non installé.</p></section>
-</main><footer>Prototype pédagogique V0.1 · Aucune ressource externe · Aucune donnée transmise</footer><script src="app.js"></script></body></html>
+    return m</textarea>
+<label for="question">Ta question</label>
+<textarea id="question" rows="3" placeholder="Que veux-tu comprendre ou vérifier ?"></textarea>
+<button id="diagnostic" type="button">Vérifier la disponibilité du tuteur</button>
+<p id="status" role="status">Tuteur indisponible.</p>
+</form>
+</section>
+</main><footer>Prototype pédagogique · Aucune ressource externe · Aucune donnée transmise</footer><script src="app.js"></script></body></html>

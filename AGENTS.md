@@ -1,0 +1,8 @@
+# Développement de LANG-JEPA NSI
+
+- Travailler dans le dépôt `darksathili-jpg/lang-jepa-nsi` et livrer sur `main`. Conserver l'historique et les fonctionnalités existantes. Ne créer ni branche de travail supplémentaire ni dépôt supplémentaire. Respecter les droits GitHub et toute protection de `main`. Ne jamais forcer une publication.
+- Regrouper les modifications cohérentes. Développer de façon autonome dans le périmètre de la mission. Solliciter une intervention uniquement pour une autorisation indispensable ou une décision qui change substantiellement le projet.
+- Exécuter les tests concernés après chaque modification significative. Réserver la recette complète aux jalons et aux changements critiques. Après deux corrections infructueuses, identifier la cause profonde avant une nouvelle modification. Préserver les assertions des tests.
+- Garder l'application utilisable hors ligne. Les traitements doivent rester locaux. Ne verser dans Git ni poids, ni données d'élèves, ni données d'entraînement, ni secrets. Ne jamais exécuter le code élève dans le processus serveur.
+- Utiliser uniquement le véritable LANG-JEPA de `jerber/lang-jepa` pour les résultats attribués au modèle. Figer et vérifier les révisions des ressources. Documenter la provenance et les droits avant toute redistribution. Garder les sorties brutes et les métadonnées de chaque expérience réelle. Identifier explicitement les démonstrations et les tests techniques.
+- Vérifier l'inférence CPU sur la cible Windows 16 Go, puis évaluer les capacités pédagogiques en français avant de qualifier le moteur de tuteur. Documenter les limites et les étapes bloquées.

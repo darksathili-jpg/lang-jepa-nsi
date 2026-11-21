@@ -1,2 +1,8 @@
-Set-Location (Join-Path $PSScriptRoot '..')
-py -m unittest discover -s tests -v
+$ErrorActionPreference = 'Stop'
+Push-Location (Join-Path $PSScriptRoot '..')
+try {
+    py -m unittest discover -s tests -v
+    exit $LASTEXITCODE
+} finally {
+    Pop-Location
+}

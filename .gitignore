@@ -7,3 +7,6 @@ models/*
 *.pt
 *.gguf
 .env
+wheelhouse/
+results/
+*.safetensors
