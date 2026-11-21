@@ -6,7 +6,7 @@ import unittest
 from tutor.analysis import analyze
 from tutor.benchmark import evidence
 from tutor.catalog import ROOT, verify_file
-from tutor.dialogue import DialogueError, choose_stage, read_reply, validate
+from tutor.dialogue import DialogueError, choose_stage, make_messages, read_reply, validate
 
 
 CASES = json.loads((ROOT / "p3" / "scenarios.json").read_text(encoding="utf-8"))
@@ -40,6 +40,8 @@ class TutorTests(unittest.TestCase):
         self.assertEqual(analyze("def pair(n):\nreturn n")["syntax"], 2)
         self.assertTrue(analyze(MAXIMUM["code"])["maximum_zero"])
         self.assertFalse(analyze(MAXIMUM["turns"][-1]["code"])["maximum_zero"])
+        self.assertEqual(analyze("while n > 0:\n    print(n)")["unchanged_guard"], "n")
+        self.assertIsNone(analyze("while n > 0:\n    n -= 1")["unchanged_guard"])
 
     def test_stages_follow_attempts_and_code_changes(self):
         initial = analyze(MAXIMUM["code"])
@@ -63,14 +65,27 @@ class TutorTests(unittest.TestCase):
         with self.assertRaises(DialogueError):
             read_reply({"finish": "stop", "text": '{"indice":"Indice","question":"Trace m."}'}, facts)
         reply = read_reply({"finish": "stop", "text": '{"indice":"Teste [-4, -2].","question":"Observe ? Que vaut m ?"}'}, facts)
-        self.assertEqual(reply["question"], "Que vaut m?")
+        self.assertEqual(reply["question"], "Que vaut m ?")
 
     def test_invalid_input_is_refused(self):
         base = {"class": "premiere", "statement": "Exercice", "code": "", "question": "Pourquoi ?"}
         self.assertEqual(validate(base)[0], "premiere")
+        self.assertEqual(validate(base | {"code": "    x = 2\n"})[2], "    x = 2\n")
         for patch in ({"class": []}, {"code": "x" * 3601}, {"question": " "}, {"history": [{}]}, {"history": [1] * 4}):
             with self.subTest(patch=patch), self.assertRaises(DialogueError):
                 validate(base | patch)
+
+    def test_maximum_consolidation_uses_current_contract(self):
+        turn = MAXIMUM["turns"][-1]
+        history = [{"learner": "Ancien code", "assistant": "Ancien diagnostic"}]
+        messages = make_messages(
+            "premiere", MAXIMUM["statement"], turn["code"], turn["question"], history,
+            analyze(turn["code"]), 5,
+        )
+        self.assertEqual(len(messages), 2)
+        self.assertIn(turn["question"], messages[-1]["content"])
+        self.assertIn("hors précondition", messages[-1]["content"])
+        self.assertNotIn("Ancien diagnostic", messages[-1]["content"])
 
     def test_scenarios_define_three_turns_and_reference_signals(self):
         self.assertEqual(len({case["id"] for case in CASES}), 20)

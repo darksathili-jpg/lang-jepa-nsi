@@ -33,12 +33,16 @@ def check_page(browser, url, width):
     expect(page.get_by_role("heading", name="Laboratoire Python")).to_have_count(1)
     page.get_by_role("button", name="Mode sombre").click()
     expect(page.get_by_role("button", name="Mode clair")).to_be_visible()
+    expect(page.locator("#questions fieldset").first).to_have_css("background-color", "rgb(28, 43, 64)")
     page.get_by_role("button", name="Mode clair").click()
+    page.get_by_role("button", name="Projecteur", exact=True).click()
+    expect(page.locator("body")).to_have_class("projector")
+    page.get_by_role("button", name="Projecteur", exact=True).click()
     for question, answer in enumerate((1, 0, 1)):
         page.locator(f'input[name="q{question}"][value="{answer}"]').check()
     expect(page.locator("#score")).to_contain_text("3/3")
 
-    page.get_by_role("link", name="Laboratoire").click()
+    page.get_by_role("link", name="Laboratoire", exact=True).click()
     fields = {
         "Énoncé": "Chercher le maximum d’une liste.",
         "Code Python": "raise RuntimeError('Cette saisie doit rester du texte.')",

@@ -3,6 +3,12 @@ const questions=[{q:'Que prédit principalement LANG-JEPA ?',options:['Le procha
 const root=document.getElementById('questions');let answers={};
 questions.forEach((q,i)=>{const field=document.createElement('fieldset');const legend=document.createElement('legend');legend.textContent=`${i+1}. ${q.q}`;field.append(legend);q.options.forEach((opt,j)=>{const label=document.createElement('label'),radio=document.createElement('input');radio.type='radio';radio.name=`q${i}`;radio.value=j;radio.addEventListener('change',()=>{answers[i]=j;const n=Object.keys(answers).length;document.getElementById('score').textContent=n===questions.length?`Résultat : ${questions.filter((v,k)=>answers[k]===v.correct).length}/${questions.length}. ${questions.map((v,k)=>v.explain).join(' ')}`:`${n}/${questions.length} réponses.`});label.append(radio,document.createTextNode(' '+opt));field.append(label)});root.append(field)});
 document.getElementById('theme').addEventListener('click',()=>{const active=document.body.classList.toggle('dark');document.getElementById('theme').textContent=active?'Mode clair':'Mode sombre'});
+const projector = document.getElementById('projector');
+projector.addEventListener('click', () => {
+  const active = document.body.classList.toggle('projector');
+  projector.setAttribute('aria-pressed', String(active));
+  document.getElementById('theme').disabled = active;
+});
 const tutorRequest = document.getElementById('tutor-request');
 tutorRequest.addEventListener('submit', (event) => event.preventDefault());
 

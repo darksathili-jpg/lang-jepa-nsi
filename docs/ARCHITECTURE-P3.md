@@ -14,6 +14,8 @@ Le tuteur Python est le parcours principal. Le laboratoire scientifique conserve
 
 L’état d’aide peut rester stable, avancer si l’élève a essayé une trace, s’orienter vers une erreur de syntaxe ou demander une consolidation après une modification. Les stades sont Comprendre, Orienter, Expérimenter, Débloquer et Consolider. Le stade Consolidation déclenche une vérification proposée à l’élève, sans présumer que sa correction fonctionne. Les signaux textuels et la modification du code sont des heuristiques documentées.
 
+Pour le scénario du maximum, la consolidation utilise l’énoncé et le dernier message de l’élève. Les indices générés sur l’ancien code avaient tendance à revenir dans la réponse. Cette consigne recentre le modèle sur le contrat du nouvel état, notamment la précondition d’une liste non vide.
+
 L’adaptateur ne charge que des fichiers locaux. Il n’accepte ni URL de modèle ni URL de service depuis le navigateur. Les états modèle absent, chargement, prêt et erreur sont distincts. Les erreurs et refus sont affichés comme états, sans réponse de remplacement. Le modèle reçoit au plus trois tours précédents et des entrées bornées. Pour une question refusée, l’atelier permet de reformuler et réessayer.
 
 ## Référentiel pédagogique

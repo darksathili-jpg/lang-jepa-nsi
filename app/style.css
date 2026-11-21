@@ -23,3 +23,15 @@ body.dark #tutor-request textarea:not(#code) {
 body.dark #tutor-request textarea::placeholder {
   color: #bdcde0;
 }
+
+.atelier-link { color: #126b83; font-weight: 750; }
+body.dark .atelier-link { color: #a5eaf4; }
+.science-link { display: inline-block; margin: .6rem .2rem; text-underline-offset: .25rem; text-decoration: underline; }
+body.dark:not(.projector) #questions > fieldset { background: #1c2b40; border-color: #354960; }
+body.dark:not(.projector) .diagram strong { background: #33566d; color: white; }
+body.dark:not(.projector) footer { color: #bdcde0; }
+#projector[aria-pressed="true"] { background: #182b47; }
+body.projector { background: white; color: #101b2f; font-size: clamp(1.13rem, 1.35vw, 1.35rem); }
+body.projector header, body.projector article, body.projector fieldset { background: white; color: #101b2f; }
+body.projector .hero>p:not(.eyebrow), body.projector .note { color: #253754; }
+body.projector .diagram { background: #e5f3f8; color: #101b2f; }

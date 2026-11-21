@@ -2,9 +2,9 @@
 <html lang="fr">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'"><title>LANG-JEPA NSI — Découvrir</title><link rel="stylesheet" href="style.css"></head>
 <body>
-<header><strong>LANG-JEPA <span>NSI</span></strong><nav><a href="#comprendre">Comprendre</a><a href="#quiz">Quiz</a><a href="#laboratoire">Laboratoire</a></nav><button id="theme">Mode sombre</button></header>
+<header><strong>LANG-JEPA <span>NSI</span></strong><nav><a class="atelier-link" href="/atelier">Professeur virtuel</a><a href="#comprendre">Comprendre</a><a href="#quiz">Quiz</a><a href="#laboratoire">Laboratoire</a></nav><button id="theme">Mode sombre</button><button id="projector" aria-pressed="false">Projecteur</button></header>
 <main>
-<section class="hero"><p class="eyebrow">LABORATOIRE HORS LIGNE · PREMIÈRE & TERMINALE NSI</p><h1>Et si une IA prédisait des <em>idées</em> plutôt que des tokens ?</h1><p>Découvre deux objectifs d'apprentissage, formule des hypothèses et prépare une expérimentation scientifique avec LANG-JEPA.</p><a class="cta" href="#comprendre">Commencer l'exploration ↓</a></section>
+<section class="hero"><p class="eyebrow">LABORATOIRE HORS LIGNE · PREMIÈRE & TERMINALE NSI</p><h1>Et si une IA prédisait des <em>idées</em> plutôt que des tokens ?</h1><p>Découvre deux objectifs d'apprentissage, formule des hypothèses et prépare une expérimentation scientifique avec LANG-JEPA.</p><a class="cta" href="/atelier">Ouvrir le professeur virtuel</a> <a class="science-link" href="#comprendre">Explorer le laboratoire ↓</a></section>
 <section id="comprendre"><h2>Deux approches de la prédiction</h2><div class="columns">
 <article><p class="eyebrow">MODÈLE AUTORÉGRESSIF</p><h3>LLM : le prochain token</h3><div class="diagram">« Une fonction Python renvoie une »<br><b>↓</b><br><strong>valeur</strong></div><p>Un modèle de langage autorégressif estime des probabilités sur les tokens suivants. Il utilise aussi des représentations vectorielles internes.</p></article>
 <article><p class="eyebrow">ARCHITECTURE PRÉDICTIVE</p><h3>LANG-JEPA : le prochain vecteur</h3><div class="diagram">Phrases de contexte<br><b>↓</b><br><strong>[0,42 ; −0,18 ; …]</strong><br><b>↓</b><br>Décodeur éventuel</div><p>LANG-JEPA apprend à prédire une représentation de la phrase suivante. La génération de texte nécessite un décodeur entraîné.</p></article>
@@ -12,7 +12,7 @@
 <section id="quiz"><h2>Vérifie ta compréhension</h2><div id="questions"></div><p id="score" role="status"></p></section>
 <section id="laboratoire">
 <h2>Laboratoire Python</h2>
-<p>Prépare ton énoncé, ton code et ta question. Le tuteur est indisponible. Ta saisie reste dans cet onglet.</p>
+<p>Ici, tu peux préparer un exemple pour l’expérimentation LANG-JEPA. Pour demander un indice, ouvre le professeur virtuel.</p>
 <form id="tutor-request">
 <label for="statement">Énoncé</label>
 <textarea id="statement" rows="3" placeholder="Écris l’objectif de ton exercice."></textarea>
@@ -26,7 +26,7 @@
 <label for="question">Ta question</label>
 <textarea id="question" rows="3" placeholder="Que veux-tu comprendre ou vérifier ?"></textarea>
 <button id="diagnostic" type="button">Vérifier la disponibilité du tuteur</button>
-<p id="status" role="status">Tuteur indisponible.</p>
+<p id="status" role="status">Moteur expérimental LANG-JEPA indisponible.</p>
 </form>
 </section>
 </main><footer>Prototype pédagogique · Aucune ressource externe · Aucune donnée transmise</footer><script src="app.js"></script></body></html>

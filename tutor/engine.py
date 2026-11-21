@@ -3,6 +3,7 @@
 import http.client
 import json
 import os
+from copy import deepcopy
 import secrets
 import socket
 import subprocess
@@ -23,11 +24,19 @@ REPLY_FORMAT = {
         "strict": True,
         "schema": {
             "type": "object",
-            "properties": {"indice": {"type": "string"}, "question": {"type": "string"}},
+            "properties": {
+                "indice": {"type": "string", "minLength": 3, "maxLength": 230},
+                "question": {"type": "string", "minLength": 4, "maxLength": 170},
+            },
             "required": ["indice", "question"],
             "additionalProperties": False,
         },
     },
+}
+CONTRACT_FORMAT = deepcopy(REPLY_FORMAT)
+CONTRACT_FORMAT["json_schema"]["schema"]["properties"]["indice"] = {
+    "type": "string",
+    "pattern": "^(La précondition|Une liste non vide|L'énoncé exige une liste non vide).{2,180}$",
 }
 
 
@@ -125,7 +134,7 @@ class LlamaEngine:
             )
             self.close()
 
-    def generate(self, messages):
+    def generate(self, messages, contract=False):
         if self.status()["state"] != "ready":
             raise EngineError(self.detail)
         if not self.lock.acquire(blocking=False):
@@ -134,7 +143,8 @@ class LlamaEngine:
         try:
             status, data = self._request("/v1/chat/completions", {
                 "model": self.key, "messages": messages, "temperature": 0, "seed": 42,
-                "max_tokens": 128, "response_format": REPLY_FORMAT, "cache_prompt": False,
+                "max_tokens": 160, "response_format": CONTRACT_FORMAT if contract else REPLY_FORMAT,
+                "cache_prompt": False,
             }, timeout=110)
             if status == 400:
                 raise EngineError("Le contexte est trop long ou incompatible. Raccourcissez la demande.")

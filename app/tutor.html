@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Atelier Python — Professeur virtuel NSI</title>
+  <link rel="stylesheet" href="tutor.css">
+  <script src="tutor.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Aller à l’atelier</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/atelier" aria-current="page"><span class="brand-mark" aria-hidden="true">NSI</span> Professeur virtuel</a>
+      <a class="lab-link" href="/">Laboratoire LANG-JEPA</a>
+      <div class="themes" role="group" aria-label="Mode d’affichage">
+        <button type="button" data-theme="light" aria-pressed="true">Clair</button>
+        <button type="button" data-theme="dark" aria-pressed="false">Sombre</button>
+        <button type="button" data-theme="projector" aria-pressed="false">Projecteur</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="intro" aria-labelledby="title">
+      <div>
+        <h1 id="title">Atelier Python</h1>
+        <p>Pose une question, essaie un cas de test et explique ce que tu observes.</p>
+      </div>
+      <div class="model-card">
+        <span id="model-state" class="model-state" data-state="loading" role="status">Vérification du modèle</span>
+        <span id="model-identity"></span>
+        <span id="model-detail"></span>
+      </div>
+    </section>
+
+    <div class="workspace">
+      <section class="panel exercise" aria-labelledby="exercise-title">
+        <div class="panel-top">
+          <h2 id="exercise-title">Ton exercice</h2>
+          <div class="class-field">
+            <label for="class">Classe</label>
+            <select id="class">
+              <option value="premiere">Première</option>
+              <option value="terminale">Terminale</option>
+            </select>
+          </div>
+        </div>
+        <label for="statement">Énoncé</label>
+        <textarea id="statement" maxlength="1600" rows="3">Trouver la plus grande valeur d’une liste non vide d’entiers.</textarea>
+        <div class="editor-label">
+          <label for="code">Code Python</label>
+          <span id="syntax" role="status"></span>
+        </div>
+        <div class="editor">
+          <pre id="highlight" aria-hidden="true"></pre>
+          <textarea id="code" maxlength="3600" spellcheck="false" autocapitalize="off" wrap="off"
+                    aria-describedby="editor-note">def maximum(tab):
+    m = 0
+    for valeur in tab:
+        if valeur > m:
+            m = valeur
+    return m</textarea>
+        </div>
+        <p id="editor-note" class="quiet editor-note">Le code est analysé comme du texte. Il reste sur cet ordinateur.</p>
+      </section>
+
+      <section class="panel conversation" aria-labelledby="conversation-title">
+        <div class="panel-top">
+          <h2 id="conversation-title">Dialogue</h2>
+          <button type="button" id="reset" class="secondary" disabled>Recommencer</button>
+        </div>
+        <div class="progress" aria-label="Niveau d’aide">
+          <span id="active-stage">Comprendre</span>
+          <ol id="stages" aria-label="Étapes de l’aide">
+            <li aria-current="step" title="Comprendre">Comprendre</li>
+            <li title="Orienter">Orienter</li>
+            <li title="Expérimenter">Expérimenter</li>
+            <li title="Débloquer">Débloquer</li>
+            <li title="Consolider">Consolider</li>
+          </ol>
+        </div>
+        <div id="history" role="log" aria-label="Historique du dialogue" aria-live="polite" tabindex="0">
+          <p id="empty" class="empty">Quelle partie du programme veux-tu comprendre&nbsp;?</p>
+        </div>
+        <form id="compose">
+          <label for="question">Ta question ou ton observation</label>
+          <textarea id="question" maxlength="720" rows="2" placeholder="Par exemple, quelle liste pourrais-je tester ?" required></textarea>
+          <div class="form-footer">
+            <p id="feedback" class="quiet" role="status" aria-live="polite"></p>
+            <button type="submit" id="send" disabled>Demander un indice</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
