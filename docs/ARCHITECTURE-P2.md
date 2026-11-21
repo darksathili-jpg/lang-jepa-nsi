@@ -1,5 +1,7 @@
 # Architecture P2
 
+Depuis P3, l’expérimentation LANG-JEPA reste indépendante et le professeur virtuel utilise un moteur conversationnel local. Ce document conserve l’architecture et les résultats de la mission P2. [Architecture du tuteur P3](ARCHITECTURE-P3.md)
+
 Le laboratoire conserve son point d’entrée `app/index.html`, servi sur l’interface de bouclage. Les champs énoncé, code et question restent dans le navigateur. La politique de sécurité de contenu interdit toute connexion du formulaire. Le bouton de disponibilité donne l’état explicite du tuteur. Le navigateur ne lance aucun code Python fourni par l’élève.
 
 Le lanceur `scripts/lang_jepa_cpu.py` est le point d’entrée de l’expérimentation. Il prend un texte UTF-8 local, le chemin d’un bundle et un nouveau chemin de résultat. Il vérifie d’abord la révision, les empreintes, la provenance déclarée et l’association encodeur-décodeur. Il extrait l’archive amont vérifiée dans un répertoire temporaire. La source de l’auteur reste hors du dépôt NSI. [Révision d’origine](https://github.com/jerber/lang-jepa/tree/f6e29a53760e631f12e16922c7300588c61c61d8)

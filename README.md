@@ -1,22 +1,20 @@
 # LANG-JEPA NSI
 
-Laboratoire pédagogique hors ligne pour Première et Terminale NSI. Il comprend une présentation interactive, un quiz et un espace pour saisir un énoncé, du code Python et une question.
+Professeur virtuel local pour travailler le Python en Première et Terminale NSI. L’expérimentation scientifique LANG-JEPA reste accessible dans un laboratoire indépendant.
 
-## Démarrage Windows
+## Professeur virtuel · P3
 
-Prérequis du laboratoire : Python 3 et son lanceur Windows `py`. Depuis la racine du dépôt, dans PowerShell :
+L’atelier propose des questions et indices progressifs avec un modèle conversationnel qui s’exécute sur le processeur. Le code saisi relève d’une analyse statique locale. Le profil de déploiement est Windows x64, 16 Go de RAM.
 
-```powershell
-.\scripts\dev.ps1
-```
-
-Ouvrir [le laboratoire](http://127.0.0.1:8765). Exécuter `.\scripts\check.ps1` pour les tests. Le serveur écoute uniquement sur l’interface locale. Le formulaire garde la saisie dans l’onglet et traite le code Python comme du texte.
-
-## Mission P2
-
-La révision amont est figée. Le lanceur d’expérimentation CPU fonctionne séparément du laboratoire et exige des poids d’entraînement compatibles. Au 21 novembre 2026, la recherche publique n’a identifié aucun checkpoint d’encodeur ni de décodeur compatible. Le tuteur reste indisponible.
-
-- [Installation, expérimentation et restauration hors ligne](docs/INSTALLATION-P2.md)
-- [Audit des checkpoints, estimation CPU et bilan de validation](docs/RAPPORT-P2.md)
-- [Architecture et protocole d’évaluation pédagogique](docs/ARCHITECTURE-P2.md)
+- [Architecture du professeur virtuel](docs/ARCHITECTURE-P3.md)
 - [Règles permanentes de développement](AGENTS.md)
+
+## Laboratoire LANG-JEPA · P2
+
+Depuis PowerShell, `.\scripts\dev.ps1` lance le site local sur [127.0.0.1:8765](http://127.0.0.1:8765). Les tests se lancent avec `.\scripts\check.ps1`.
+
+La révision LANG-JEPA d’origine est figée. Le lanceur P2 exige des checkpoints entraînés compatibles, absents des sources publiques consultées au cours de la mission P2.
+
+- [Rapport de recherche et compatibilité CPU](docs/RAPPORT-P2.md)
+- [Installation et restauration P2](docs/INSTALLATION-P2.md)
+- [Architecture du laboratoire P2](docs/ARCHITECTURE-P2.md)

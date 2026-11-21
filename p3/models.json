@@ -1,0 +1,49 @@
+{
+  "runtime": {
+    "version": "b12600",
+    "commit": "29b52d398",
+    "license": "MIT",
+    "platforms": {
+      "windows-x64": {
+        "file": "llama-b12600-bin-win-cpu-x64.zip",
+        "sha256": "a31a14f1630408422228d02ff2a3fc41c06a6b3b3849d8d2782c37f0f6e30951"
+      },
+      "linux-x64": {
+        "file": "llama-b12600-bin-ubuntu-x64.tar.gz",
+        "sha256": "da524c71f9dd09913df29264bb7229b99a2de82d8a26e6902e6921d413560d6d"
+      }
+    }
+  },
+  "models": {
+    "qwen": {
+      "name": "Qwen2.5-1.5B-Instruct",
+      "repository": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+      "revision": "91cad51170dc346986eccefdc2dd33a9da36ead9",
+      "quantization": "Q4_K_M",
+      "license": "Apache-2.0",
+      "file": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+      "bytes": 1117320736,
+      "sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e"
+    },
+    "granite": {
+      "name": "Granite 4.0 Micro",
+      "repository": "ibm-granite/granite-4.0-micro-GGUF",
+      "revision": "55cded3dcb8ab9f0fdd5373f4e960ffb7fda1c61",
+      "quantization": "Q4_K_M",
+      "license": "Apache-2.0",
+      "file": "granite-4.0-micro-Q4_K_M.gguf",
+      "bytes": 2099502528,
+      "sha256": "97c417dcc0534b0737c74016fb2af083cb17c3b51eaac621192d23961b7024eb"
+    },
+    "smol": {
+      "name": "SmolLM3-3B",
+      "repository": "ggml-org/SmolLM3-3B-GGUF",
+      "revision": "4965cb60b150737b68a0408c36aeefb65078f894",
+      "quantization": "Q4_K_M",
+      "license": "Apache-2.0",
+      "file": "SmolLM3-Q4_K_M.gguf",
+      "bytes": 1915305312,
+      "sha256": "8334b850b7bd46238c16b0c550df2138f0889bf433809008cc17a8b05761863e"
+    }
+  }
+}
