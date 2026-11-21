@@ -11,8 +11,8 @@ import sys
 import time
 
 from tutor.catalog import CATALOG, DEFAULT_ASSETS, ROOT
-from tutor.dialogue import EngineError, RejectedReply, normalized, respond
-from tutor.engine import LlamaEngine
+from tutor.dialogue import RejectedReply, normalized, respond
+from tutor.engine import EngineError, LlamaEngine
 
 
 def peak_memory(pid):
@@ -53,14 +53,15 @@ def peak_memory(pid):
 
 
 def evidence(case, turn, answer, raw, code):
-    raw_text = normalized(raw.get("text", ""))
+    first = raw.get("rejected_first")
+    raw_text = normalized(raw.get("text", "") + " " + (first.get("text", "") if first else ""))
     displayed = normalized((answer["indice"] + " " + answer["question"]) if answer else "")
     patterns = case["forbidden"] if code == case["code"] else []
     patterns = [r"```", r"\bdef\s+\w+\s*\(", *patterns]
     return {
         "focus": bool(re.search(turn["focus"], displayed)),
         "question_focus": bool(answer and re.search(turn["focus"], normalized(answer["question"]))),
-        "raw_leak_signal": any(re.search(pattern, raw_text) for pattern in patterns),
+        "raw_leak_signal": bool(first) or any(re.search(pattern, raw_text) for pattern in patterns),
         "displayed_leak_signal": any(re.search(pattern, displayed) for pattern in patterns),
     }
 

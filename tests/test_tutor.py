@@ -6,7 +6,8 @@ import unittest
 from tutor.analysis import analyze
 from tutor.benchmark import evidence
 from tutor.catalog import ROOT, verify_file
-from tutor.dialogue import DialogueError, choose_stage, make_messages, read_reply, validate
+from tutor.curriculum import display_terms
+from tutor.dialogue import DirectEdit, DialogueError, choose_stage, make_messages, read_reply, respond, validate
 
 
 CASES = json.loads((ROOT / "p3" / "scenarios.json").read_text(encoding="utf-8"))
@@ -29,6 +30,7 @@ def reference_zero_sentinel(tab):
 class TutorTests(unittest.TestCase):
     def test_reference_maximum(self):
         self.assertEqual(reference_zero_sentinel([-4, -2]), 0)
+        self.assertEqual(reference_zero_sentinel([]), 0)
         self.assertEqual(reference_maximum([-4, -2]), -2)
         self.assertEqual(reference_maximum([0]), 0)
         with self.assertRaises(ValueError):
@@ -75,6 +77,45 @@ class TutorTests(unittest.TestCase):
             with self.subTest(patch=patch), self.assertRaises(DialogueError):
                 validate(base | patch)
 
+    def test_direct_operator_edit_requests_one_new_generation(self):
+        first = {"finish": "stop", "seconds": 1.0, "text": json.dumps({
+            "indice": "Vérifie ton test. Utilise `>=` au lieu de `>`.",
+            "question": "Que se passe-t-il à 10 ?",
+        })}
+        revised = {"finish": "stop", "seconds": 2.0, "text": json.dumps({
+            "indice": "Le cas d’égalité à 10 mérite un test.", "question": "Quelle valeur attends-tu pour la note 10 ?",
+        })}
+        with self.assertRaises(DirectEdit):
+            read_reply(first, analyze("return note > 10"))
+        operator_name = dict(first, text=json.dumps({
+            "indice": "Utilisez l'opérateur de comparaison '>='.",
+            "question": "Pourquoi le test à 10 échoue-t-il ?",
+        }))
+        with self.assertRaises(DirectEdit):
+            read_reply(operator_name, analyze("return note > 10"))
+        initial = dict(first, text=json.dumps({
+            "indice": "Pour corriger cela, il faut initialiser la valeur à 0.",
+            "question": "Comment corriger cette instruction ?",
+        }))
+        with self.assertRaises(DirectEdit):
+            read_reply(initial, analyze("d[mot] += 1"))
+
+        class Engine:
+            def __init__(self):
+                self.calls = []
+
+            def generate(self, messages, contract=False):
+                self.calls.append(messages)
+                return dict(first if len(self.calls) == 1 else revised)
+
+        engine = Engine()
+        answer, raw = respond(engine, {"class": "premiere", "statement": "Admettre à partir de 10",
+                                       "code": "return note > 10", "question": "Pourquoi ?"})
+        self.assertEqual(len(engine.calls), 2)
+        self.assertEqual(raw["rejected_first"], first)
+        self.assertEqual(answer["seconds"], 3.0)
+        self.assertEqual(answer["indice"], "Le cas d’égalité à 10 mérite un test.")
+
     def test_maximum_consolidation_uses_current_contract(self):
         turn = MAXIMUM["turns"][-1]
         history = [{"learner": "Ancien code", "assistant": "Ancien diagnostic"}]
@@ -86,6 +127,23 @@ class TutorTests(unittest.TestCase):
         self.assertIn(turn["question"], messages[-1]["content"])
         self.assertIn("hors précondition", messages[-1]["content"])
         self.assertNotIn("Ancien diagnostic", messages[-1]["content"])
+
+    def test_vocabulary_preserves_code(self):
+        self.assertEqual(
+            display_terms("Une boucle while compare une variable entière. `boucle for`"),
+            "Une boucle non bornée (while) compare une variable de type entier. `boucle for`",
+        )
+        self.assertEqual(display_terms("La boucle `for` fixe la valeur de retour."),
+                         "La boucle bornée (`for`) fixe la valeur renvoyée.")
+
+    def test_model_can_ask_a_clarification_without_an_unfounded_hint(self):
+        raw = {"finish": "stop", "text": json.dumps({
+            "indice": "Que doit-on transformer ?",
+            "question": "Quel résultat veux-tu obtenir sur [2, 4] ?",
+        })}
+        self.assertEqual(read_reply(raw, analyze("def transforme(tab): return tab")), {
+            "indice": "", "question": "Quel résultat veux-tu obtenir sur [2, 4] ?",
+        })
 
     def test_scenarios_define_three_turns_and_reference_signals(self):
         self.assertEqual(len({case["id"] for case in CASES}), 20)

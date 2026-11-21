@@ -110,6 +110,7 @@ function addMessage(kind, who, ...parts) {
   name.textContent = who;
   message.append(name);
   for (const text of parts) {
+    if (!text) continue;
     const paragraph = document.createElement('p');
     paragraph.textContent = text;
     message.append(paragraph);

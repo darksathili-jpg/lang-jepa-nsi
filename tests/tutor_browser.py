@@ -68,13 +68,13 @@ def themes(page, captures=None):
             page.screenshot(path=captures / f"atelier-{key}.png", full_page=True)
 
 
-def absent(browser, origin):
+def unavailable(browser, origin, status):
     page = browser.new_page(viewport={"width": 390, "height": 900})
     external, errors = protect_page(page, origin)
     page.goto(origin)
     page.get_by_role("link", name="Ouvrir le professeur virtuel").click()
     expect(page.get_by_role("heading", name="Atelier Python")).to_be_visible()
-    expect(page.locator("#model-state")).to_contain_text("Modèle absent")
+    expect(page.locator("#model-state")).to_contain_text(status)
     expect(page.get_by_role("button", name="Demander un indice")).to_be_disabled()
     expect(page.locator(".token-keyword").first).to_have_text("def")
     page.get_by_label("Classe", exact=True).select_option("terminale")
@@ -145,9 +145,18 @@ def main():
         args.captures.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(executable_path=args.chromium)
-        with tempfile.TemporaryDirectory() as empty, local_server(Path(empty), args.model) as origin:
-            absent(browser, origin)
-        print("Recette mobile et état absent vérifiés.", flush=True)
+        with tempfile.TemporaryDirectory() as empty:
+            fixtures = Path(empty)
+            with local_server(fixtures, args.model) as origin:
+                unavailable(browser, origin, "Modèle absent")
+            catalogue = json.loads((ROOT / "p3" / "models.json").read_text(encoding="utf-8"))
+            (fixtures / catalogue["models"][args.model]["file"]).touch()
+            (fixtures / "runtime").mkdir()
+            executable = "llama-server.exe" if sys.platform == "win32" else "llama-server"
+            (fixtures / "runtime" / executable).touch()
+            with local_server(fixtures, args.model) as origin:
+                unavailable(browser, origin, "Erreur du modèle")
+        print("Recette mobile et états absent et erreur vérifiés.", flush=True)
         if args.assets:
             with local_server(args.assets, args.model) as origin:
                 live(browser, origin, args.captures)

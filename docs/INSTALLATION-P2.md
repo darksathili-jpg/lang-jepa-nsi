@@ -2,7 +2,7 @@
 
 ## Laboratoire Windows
 
-Installer Python 3 avec le lanceur `py`. Depuis la racine du dépôt, exécuter `.\scripts\check.ps1`, puis `.\scripts\dev.ps1`. Ouvrir `http://127.0.0.1:8765`. Pour une installation sur un poste déjà hors ligne, conserver préalablement le programme d’installation Python depuis le site officiel et l’installer avant ces commandes. [Python pour Windows](https://www.python.org/downloads/windows/)
+Installer Python 3 avec le lanceur `py`. Depuis la racine du dépôt, exécuter `.\scripts\check.ps1`, puis `.\scripts\dev.ps1 -LaboratoireSeul`. Ouvrir `http://127.0.0.1:8765`. Pour une installation sur un poste déjà hors ligne, conserver préalablement le programme d’installation Python depuis le site officiel et l’installer avant ces commandes. [Python pour Windows](https://www.python.org/downloads/windows/)
 
 Sous Linux, les équivalents sont `python -m unittest discover -s tests -v` et `python -m http.server 8765 --bind 127.0.0.1 --directory app`, depuis la racine du dépôt. La recette facultative `python tests/browser_smoke.py` utilise Playwright et Chromium. Pour un Chromium déjà installé, ajouter `--chromium CHEMIN`.
 

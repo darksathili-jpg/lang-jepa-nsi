@@ -5,11 +5,15 @@ import re
 import unicodedata
 
 from tutor.analysis import analyze
-from tutor.curriculum import LEVELS, STAGES, VOCABULARY
+from tutor.curriculum import LEVELS, STAGES, VOCABULARY, display_terms
 from tutor.engine import EngineError
 
 
 class DialogueError(ValueError):
+    pass
+
+
+class DirectEdit(DialogueError):
     pass
 
 
@@ -156,14 +160,21 @@ def read_reply(raw, facts):
         normalized(combined),
     ):
         raise DialogueError("La réponse dévoile une méthode de correction de maximum.")
+    direct_edit = (
+        r"\b(?:utilis\w*|ajout\w*|remplac\w*|employ\w*)\s+"
+        r"(?:plutot\s+)?(?:(?:le signe|l'operateur)(?: de comparaison)?\s+)?"
+        r"[`'\"]?\s*(?:>=|<=|==|!=|\+=|-=|>|<)\s*[`'\"]?(?:\s|[.,;!?]|$)"
+        r"|\b(?:il faut|tu dois|vous devez)\s+initialiser\b[^.!?\n]{0,70}"
+        r"\ba (?:`)?(?:0|1|none|true|false)\b"
+    )
+    if re.search(direct_edit, normalized(combined)):
+        raise DirectEdit("La réponse donne directement une modification du code.")
     # Certaines sorties enchaînent deux questions. Garder la dernière formulation générée.
     question = question[:-1].rsplit("?", 1)[-1].strip() + " ?"
     if len(question) < 4:
         raise DialogueError("Le modèle n’a pas formulé une question ciblée.")
     hint = " ".join(sentence for sentence in re.split(r"(?<=[.!?])\s+", hint) if not sentence.endswith("?"))
-    if not hint:
-        raise DialogueError("Le modèle n’a pas formulé d’indice exploitable.")
-    return {"indice": hint, "question": question}
+    return {"indice": display_terms(hint), "question": display_terms(question)}
 
 
 def respond(engine, payload):
@@ -174,7 +185,32 @@ def respond(engine, payload):
     contract = stage == 5 and facts["maximum_function"] and "non vide" in normalized(statement)
     raw = engine.generate(messages, contract=contract)
     try:
-        answer = read_reply(raw, facts)
+        try:
+            answer = read_reply(raw, facts)
+        except DirectEdit:
+            # Relancer le véritable modèle avec une contrainte adaptée à la fuite détectée.
+            first = raw
+            revised = [
+                {"role": "system", "content": (
+                    "Tu aides un élève en NSI. En français, propose un cas limite concret puis demande "
+                    "quel résultat il attend et quelle observation ferait avancer. N'écris aucun code, "
+                    "aucun opérateur de comparaison, aucune valeur d'initialisation ni instruction de remplacement."
+                )},
+                {"role": "user", "content": (
+                    f"Énoncé : {statement}\nMessage de l'élève : {question}\n"
+                    f"Notions repérées : {', '.join(facts['notions'])}. "
+                    "Propose le test sans dire comment corriger le programme."
+                )},
+            ]
+            try:
+                raw = engine.generate(revised, contract=contract)
+            except EngineError as exc:
+                raise RejectedReply(str(exc), {"rejected_first": first}) from exc
+            raw["rejected_first"] = first
+            raw["seconds"] = round(raw["seconds"] + first["seconds"], 3)
+            answer = read_reply(raw, facts)
+            if re.search(r"[<>]", answer["indice"] + " " + answer["question"]):
+                raise DirectEdit("La réponse régénérée contient encore un opérateur de remplacement.")
         if contract and not re.search(
             r"precondition|non vide|hors contrat|exclu",
             normalized(answer["indice"] + " " + answer["question"]),

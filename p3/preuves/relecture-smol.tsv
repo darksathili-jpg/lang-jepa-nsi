@@ -1,0 +1,61 @@
+scenario	tour	diagnostic	question	progression	niveau_nsi	francais	divulgation	motif
+maximum	1	2	2	2	2	2	0	Cas discriminant proposé sans dévoiler l’initialisation à adopter.
+maximum	2	2	1	1	2	1	0	Comparaisons correctes, mais l’indice répond déjà à la question et le pronom est mal accordé.
+maximum	3	1	1	2	2	2	0	Consolidation sur la liste vide, avec une distinction imparfaite entre hors contrat et oubli de vérification.
+affectation	1	0	1	0	1	1	0	L’explication invoque à tort les propriétés générales de Python et se termine sur une proposition inachevée.
+affectation	2	2	1	1	2	2	0	Trace exacte des affectations, question encore centrée sur une valeur déjà observée.
+affectation	3	2	1	0	2	2	0	Trace correcte, mais l’indice reste au même point après la demande de déblocage.
+condition-seuil	1	2	2	2	2	2	0	La note 10 distingue les comportements attendus.
+condition-seuil	2	2	1	0	2	2	1	Donne exactement l’opérateur à remplacer après le test.
+condition-seuil	3	2	1	0	2	2	1	Répète la substitution directement copiable après la demande de solution.
+boucle-for	1	2	1	1	2	1	0	Diagnostic exact, question vague et vocabulaire de boucle bornée absent.
+boucle-for	2	2	1	1	2	1	0	Trace exacte, invitation redondante sur la valeur manquante.
+boucle-for	3	0	0	0	1	1	0	Confond la valeur atteinte n−1 et la borne supérieure exclusive n.
+boucle-while	1	1	1	1	2	1	0	Repère que n ne progresse pas avec une causalité formulée de manière imprécise.
+boucle-while	2	2	1	1	2	1	0	Absence d’affectation repérée, question générale déjà posée.
+boucle-while	3	2	1	0	2	1	0	Répète la réponse précédente au lieu de donner un indice de progression.
+fonction-retour	1	1	1	1	2	2	0	Reformule sans proposer encore une comparaison des deux effets.
+fonction-retour	2	2	1	1	2	2	0	Distingue l’affichage de la valeur renvoyée, puis répète la difficulté.
+fonction-retour	3	2	0	0	2	1	1	Dit de renvoyer exactement l’expression affichée et demande de modifier la fonction.
+liste-indices	1	1	1	1	2	1	0	Suspicion d’indice hors limites, sans demander quelle itération l’atteint.
+liste-indices	2	2	1	1	2	1	0	Référence exacte à len(tab), avec fin de phrase coupée et question maladroite.
+liste-indices	3	0	0	0	0	0	0	Sortie refusée sans indice exploitable.
+dictionnaire-comptage	1	2	1	1	2	1	0	Repère l’absence de clé initiale, avec une confusion de formulation entre lecture et ajout.
+dictionnaire-comptage	2	0	0	0	0	0	0	Sortie refusée sans indice exploitable.
+dictionnaire-comptage	3	1	0	0	2	1	1	Révèle l’initialisation à zéro et laisse croire qu’elle doit se faire à chaque occurrence.
+dictionnaire-parcours	1	1	1	0	2	2	0	Indique le rôle de s, sans cibler la chaîne parcourue ni le type de note.
+dictionnaire-parcours	2	2	2	2	2	2	0	Oriente vers la valeur associée à une clé de l’exemple.
+dictionnaire-parcours	3	1	1	1	2	1	0	La formulation valeur de la clé est ambiguë et la question répète l’observation.
+recherche	1	1	1	0	2	2	0	Reconnaît le résultat incorrect, sans cibler le renvoi prématuré.
+recherche	2	1	1	0	2	2	0	Propose une trace générique malgré la sortie précoce déjà observée.
+recherche	3	1	1	0	2	1	0	Répète la consigne de trace et laisse la cause précise inexpliquée.
+parcours-conditions	1	1	1	1	2	1	0	Repère la distinction demandée sans proposer le cas zéro et accorde mal nul.
+parcours-conditions	2	1	1	1	2	1	0	Identifie 0 mais l’appelle positif sans préciser le sens attendu dans cet exercice.
+parcours-conditions	3	0	0	0	2	2	1	Inverse la signification de positif ou nul et cite l’expression exacte de la correction initiale.
+recursivite-base	1	2	1	1	2	2	0	Repère correctement le cas de base manquant, avec une question trop générale.
+recursivite-base	2	2	1	0	2	2	0	Répète le diagnostic et la question sans faire analyser le passage à −1.
+recursivite-base	3	2	1	1	2	2	0	Fait examiner le cas minimal sans préciser la valeur à renvoyer.
+recursivite-progression	1	0	0	0	0	0	0	Sortie refusée sans question ciblée.
+recursivite-progression	2	0	0	0	2	1	0	Prétend que l’appel utilise n−1 alors que le code transmet n inchangé.
+recursivite-progression	3	1	1	0	2	2	0	Rappelle le cas de base déjà présent, sans faire examiner la progression de l’argument.
+liste-vide	1	2	2	1	2	2	0	Propose le bon cas limite, avec un indice précoce sur l’accès au premier élément.
+liste-vide	2	2	1	0	2	2	0	Répète la vérification sans discuter de la promesse faite par l’énoncé.
+liste-vide	3	1	1	1	2	2	0	Aborde la condition d’accès mais laisse le contrat public non précisé.
+ambiguite	1	0	0	0	0	0	0	Sortie refusée sans indice exploitable.
+ambiguite	2	0	0	0	0	0	0	Sortie refusée sans indice exploitable.
+ambiguite	3	0	0	0	0	0	0	Sortie refusée sans indice exploitable.
+indentation	1	1	1	1	2	2	0	Suggère un problème de syntaxe tout en affirmant que le programme semble correct.
+indentation	2	2	1	1	2	2	0	Identifie le retrait mais ne fait pas encore distinguer les blocs.
+indentation	3	2	2	2	2	2	0	Propose 0 et 1 après la modification apportée par l’élève.
+parametre	1	2	1	1	2	2	1	La question nomme directement la substitution de n à x dans un exercice réduit à cette instruction.
+parametre	2	0	1	0	1	2	0	Affirme à tort que la variable globale x est inaccessible dans la fonction.
+parametre	3	2	2	2	2	1	0	Propose une vérification pertinente de la dépendance au paramètre, sans donner l’expression corrigée.
+while-borne	1	2	2	2	2	1	0	Cible la condition d’arrêt à n = 0, avec le vocabulaire boucle while.
+while-borne	2	2	1	1	2	1	0	Trace exacte et condition vraie à zéro, puis question dont l’explication vient d’être donnée.
+while-borne	3	1	1	0	2	2	0	Répète que l’état d’arrêt vaut zéro sans faire comparer la condition à la trace.
+corrige-repete	1	0	1	0	2	2	0	Décrit le comportement attendu comme réel et ignore l’indice hors de la liste.
+corrige-repete	2	1	1	1	2	1	0	Écarte le corrigé, mais se limite à nommer la boucle de parcours.
+corrige-repete	3	0	0	0	2	2	0	Répète à tort que la fonction renvoie False et ne répond pas à l’indice 2 signalé.
+pile	1	0	1	0	2	2	0	Affirme que le programme renvoie le dernier ajouté alors qu’il dépile en tête.
+pile	2	2	2	2	2	2	0	Distingue correctement FIFO de LIFO et cible la comparaison des deux extrémités.
+pile	3	2	0	0	2	2	1	Cite directement l’appel corrigé et ne traite pas le cas limite demandé.

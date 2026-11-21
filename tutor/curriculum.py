@@ -1,5 +1,7 @@
 """Terminologie et périmètre du tuteur Python, d’après les programmes NSI."""
 
+import re
+
 LEVELS = {
     "premiere": (
         "Première NSI. Types et valeurs, affectation, conditions, boucles, fonctions, "
@@ -23,3 +25,21 @@ STAGES = {
     4: ("Débloquer", "Donne un indice précis sur le raisonnement, sans donner la modification exacte."),
     5: ("Consolider", "La modification vient de l'élève. Fais justifier et examiner un autre cas limite."),
 }
+
+
+def display_terms(text):
+    """Harmonise les mentions en prose et préserve le code entre accents graves."""
+    parts = text.split("`")
+    for index in range(0, len(parts), 2):
+        prose = parts[index]
+        if index + 2 < len(parts) and parts[index + 1] in {"for", "while"}:
+            loop = "boucle bornée" if parts[index + 1] == "for" else "boucle non bornée"
+            revised = re.sub(r"\bboucle\s+$", loop + " (", prose, flags=re.I)
+            if revised != prose:
+                prose = revised
+                parts[index + 2] = ")" + parts[index + 2]
+        prose = re.sub(r"\bboucle for\b", "boucle bornée (for)", prose, flags=re.I)
+        prose = re.sub(r"\bboucle while\b", "boucle non bornée (while)", prose, flags=re.I)
+        prose = re.sub(r"\bvaleur de retour\b", "valeur renvoyée", prose, flags=re.I)
+        parts[index] = re.sub(r"\bvariable entière\b", "variable de type entier", prose, flags=re.I)
+    return "`".join(parts)

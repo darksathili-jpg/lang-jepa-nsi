@@ -18,6 +18,8 @@ Pour le scénario du maximum, la consolidation utilise l’énoncé et le dernie
 
 L’adaptateur ne charge que des fichiers locaux. Il n’accepte ni URL de modèle ni URL de service depuis le navigateur. Les états modèle absent, chargement, prêt et erreur sont distincts. Les erreurs et refus sont affichés comme états, sans réponse de remplacement. Le modèle reçoit au plus trois tours précédents et des entrées bornées. Pour une question refusée, l’atelier permet de reformuler et réessayer.
 
+Quand le modèle propose une substitution explicite repérée par le filtre, l’orchestrateur demande une seule nouvelle génération centrée sur le cas limite. Si le texte contient seulement des questions, l’atelier peut afficher la question générée et laisser l’indice vide. Les termes de boucle et de valeur renvoyée sont harmonisés en prose sans modifier les extraits Python.
+
 ## Référentiel pédagogique
 
 - Première. Types et valeurs, affectations, expressions, conditions, boucles bornées et non bornées, fonctions, parcours de tableaux Python et dictionnaires, recherche séquentielle. [Programme officiel de Première](https://www.education.gouv.fr/bo/19/Special1/MENE1901633A.htm)
