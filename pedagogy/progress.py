@@ -229,6 +229,7 @@ class TraceReading:
 
 def read_trace(words, question, trace_value):
     text = words.replace("`", "")
+    text = re.sub(r"^(?:pour|avec|sur)\s+\[\s*-4\s*,\s*-2\s*\]\s*[,;:]?\s*", "", text)
     clauses = [clause.strip() for clause in re.split(r"[.!?;,]|\b(?:donc|car|alors|parce que|mais)\b", text)]
     false_claim = re.search(rf"\b{CONDITION}\s+(?:est|donne|vaut)\s+{FALSE}\b", text)
     both_false = any(FALSE_BOTH.fullmatch(clause) for clause in clauses)
@@ -240,7 +241,7 @@ def read_trace(words, question, trace_value):
                    or re.search(r"\bm\s+(?:n'est pas (?:modifie|reaffecte)|ne change pas)\b", text))
     mixed_types = bool(re.search(rf"{M_VALUE}\s*(?:{FALSE}|true|vrai)\b", text))
     contradiction = bool(re.search(rf"\b{ASSIGNMENT}\s+(?:s'execute|est executee|a lieu)\b(?!\s+(?:si|quand|lorsque)\b)", text)
-                         or re.search(rf"\b(?:pas (?:toujours )?{FALSE}|vrai\w* (?:pour|une fois)|"
+                         or re.search(rf"\b(?:pas (?:toujours )?{FALSE}|vrai\w* (?:pour\s+-?\d|une fois)|"
                                       rf"(?:une comparaison|{CONDITION}) (?:est|vaut) (?:vrai\w*|true)|m ne vaut pas 0)\b", text)
                          or re.search(rf"\b{FALSE}\b[^.!?;]*\b(?:sauf|a l'exception)\b", text)
                          or any(int(number) != 0 for number in re.findall(rf"{M_VALUE}\s*(-?\d+)\b", text)))

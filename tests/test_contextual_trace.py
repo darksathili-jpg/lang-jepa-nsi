@@ -84,7 +84,9 @@ class ContextualTraceTests(unittest.TestCase):
 
     def test_equivalent_formulations_and_short_causal_answer(self):
         for answer in ("faux dans les deux cas", "la condition n’est vraie à aucun des deux passages",
-                       "La condition vaut `False` pour -4 et pour -2."):
+                       "La condition n’est vraie pour aucune des deux valeurs.",
+                       "La condition vaut `False` pour -4 et pour -2.",
+                       "Pour [-4, -2] la condition vaut toujours False."):
             with self.subTest(answer=answer):
                 dialogue = Dialogue()
                 dialogue.through("comparaison")
@@ -116,6 +118,7 @@ class ContextualTraceTests(unittest.TestCase):
         for text, status in (("faux", "ambigue"), ("pas toujours faux", "incorrecte"),
                              ("`m` vaut `False`", "incorrecte"),
                              ("La condition est fausse mais l’affectation s’exécute", "incorrecte"),
+                             ("Toujours False, mais vrai pour -2.", "incorrecte"),
                              ("toujours False sauf pour -2", "incorrecte"),
                              ("Pour [3, 7], la condition vaut toujours False.", "partielle"),
                              ("Donne-moi le corrigé, j’ai vu False.", "hors_sujet")):
