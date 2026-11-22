@@ -74,6 +74,7 @@ def unavailable(browser, origin, status):
     page.goto(origin)
     page.get_by_role("link", name="Ouvrir le professeur virtuel").click()
     expect(page.get_by_role("heading", name="Atelier Python")).to_be_visible()
+    page.get_by_label("Mode d’aide").select_option("conversation")
     expect(page.locator("#model-state")).to_contain_text(status)
     expect(page.get_by_role("button", name="Demander un indice")).to_be_disabled()
     expect(page.locator(".token-keyword").first).to_have_text("def")
@@ -91,6 +92,7 @@ def live(browser, origin, captures):
     if captures:
         page.screenshot(path=captures / "laboratoire.png", full_page=True)
     page.get_by_role("link", name="Ouvrir le professeur virtuel").click()
+    page.get_by_label("Mode d’aide").select_option("conversation")
     expect(page.locator("#model-state")).to_contain_text("Modèle prêt", timeout=90000)
     expect(page.locator("#model-identity")).to_contain_text("Q4_K_M")
     reply = page.request.post(origin + "/api/tutor", headers={"Origin": "https://externe.invalid"}, data={})

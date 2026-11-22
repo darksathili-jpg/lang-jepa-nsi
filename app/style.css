@@ -35,3 +35,7 @@ body.projector { background: white; color: #101b2f; font-size: clamp(1.13rem, 1.
 body.projector header, body.projector article, body.projector fieldset { background: white; color: #101b2f; }
 body.projector .hero>p:not(.eyebrow), body.projector .note { color: #253754; }
 body.projector .diagram { background: #e5f3f8; color: #101b2f; }
+
+.jepa-results { margin: 1rem 0; padding: .8rem 1rem; border: 1px solid #8f9bae; border-radius: .55rem; }
+.jepa-results summary { font-weight: 700; cursor: pointer; }
+.jepa-results p { margin: .55rem 0; }

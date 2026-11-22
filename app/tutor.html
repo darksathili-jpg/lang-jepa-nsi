@@ -29,7 +29,12 @@
         <p>Pose une question, essaie un cas de test et explique ce que tu observes.</p>
       </div>
       <div class="model-card">
-        <span id="model-state" class="model-state" data-state="loading" role="status">Vérification du modèle</span>
+        <label for="mode">Mode d’aide</label>
+        <select id="mode">
+          <option value="guided">Parcours guidé</option>
+          <option value="conversation">Conversation locale</option>
+        </select>
+        <span id="model-state" class="model-state" data-state="loading" role="status">Chargement des exercices</span>
         <span id="model-identity"></span>
         <span id="model-detail"></span>
       </div>
@@ -46,6 +51,11 @@
               <option value="terminale">Terminale</option>
             </select>
           </div>
+        </div>
+        <div id="exercise-field" hidden>
+          <label for="exercise">Exercice</label>
+          <select id="exercise"></select>
+          <p id="objective" class="quiet"></p>
         </div>
         <label for="statement">Énoncé</label>
         <textarea id="statement" maxlength="1600" rows="3">Trouver la plus grande valeur d’une liste non vide d’entiers.</textarea>

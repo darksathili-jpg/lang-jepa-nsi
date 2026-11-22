@@ -2,6 +2,8 @@
 
 Le profil vise un poste **Windows x64, 16 Go de RAM, CPU**. Préparer Python **3.12 x64** avec le lanceur `py`. L’application utilise la bibliothèque standard de Python. Chromium ou un navigateur récent sert l’interface. Conserver l’installateur Python si le poste cible ne dispose d’aucune connexion. [Python pour Windows](https://www.python.org/downloads/windows/)
 
+Le **Parcours guidé** fonctionne avec Python 3.12 et le dépôt seul. Exécuter `.\scripts\tutor.ps1` et attendre **Parcours prêt**. Le téléchargement ci-dessous concerne le mode **Conversation locale**.
+
 ## Préparation connectée
 
 Récupérer le dépôt `darksathili-jpg/lang-jepa-nsi` sur `main`. Exécuter la commande suivante depuis la racine pour préparer le modèle et l’archive native Windows.
@@ -23,7 +25,7 @@ Transférer le dépôt, l’installateur Python si nécessaire et `models/tutor/
 .\scripts\tutor.ps1
 ```
 
-Ouvrir [l’atelier](http://127.0.0.1:8765/atelier) et attendre **Modèle prêt**. L’identité et la révision du modèle sont affichées. La page d’accueil donne aussi accès au [laboratoire scientifique](http://127.0.0.1:8765/). Appuyer sur Ctrl+C dans le terminal pour arrêter les services. Pour changer de port, lancer `py -3.12 -m tutor.server --port 8775`.
+Ouvrir [l’atelier](http://127.0.0.1:8765/atelier). Le parcours guidé est actif par défaut. Pour utiliser le modèle, choisir **Conversation locale** et attendre **Modèle prêt**. L’identité et la révision du modèle sont affichées. La page d’accueil donne aussi accès au [laboratoire scientifique](http://127.0.0.1:8765/). Appuyer sur Ctrl+C dans le terminal pour arrêter les services. Pour changer de port, lancer `py -3.12 -m tutor.server --port 8775`.
 
 Lorsque le moteur est absent, vérifier la présence de `models/tutor/runtime/llama-server.exe` (ou du sous-dossier de release qui le contient) et de `SmolLM3-Q4_K_M.gguf`, puis redémarrer. En cas d’erreur d’empreinte, restaurer le fichier à partir d’une copie préparée et vérifiée. En cas d’échec du binaire, essayer `.\models\tutor\runtime\llama-server.exe --version` dans le terminal et vérifier que l’archive est le paquet CPU x64 prévu.
 

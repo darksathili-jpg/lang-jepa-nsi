@@ -8,11 +8,13 @@ def analyze(code):
     digest = hashlib.sha256(code.encode("utf-8")).hexdigest()
     try:
         tree = ast.parse(code)
+        structure = ast.dump(tree)
     except (SyntaxError, ValueError, RecursionError) as exc:
         line = getattr(exc, "lineno", None)
         return {
-            "digest": digest, "syntax": line or 1, "maximum_function": False,
+            "digest": digest, "structure_digest": digest, "syntax": line or 1, "maximum_function": False,
             "maximum_zero": False, "notions": [], "unchanged_guard": None,
+            "analysis_too_deep": isinstance(exc, RecursionError),
         }
 
     nodes = list(ast.walk(tree))
@@ -47,5 +49,6 @@ def analyze(code):
                 break
     return {
         "digest": digest, "syntax": None, "maximum_zero": maximum_zero,
+        "structure_digest": hashlib.sha256(structure.encode("utf-8")).hexdigest(),
         "maximum_function": bool(maximum_functions), "notions": notions, "unchanged_guard": unchanged_guard,
     }

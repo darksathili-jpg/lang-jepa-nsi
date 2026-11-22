@@ -1,16 +1,25 @@
 # Architecture P3 · Professeur virtuel NSI
 
-Le tuteur Python est le parcours principal. Le laboratoire scientifique conserve son quiz, ses explications et l’expérimentation LANG-JEPA P2. Il fonctionne indépendamment des poids conversationnels. [Architecture P2](ARCHITECTURE-P2.md)
+Le mode par défaut est le **Parcours guidé**. Le mode **Conversation locale** conserve la génération SmolLM3 évaluée précédemment. Le laboratoire conserve son quiz, ses explications et l’expérimentation LANG-JEPA. [Architecture P2](ARCHITECTURE-P2.md)
 
 | Composant | Responsabilité |
 | --- | --- |
 | Atelier navigateur | Énoncé, éditeur Python coloré, thème clair/sombre/projecteur, classe, historique en mémoire et état du modèle. |
 | Service local | Sert l’atelier et la page scientifique, expose un statut et reçoit des demandes JSON de la même origine sur 127.0.0.1. Aucun travail élève n’est écrit sur disque. |
+| Sélecteur guidé | Valide le niveau et choisit une question d’un exercice rédigé à partir des observations déclarées et de l’évolution du code. |
 | Adaptateur conversationnel | Pilote un processus llama.cpp CPU, vérifie l’identité et l’empreinte du modèle, communique uniquement en boucle locale. Le catalogue dissocie modèle et application. |
 | Orchestrateur | Valide les champs et l’historique récent, choisit l’étape selon les signaux du tour, assemble une consigne et contrôle la réponse avant l’affichage. |
 | Analyse Python | Analyse l’arbre syntaxique et rapporte des indices statiques. Les tests sur des programmes de référence sont exécutés uniquement dans la suite de tests. |
 | Évaluation | Rejoue des scénarios synthétiques, conserve sorties brutes, refus, métriques et signaux de référence. |
 | Laboratoire P2 | Garde le lanceur et la procédure de LANG-JEPA indépendants du service d’atelier. |
+
+## Parcours guidé et sources des réponses
+
+Le catalogue `pedagogy/exercices.json` contient quatre exercices, avec spécification, objectifs, erreurs, tests de référence et indices. Le navigateur ne reçoit que les métadonnées et le code initial, puis les indices demandés. Le service appelle l’analyse syntaxique et compare la structure de l’arbre Python pour ignorer les changements de commentaires. Le parcours du maximum demande une proposition, oriente vers une liste négative, invite à tracer `m`, questionne l’hypothèse d’initialisation et traite la précondition après une modification. La consolidation invite à vérifier la modification. Le serveur exécute uniquement son analyse textuelle.
+
+Chaque tour affiche la source de l’indice et celle du diagnostic. Les résultats JEPA enregistrés restent au laboratoire. Le modèle du pilote donne des représentations proches et des classements variables selon la graine. Le choix des indices revient donc au parcours pédagogique. L’accès au statut du mode conversationnel déclenche le chargement de llama.cpp à la demande. [Expérience et décision](EXPERIENCE-JEPA-NSI.md)
+
+## Conversation locale
 
 L’état d’aide peut rester stable, avancer si l’élève a essayé une trace, s’orienter vers une erreur de syntaxe ou demander une consolidation après une modification. Les stades sont Comprendre, Orienter, Expérimenter, Débloquer et Consolider. Le stade Consolidation déclenche une vérification proposée à l’élève, sans présumer que sa correction fonctionne. Les signaux textuels et la modification du code sont des heuristiques documentées.
 

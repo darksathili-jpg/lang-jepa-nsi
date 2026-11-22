@@ -8,9 +8,12 @@ import signal
 import sys
 import threading
 
+from pedagogy.catalogue import for_level
 from tutor.catalog import CATALOG, DEFAULT_ASSETS, ROOT
+from tutor.curriculum import LEVELS
 from tutor.dialogue import DialogueError, RejectedReply, respond
 from tutor.engine import EngineError, LlamaEngine
+from tutor.guided import respond_guided
 
 
 DEFAULT_MODEL = "smol"
@@ -35,8 +38,16 @@ class WorkshopServer(ThreadingHTTPServer):
     def __init__(self, port, engine):
         super().__init__(("127.0.0.1", port), Handler)
         self.engine = engine
+        self.engine_thread = None
+        self.engine_lock = threading.Lock()
         self.host_header = f"127.0.0.1:{self.server_port}"
         self.origin = "http://" + self.host_header
+
+    def start_engine(self):
+        with self.engine_lock:
+            if self.engine_thread is None and self.engine.state == "loading":
+                self.engine_thread = threading.Thread(target=self.engine.start, name="modele-cpu", daemon=True)
+                self.engine_thread.start()
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -74,7 +85,10 @@ class Handler(BaseHTTPRequestHandler):
         if not self.valid_host():
             return
         if self.path == "/api/status":
+            self.server.start_engine()
             self.send_json(200, self.server.engine.status())
+        elif self.path == "/api/exercises":
+            self.send_json(200, {level: for_level(level) for level in LEVELS})
         elif self.path in PAGES:
             filename, mime = PAGES[self.path]
             self.reply(200, (APP / filename).read_bytes(), mime)
@@ -84,7 +98,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.valid_host():
             return
-        if self.path != "/api/tutor":
+        if self.path not in ("/api/tutor", "/api/guide"):
             self.send_json(404, {"error": "Page introuvable."})
             return
         if self.headers.get("Origin") != self.server.origin:
@@ -104,7 +118,16 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         try:
-            answer, _ = respond(self.server.engine, payload)
+            if self.path == "/api/guide":
+                answer = respond_guided(payload)
+            else:
+                self.server.start_engine()
+                answer, _ = respond(self.server.engine, payload)
+                answer["provenance"] = {
+                    "hint": self.server.engine.status()["name"] + " · génération locale",
+                    "diagnostic": "Analyse statique Python",
+                    "jepa": "Aucune contribution de LANG-JEPA à cet indice.",
+                }
         except DialogueError as exc:
             self.send_json(400, {"error": str(exc)})
         except RejectedReply as exc:
@@ -132,7 +155,6 @@ def main():
     engine = LlamaEngine(args.assets.resolve(), args.model, args.threads)
     try:
         with WorkshopServer(args.port, engine) as server:
-            threading.Thread(target=engine.start, name="modele-cpu", daemon=True).start()
             print(f"Professeur virtuel : {server.origin}/atelier", flush=True)
             server.serve_forever()
     except KeyboardInterrupt:

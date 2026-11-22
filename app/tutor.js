@@ -4,7 +4,7 @@ const $ = (id) => document.getElementById(id);
 const els = Object.fromEntries([
   'class', 'statement', 'code', 'highlight', 'syntax', 'question', 'history', 'empty',
   'compose', 'send', 'reset', 'feedback', 'stages', 'active-stage', 'model-state',
-  'model-identity', 'model-detail',
+  'model-identity', 'model-detail', 'mode', 'exercise-field', 'exercise', 'objective',
 ].map((id) => [id, $(id)]));
 const labels = ['Comprendre', 'Orienter', 'Expérimenter', 'Débloquer', 'Consolider'];
 const themeButtons = [...document.querySelectorAll('button[data-theme]')];
@@ -61,19 +61,36 @@ colorCode();
 let history = [];
 let busy = false;
 let engineState = 'loading';
+let catalogue = null;
+let catalogueError = false;
+const guided = () => els.mode.value === 'guided';
 
 function updateActions() {
-  els.send.disabled = busy || engineState !== 'ready';
+  els.send.disabled = busy || (guided() ? !catalogue || !els.exercise.value : engineState !== 'ready');
   els.reset.disabled = busy || history.length === 0;
   els.class.disabled = busy;
-  els.send.textContent = busy ? 'Génération en cours…' : 'Demander un indice';
+  els.mode.disabled = busy;
+  els.exercise.disabled = busy;
+  els.send.textContent = busy ? (guided() ? 'Sélection en cours…' : 'Génération en cours…') : 'Demander un indice';
 }
 
 async function updateModel() {
+  if (guided()) {
+    els['model-state'].textContent = catalogue ? 'Parcours prêt' : catalogueError ? 'Exercices indisponibles' : 'Chargement des exercices';
+    els['model-state'].dataset.state = catalogue ? 'ready' : catalogueError ? 'error' : 'loading';
+    els['model-identity'].textContent = catalogue ? 'Indices rédigés · Analyse Python' : '';
+    els['model-identity'].removeAttribute('title');
+    els['model-detail'].textContent = catalogueError
+      ? 'Vérifie que le lanceur local est en cours d’exécution.'
+      : 'Les résultats de LANG-JEPA sont consultables au laboratoire.';
+    updateActions();
+    return;
+  }
   try {
     const response = await fetch('/api/status', {cache: 'no-store'});
     if (!response.ok) throw new Error();
     const status = await response.json();
+    if (guided()) return;
     const states = {
       absent: 'Modèle absent', loading: 'Chargement du modèle',
       ready: 'Modèle prêt', error: 'Erreur du modèle',
@@ -86,6 +103,7 @@ async function updateModel() {
     els['model-identity'].title = `Révision ${status.revision} · llama.cpp ${status.runtime}`;
     els['model-detail'].textContent = status.detail;
   } catch {
+    if (guided()) return;
     engineState = 'error';
     els['model-state'].textContent = 'Service local indisponible';
     els['model-state'].dataset.state = 'error';
@@ -93,6 +111,35 @@ async function updateModel() {
   } finally {
     updateActions();
   }
+}
+
+function applyExercise() {
+  const item = catalogue?.[els.class.value]?.find((exercise) => exercise.id === els.exercise.value);
+  if (!item) return;
+  els.statement.value = item.statement;
+  els.code.value = item.code;
+  els.objective.textContent = item.objective;
+  colorCode();
+  reset();
+}
+
+function listExercises() {
+  if (!catalogue) return;
+  const items = catalogue[els.class.value] ?? [];
+  els.exercise.replaceChildren(...items.map((item) => new Option(item.title, item.id)));
+  applyExercise();
+}
+
+async function loadExercises() {
+  try {
+    const response = await fetch('/api/exercises', {cache: 'no-store'});
+    if (!response.ok) throw new Error();
+    catalogue = await response.json();
+    if (guided()) listExercises();
+  } catch {
+    catalogueError = true;
+  }
+  if (guided()) updateModel();
 }
 
 function showStage(stage) {
@@ -103,7 +150,7 @@ function showStage(stage) {
   });
 }
 
-function addMessage(kind, who, ...parts) {
+function addMessage(kind, who, parts, provenance = '') {
   const message = document.createElement('article');
   message.className = 'message ' + kind;
   const name = document.createElement('strong');
@@ -114,6 +161,12 @@ function addMessage(kind, who, ...parts) {
     const paragraph = document.createElement('p');
     paragraph.textContent = text;
     message.append(paragraph);
+  }
+  if (provenance) {
+    const note = document.createElement('p');
+    note.className = 'provenance';
+    note.textContent = provenance;
+    message.append(note);
   }
   els.history.append(message);
   els.history.scrollTop = els.history.scrollHeight;
@@ -131,10 +184,20 @@ function reset() {
 }
 
 els.reset.addEventListener('click', reset);
-els.class.addEventListener('change', reset);
+els.exercise.addEventListener('change', applyExercise);
+els.class.addEventListener('change', () => {
+  if (guided()) listExercises();
+  else reset();
+});
+els.mode.addEventListener('change', () => {
+  els['exercise-field'].hidden = !guided();
+  reset();
+  if (guided()) listExercises();
+  updateModel();
+});
 els.compose.addEventListener('submit', async (event) => {
   event.preventDefault();
-  if (busy || engineState !== 'ready') return;
+  if (busy || els.send.disabled) return;
   const question = els.question.value.trim();
   const statement = els.statement.value.trim();
   if (!statement || !question) {
@@ -145,19 +208,21 @@ els.compose.addEventListener('submit', async (event) => {
   const code = els.code.value;
   busy = true;
   els.feedback.dataset.error = 'false';
-  els.feedback.textContent = 'Le modèle prépare un indice sur cet ordinateur.';
+  els.feedback.textContent = guided() ? 'Sélection d’un indice rédigé.' : 'Le modèle prépare un indice sur cet ordinateur.';
   updateActions();
   try {
-    const response = await fetch('/api/tutor', {
+    const response = await fetch(guided() ? '/api/guide' : '/api/tutor', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({class: els.class.value, statement, code, question, history: history.slice(-3)}),
+      body: JSON.stringify({class: els.class.value, exercise: els.exercise.value,
+        statement, code, question, history: history.slice(-3)}),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);
     els.empty.hidden = true;
-    addMessage('learner', 'Toi', question);
-    addMessage('assistant', 'Professeur virtuel', data.indice, data.question);
+    addMessage('learner', 'Toi', [question]);
+    addMessage('assistant', guided() ? 'Indice et question' : 'Professeur virtuel',
+      [data.indice, data.question], data.provenance.hint + ' · ' + data.provenance.jepa);
     history.push({
       learner: question,
       assistant: data.indice + ' ' + data.question,
@@ -167,12 +232,14 @@ els.compose.addEventListener('submit', async (event) => {
     showStage(data.stage);
     if (els.code.value === code) {
       els.syntax.dataset.error = String(data.analysis.syntax !== null);
-      els.syntax.textContent = data.analysis.syntax === null
+      const diagnosis = data.diagnostic ?? (data.analysis.syntax === null
         ? 'Syntaxe analysée'
-        : `Vérifie la syntaxe vers la ligne ${data.analysis.syntax}.`;
+        : `Vérifie la syntaxe vers la ligne ${data.analysis.syntax}.`);
+      els.syntax.textContent = data.provenance.diagnostic + ' · ' + diagnosis;
     }
     if (els.question.value.trim() === question) els.question.value = '';
-    els.feedback.textContent = `Réponse locale en ${data.seconds.toFixed(1).replace('.', ',')} s`;
+    els.feedback.textContent = guided() ? 'Indice choisi localement.'
+      : `Réponse locale en ${data.seconds.toFixed(1).replace('.', ',')} s`;
   } catch (error) {
     els.feedback.dataset.error = 'true';
     els.feedback.textContent = error instanceof TypeError
@@ -185,5 +252,7 @@ els.compose.addEventListener('submit', async (event) => {
 });
 
 showStage(1);
+els['exercise-field'].hidden = !guided();
 updateModel();
+loadExercises();
 setInterval(updateModel, 3500);
