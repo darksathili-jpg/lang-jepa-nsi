@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import signal
+import socket
 import sys
 import threading
 
@@ -49,6 +50,8 @@ POLICY = (
 
 
 class WorkshopServer(ThreadingHTTPServer):
+    allow_reuse_address = os.name != "nt"
+
     def __init__(self, port, engine, experiment=None, control=None):
         super().__init__(("127.0.0.1", port), Handler)
         self.engine = engine
@@ -60,6 +63,12 @@ class WorkshopServer(ThreadingHTTPServer):
         self.host_header = f"127.0.0.1:{self.server_port}"
         self.origin = "http://" + self.host_header
         self.control = control
+
+    def server_bind(self):
+        # Sous Windows, SO_REUSEADDR peut autoriser deux serveurs sur le même port.
+        if os.name == "nt":
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
 
     def status(self):
         llm = self.engine.status()

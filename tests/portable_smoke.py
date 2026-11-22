@@ -47,6 +47,8 @@ def smoke(home, packaged, old_port):
         print(result.stdout, end="", flush=True)
         if result.returncode:
             print(result.stderr, end="", flush=True)
+            for report in (home / "logs").glob("serveur-*.log"):
+                print(report.read_text(encoding="utf-8", errors="replace")[-2000:], flush=True)
             result.check_returncode()
         return result.stdout
 
