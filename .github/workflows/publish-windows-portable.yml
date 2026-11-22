@@ -1,0 +1,74 @@
+name: Publier le paquet Windows vérifié
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        type: string
+        required: true
+        description: Identifiant de la recette Windows complète avec modèles
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      NSI_RUN_ID: ${{ inputs.run_id }}
+    steps:
+      - name: Confirmer la réussite native
+        id: verdict
+        run: |
+          python - <<'PY'
+          import json, os, re, subprocess
+          run_id = os.environ["NSI_RUN_ID"]
+          if not re.fullmatch(r"\d+", run_id):
+              raise SystemExit("Identifiant de recette invalide.")
+          result = json.loads(subprocess.check_output(["gh", "run", "view", run_id, "--json",
+              "conclusion,workflowName,headSha,url"], text=True))
+          if result["conclusion"] != "success" or result["workflowName"] != "Recette Windows portable":
+              raise SystemExit("La recette Windows est absente ou incomplète.")
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as entry:
+              print("commit=" + result["headSha"], file=entry)
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: recette-windows-portable
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+          path: native
+      - name: Vérifier et publier le ZIP issu de Windows
+        env:
+          NSI_COMMIT: ${{ steps.verdict.outputs.commit }}
+        run: |
+          python - <<'PY'
+          import json, os, zipfile
+          from pathlib import Path
+          package = Path("native/paquet/LANG-JEPA-NSI-0.6.1-Windows-x64.zip")
+          with zipfile.ZipFile(package) as zipped:
+              manifest = json.loads(zipped.read("LANG-JEPA-NSI-Windows/application/distribution/build.json"))
+          assert manifest == {"version":"0.6.1", "commit":os.environ["NSI_COMMIT"]}, manifest
+          stats = json.loads(Path("native/windows-mesures/mesures.json").read_text(encoding="utf-8"))
+          assert stats["platform"].startswith("Windows")
+          assert stats["active_after_stop"] == 0 and stats["dialogue"]["turns"] == 30
+          assert stats["engines"]["checks"]["inference"] and stats["engines"]["jepa"]["checks"]["selection"]
+          with zipfile.ZipFile("LANG-JEPA-NSI-0.6.1-Preuves-Windows.zip", "w", zipfile.ZIP_DEFLATED) as proof:
+              for directory in ("windows-captures", "windows-mesures", "installe"):
+                  for file in sorted((Path("native") / directory).rglob("*")):
+                      if file.is_file():
+                          proof.write(file, file.relative_to("native").as_posix())
+          PY
+          (cd native/paquet && sha256sum --check SHA256SUMS.txt)
+          cat > release-notes.md <<EOF_NOTES
+          ZIP portable Windows x64 avec CPython et NumPy embarqués. Extraire le dossier, lancer Installer-Modeles.cmd avec Internet puis Demarrer.cmd. Arreter.cmd ferme l'instance. Le guide et les checksums accompagnent le paquet.
+
+          L'archive a été construite et exécutée sur un runner Windows natif. Les deux moteurs ont répondu pendant les 30 tours de recette. Le ZIP de preuves contient les mesures, les traces synthétiques et les captures natives. Recette Windows 10/11 sur un poste cible de 16 Go à effectuer.
+
+          Recette automatisée : https://github.com/$GH_REPO/actions/runs/$NSI_RUN_ID
+          EOF_NOTES
+          gh release create v0.6.1 native/paquet/LANG-JEPA-NSI-0.6.1-Windows-x64.zip native/paquet/SHA256SUMS.txt LANG-JEPA-NSI-0.6.1-Preuves-Windows.zip --target "$NSI_COMMIT" --title "LANG-JEPA NSI 0.6.1 · Windows x64" --notes-file release-notes.md --prerelease
