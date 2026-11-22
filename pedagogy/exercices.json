@@ -59,7 +59,7 @@
     "code": "def compte(n):\n    while n > 0:\n        print(n)\n    return n",
     "notion": "Boucle non bornée et condition d’arrêt",
     "objective": "Tracer un état et expliquer la progression vers la fin d’une boucle.",
-    "error": "La variable n lue dans la condition reçoit la même valeur à chaque tour.",
+    "error": "La valeur de n reste inchangée entre deux tours de boucle.",
     "tests": [
       {
         "input": 3,

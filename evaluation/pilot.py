@@ -34,23 +34,37 @@ def rank_vectors(query, candidates, names, expected):
     return rank(dict(zip(names, (candidates @ query).tolist(), strict=True)), expected)
 
 
+def grouped_similarity(documents, texts, vectors, lexical):
+    cosine = vectors @ vectors.T
+    lexical_vectors = [lexical(text) for text in texts]
+    pairs = [{
+        "left": left["id"], "right": right["id"], "related": left["family"] == right["family"],
+        "cosine": cosine[i, j].item(),
+        "lexical_cosine": lexical_cosine(lexical_vectors[i], lexical_vectors[j]),
+    } for i, left in enumerate(documents) for j, right in enumerate(documents) if i < j]
+    return {
+        "pairs": pairs, "same_family_mean": mean(row["cosine"] for row in pairs if row["related"]),
+        "other_family_mean": mean(row["cosine"] for row in pairs if not row["related"]),
+        "lexical_same_family_mean": mean(row["lexical_cosine"] for row in pairs if row["related"]),
+        "lexical_other_family_mean": mean(row["lexical_cosine"] for row in pairs if not row["related"]),
+    }
+
+
 def representation_metrics(model, test, train, heldout):
     import torch
 
     errors = [doc["segments"]["erreur"] for doc in test]
+    statements = [doc["segments"]["enonce"] for doc in test]
     hints = [doc["segments"]["indice"] for doc in train]
     error_vector = model.represent(errors, "online")
+    statement_vector = model.represent(statements, "online")
     hint_vector = model.represent(hints, "online")
     predicted = model.represent([pair.context for pair in heldout], "predicted")
     targets = model.represent([pair.target for pair in heldout], "target")
     context_control = model.represent([pair.context for pair in heldout], "target")
     lexical = lexical_reference([doc["segments"][key] for doc in train for key in PARTS])
-    similarity = error_vector @ error_vector.T
-    pairs = [{
-        "left": left["id"], "right": right["id"], "related": left["family"] == right["family"],
-        "cosine": similarity[i, j].item(),
-        "lexical_cosine": lexical_cosine(lexical(errors[i]), lexical(errors[j])),
-    } for i, left in enumerate(test) for j, right in enumerate(test) if i < j]
+    similarity = grouped_similarity(test, errors, error_vector, lexical)
+    statement_similarity = grouped_similarity(test, statements, statement_vector, lexical)
     entropy = []
     for vectors in (error_vector, predicted, targets):
         variance = torch.linalg.svdvals(vectors - vectors.mean(dim=0)).square()
@@ -102,18 +116,14 @@ def representation_metrics(model, test, train, heldout):
         return {key: summarize([row[key] for row in rows]) for key in methods}
 
     return {
-        "similarity": {
-            "pairs": pairs, "same_family_mean": mean(row["cosine"] for row in pairs if row["related"]),
-            "other_family_mean": mean(row["cosine"] for row in pairs if not row["related"]),
-            "lexical_same_family_mean": mean(row["lexical_cosine"] for row in pairs if row["related"]),
-            "lexical_other_family_mean": mean(row["lexical_cosine"] for row in pairs if not row["related"]),
-        },
+        "similarity": similarity, "statement_similarity": statement_similarity,
         "spread": dict(zip(("errors_online", "predicted", "targets_ema"), entropy, strict=True)),
         "stability": stability, "retrieval": retrieval, "prediction": prediction,
         "retrieval_summary": result(retrieval, ("jepa", "lexical")),
         "prediction_summary": result(prediction, ("jepa", "context_control", "lexical")),
         "vectors": {
-            "errors_online": error_vector.tolist(), "hints_online": hint_vector.tolist(),
+            "errors_online": error_vector.tolist(), "statements_online": statement_vector.tolist(),
+            "hints_online": hint_vector.tolist(),
             "predicted": predicted.tolist(), "targets_ema": targets.tolist(),
             "heldout_pairs": [vars(pair) for pair in heldout],
         },

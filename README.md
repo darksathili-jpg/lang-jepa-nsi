@@ -8,7 +8,7 @@ Depuis la racine sous Windows avec Python 3.12, exécuter `.\scripts\tutor.ps1` 
 
 ## Expérimentation LANG-JEPA
 
-Le mandat scientifique reprend les ressources figées en P2. Les expériences mesurent les représentations, la prédiction latente et le décodage séparément. Les deux entraînements courts n’ont pas établi un avantage fiable pour sélectionner les indices. [Audit et critères](docs/AUDIT-JEPA-NSI.md) · [Protocoles et mesures](docs/EXPERIENCE-JEPA-NSI.md)
+Le mandat scientifique reprend les ressources figées en P2. Les expériences mesurent les représentations, la prédiction latente et le décodage séparément. Les deux entraînements courts n’ont pas établi un avantage fiable pour sélectionner les indices. [Audit et critères](docs/AUDIT-JEPA-NSI.md) · [Protocoles et mesures](docs/EXPERIENCE-JEPA-NSI.md) · [Recette finale](docs/RECETTE-JEPA-NSI.md)
 
 ## Mode conversationnel · livraison précédente
 

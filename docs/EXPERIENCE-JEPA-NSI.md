@@ -21,6 +21,7 @@ La référence TF-IDF utilise les mots et leurs fréquences dans les seuls segme
 
 | Mesure hors entraînement | Graine 17 | Graine 97 | Référence |
 | --- | ---: | ---: | ---: |
+| Écart de cosinus entre énoncés apparentés et d’autres familles | −0,00069 | −0,00045 | +0,08635 en TF-IDF |
 | Écart de cosinus entre descriptions d’une même erreur et d’erreurs différentes | −0,00039 | +0,00084 | +0,02972 en TF-IDF |
 | Indice de la bonne famille en tête | 4/8 | 2/8 | 4/8 en TF-IDF |
 | Rang réciproque moyen des indices | 0,705 | 0,531 | 0,698 en TF-IDF |
@@ -48,4 +49,4 @@ Pour contribuer au choix des indices, un profil devra distinguer les familles et
 
 ## Ressources observées
 
-Sur Linux CPU, deux fils et un espace réseau limité à la boucle locale, la préparation et l’instanciation ont pris 2,68 à 3,42 s. L’encodeur a passé 0,81 à 1,05 s à l’entraînement et le décodeur 3,80 à 3,92 s. Une extraction à chaud a pris environ 1,5 ms. Le pic résident du processus était de 522 Mio au maximum. Ces mesures concernent uniquement ce profil miniature. Aucune quantification n’a été appliquée. Le poste Windows de 16 Go reste à mesurer.
+Sur Linux CPU, deux fils et un espace réseau limité à la boucle locale, la préparation et l’instanciation ont pris 2,86 à 3,39 s. L’encodeur a passé 0,76 à 1,06 s à l’entraînement et le décodeur 3,77 à 3,86 s. Une extraction à chaud a pris 1,33 à 1,49 ms. Le pic résident du processus a atteint environ 521 Mio. Ces mesures concernent uniquement ce profil miniature. Aucune quantification n’a été appliquée. Le poste Windows de 16 Go reste à mesurer.

@@ -1,0 +1,6 @@
+Recette mobile et états absent et erreur vérifiés.
+1 1 Votre programme ne gère pas correctement les valeurs négatives. Quel est le résultat de la fonction `maximum([-4, -2])` ?
+2 3 Début avec m = 0. Quelle est la valeur de m après avoir traité -4 ?
+3 3 La valeur initiale de m est 0, ce qui est plus grande que -4. Lorsque vous comparez -4 avec m, vous ne mettez pas à jour m car -4 est inférieur à 0. Pourquoi m reste-t-il 0 lors de la comparaison de -4 avec m ?
+4 5 La précondition indique que la liste est non vide, donc vous devez vérifier que la liste n'est pas vide avant de calculer la plus grande valeur. Quelle condition devrait être ajoutée à l'énoncé pour accepter la liste vide, et comment cela affecterait la solution ?
+Dialogue maximum vérifié dans Chromium sur quatre tours réels.

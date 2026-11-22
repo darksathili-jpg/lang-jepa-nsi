@@ -1,0 +1,6 @@
+1 0.308 ms Cherche un test court dont tu peux calculer le résultat à la main. Quelle liste et quelle valeur attendue proposes-tu ?
+2 0.531 ms Essaie maintenant la liste [-4, -2]. Calcule sa plus grande valeur à la main. Quelle valeur le programme semble-t-il renvoyer pour cette entrée ?
+3 0.295 ms Sur [-4, -2], relève m au départ, puis après -4 et après -2. Quelles valeurs successives de m trouves-tu ?
+4 0.234 ms Une affectation dans la boucle bornée n’a lieu que lorsque la comparaison est vraie. Quelle hypothèse sur la valeur initiale explique que m ne change pas ?
+5 0.373 ms Compare ta version modifiée au résultat attendu sur [-4, -2]. L’énoncé demande une liste non vide. Si l’entrée était [], faudrait-il changer la précondition ou spécifier un autre résultat ?
+Chromium : cinq étapes guidées, deux niveaux, trois thèmes et aucun appel au modèle.
