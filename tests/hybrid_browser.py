@@ -16,7 +16,7 @@ def absent(browser):
         page = browser.new_page(viewport={"width": 390, "height": 900})
         external, errors = protect_page(page, origin)
         page.goto(origin + "/atelier")
-        page.get_by_label("Mode d’aide").select_option("conversation")
+        page.get_by_label("Mode d’aide").select_option("hybrid")
         expect(page.locator("#jepa-status")).to_contain_text("JEPA absent")
         expect(page.get_by_role("button", name="Demander un indice")).to_be_disabled()
         page.get_by_label("Mode d’aide").select_option("guided")
@@ -32,14 +32,15 @@ def hybrid(browser, origin, output, captures, case):
     page = browser.new_page(viewport={"width": 1360, "height": 950})
     external, errors = protect_page(page, origin)
     page.goto(origin + "/atelier")
-    page.get_by_label("Mode d’aide").select_option("conversation")
+    page.get_by_label("Mode d’aide").select_option("hybrid")
     expect(page.locator("#model-state")).to_have_text("Modèle prêt", timeout=95000)
     expect(page.locator("#model-identity")).to_contain_text("SmolLM3-3B")
     status = page.locator("#jepa-status")
     expect(status).to_contain_text("JEPA prêt")
-    expect(status).to_contain_text("P5")
-    assert page.request.post(origin + "/api/tutor", data={}, headers={"Origin": "https://externe.invalid"}).status == 403
-    assert page.request.post(origin + "/api/tutor", data={"question": "a" * (49 * 1024)},
+    expect(status).to_have_attribute("title", re.compile("P5"))
+    expect(page.locator("#hybrid-badge")).to_have_text("Hybride expérimental")
+    assert page.request.post(origin + "/api/hybrid", data={}, headers={"Origin": "https://externe.invalid"}).status == 403
+    assert page.request.post(origin + "/api/hybrid", data={"question": "a" * (49 * 1024)},
                              headers={"Origin": origin}).status == 413
     submit = page.get_by_role("button", name="Demander un indice")
     editor = page.get_by_label("Code Python")
@@ -51,7 +52,7 @@ def hybrid(browser, origin, output, captures, case):
         if step.get("code") == "corrige":
             editor.fill(original.replace("m = 0", "m = tab[0]"))
         page.get_by_label("Ta question ou ton observation").fill(step["texte"])
-        with page.expect_response(lambda response: response.url.endswith("/api/tutor"), timeout=115000) as pending:
+        with page.expect_response(lambda response: response.url.endswith("/api/hybrid"), timeout=115000) as pending:
             submit.click()
         response = pending.value
         data = response.json()
@@ -72,14 +73,22 @@ def hybrid(browser, origin, output, captures, case):
             decision = state["derniere_intervention"]
             assert decision["schema"] == 1 and decision["source"] == "jepa"
             changes += decision["differe_des_regles"]
+        source = page.locator(".assistant .provenance").last
+        if state["derniere_intervention"] and state["derniere_intervention"]["differe_des_regles"]:
+            expect(source).to_contain_text("Reclassement JEPA enregistré")
+        else:
+            expect(source).to_contain_text("Aucun reclassement JEPA")
         if data["generation"] == "affiche":
             assert "SmolLM3" in data["provenance"]["hint"]
+            expect(source).to_contain_text("SmolLM3")
             shown += 1
+        else:
+            expect(source).not_to_contain_text("SmolLM3")
         if i == 4:
             assert state["acquis"]["trace"]["tour"] == 4
             expect(page.locator("#pedagogical-objective")).to_contain_text("stratégie")
             teacher.click()
-            expect(page.locator("#teacher-content")).to_contain_text("classement latent")
+            expect(page.locator("#teacher-content")).to_contain_text("Aucun reclassement JEPA")
             expect(page.locator("#teacher-content")).to_contain_text("Acquis confirmés")
             themes(page, captures)
             teacher.click()

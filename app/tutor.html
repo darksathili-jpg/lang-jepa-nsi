@@ -1,115 +1,206 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <title>Atelier Python — Professeur virtuel NSI</title>
-  <link rel="stylesheet" href="tutor.css">
-  <script src="tutor.js" defer></script>
+  <meta name="color-scheme" content="dark light">
+  <title>Atelier Python — LANG-JEPA NSI</title>
+  <link rel="stylesheet" href="/design-tokens.css">
+  <link rel="stylesheet" href="/tutor.css">
+  <script src="/tutor.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Aller à l’atelier</a>
   <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="/atelier" aria-current="page"><span class="brand-mark" aria-hidden="true">NSI</span> Professeur virtuel</a>
-      <a class="lab-link" href="/">Laboratoire LANG-JEPA</a>
+    <a class="brand" href="/atelier">
+      <img src="/assets/marque-reseau.webp" alt="" width="76" height="76">
+      <span><strong>LANG-JEPA<span class="brand-accent">NSI</span></strong>
+        Le professeur virtuel de NSI<br>inspiré des travaux de Yann LeCun</span>
+    </a>
+    <nav aria-label="Navigation principale">
+      <a href="/atelier" aria-current="page"><svg aria-hidden="true"><use href="/assets/controls.svg#cap"></use></svg>Atelier</a>
+      <a href="#exercise-panel" id="parcours-link"><svg aria-hidden="true"><use href="/assets/controls.svg#bag"></use></svg>Parcours</a>
+      <a href="/#laboratoire"><svg aria-hidden="true"><use href="/assets/controls.svg#layers"></use></svg>Laboratoire JEPA</a>
+      <a href="/#resultats"><svg aria-hidden="true"><use href="/assets/controls.svg#bars"></use></svg>Résultats</a>
+      <a href="/#ressources"><svg aria-hidden="true"><use href="/assets/controls.svg#book"></use></svg>Ressources</a>
+    </nav>
+    <div class="controls">
       <div class="themes" role="group" aria-label="Mode d’affichage">
-        <button type="button" data-theme="light" aria-pressed="true">Clair</button>
-        <button type="button" data-theme="dark" aria-pressed="false">Sombre</button>
-        <button type="button" data-theme="projector" aria-pressed="false">Projecteur</button>
+        <button type="button" data-theme="light" aria-label="Clair" title="Clair" aria-pressed="false"><svg aria-hidden="true"><use href="/assets/controls.svg#sun"></use></svg></button>
+        <button type="button" data-theme="dark" aria-label="Sombre" title="Sombre" aria-pressed="true"><svg aria-hidden="true"><use href="/assets/controls.svg#moon"></use></svg></button>
       </div>
+      <button type="button" class="icon-button" data-theme="projector" aria-label="Projecteur" title="Vidéoprojecteur" aria-pressed="false"><svg aria-hidden="true"><use href="/assets/controls.svg#projector"></use></svg></button>
+      <button type="button" class="icon-button" id="fullscreen" aria-label="Plein écran" title="Plein écran" aria-pressed="false"><svg aria-hidden="true"><use href="/assets/controls.svg#expand"></use></svg></button>
+      <button type="button" class="icon-button" id="settings" aria-label="Paramètres" title="Paramètres"><svg aria-hidden="true"><use href="/assets/controls.svg#settings"></use></svg></button>
     </div>
   </header>
 
-  <main id="main">
-    <section class="intro" aria-labelledby="title">
-      <div>
-        <h1 id="title">Atelier Python</h1>
-        <p>Pose une question, essaie un cas de test et explique ce que tu observes.</p>
-      </div>
-      <div class="model-card">
-        <label for="mode">Mode d’aide</label>
-        <select id="mode">
-          <option value="guided">Parcours guidé</option>
-          <option value="conversation">Conversation locale</option>
-        </select>
-        <span id="model-state" class="model-state" data-state="loading" role="status">Chargement des exercices</span>
-        <span id="model-identity"></span>
-        <span id="model-detail"></span>
-        <span id="jepa-status" hidden></span>
-      </div>
-    </section>
+  <main class="workbench" id="main">
+    <h1 class="sr-only">Atelier Python</h1>
+    <div class="desk">
+      <figure class="scene" id="scene" aria-describedby="illustration-credit">
+        <img src="/assets/scene-bd.webp" width="881" height="525" alt="Professeur souriant aux lunettes noires et à la veste brune, dans une salle de classe éclairée en bleu, avec un petit hologramme.">
+        <div class="speech">
+          <p>Bonjour !<br>Ton <strong>professeur virtuel.</strong></p>
+          <p id="scene-prompt">Ensemble, explorons la<br> programmation <strong>Python</strong><br> et découvrons comment<br> les idées du <strong>JEPA</strong> peuvent<br> aider à mieux apprendre !</p>
+        </div>
+      </figure>
 
-    <div class="workspace">
-      <section class="panel exercise" aria-labelledby="exercise-title">
-        <div class="panel-top">
-          <h2 id="exercise-title">Ton exercice</h2>
-          <div class="class-field">
-            <label for="class">Classe</label>
-            <select id="class">
-              <option value="premiere">Première</option>
-              <option value="terminale">Terminale</option>
-            </select>
-          </div>
-        </div>
-        <div id="exercise-field" hidden>
-          <label for="exercise">Exercice</label>
-          <select id="exercise"></select>
-          <p id="objective" class="quiet"></p>
-        </div>
-        <label for="statement">Énoncé</label>
-        <textarea id="statement" maxlength="1600" rows="3">Trouver la plus grande valeur d’une liste non vide d’entiers.</textarea>
-        <div class="editor-label">
-          <label for="code">Code Python</label>
-          <span id="syntax" role="status"></span>
-        </div>
-        <div class="editor">
-          <pre id="highlight" aria-hidden="true"></pre>
-          <textarea id="code" maxlength="3600" spellcheck="false" autocapitalize="off" wrap="off"
-                    aria-describedby="editor-note">def maximum(tab):
+      <div class="desk-panels">
+        <section class="panel editor-panel" aria-labelledby="editor-title">
+          <header class="panel-title">
+            <svg aria-hidden="true"><use href="/assets/controls.svg#code"></use></svg>
+            <h2 id="editor-title"><label for="code">Ton programme (Python)</label></h2>
+          </header>
+          <div class="editor">
+            <pre id="line-numbers" aria-hidden="true"></pre>
+            <pre id="highlight" aria-hidden="true"></pre>
+            <textarea id="code" aria-label="Code Python" maxlength="3600" spellcheck="false" autocapitalize="off" wrap="off" aria-describedby="editor-note">def maximum(tab):
     m = 0
     for valeur in tab:
         if valeur > m:
             m = valeur
     return m</textarea>
+          </div>
+          <span id="editor-note" class="sr-only">Analyse statique locale. L’exécution de Python est indisponible dans l’atelier.</span>
+          <span id="syntax" class="sr-only" role="status"></span>
+          <div class="editor-actions">
+            <button type="button" id="execute" class="primary"><svg aria-hidden="true"><use href="/assets/controls.svg#play"></use></svg>Exécuter</button>
+            <button type="button" id="reset-code"><svg aria-hidden="true"><use href="/assets/controls.svg#reset"></use></svg>Réinitialiser</button>
+            <button type="button" id="copy" aria-label="Copier le code" title="Copier le code"><svg aria-hidden="true"><use href="/assets/controls.svg#copy"></use></svg></button>
+          </div>
+          <p id="editor-feedback" class="local-feedback" role="status" hidden></p>
+        </section>
+
+        <section class="panel exercise" id="exercise-panel" aria-labelledby="exercise-title">
+          <header class="panel-title">
+            <svg aria-hidden="true"><use href="/assets/controls.svg#target"></use></svg>
+            <h2 id="exercise-title">Exercice en cours</h2>
+          </header>
+          <label class="sr-only" for="statement">Énoncé</label>
+          <textarea id="statement" maxlength="1600" rows="3" spellcheck="false">Trouver et corriger l’erreur dans la fonction maximum pour qu’elle fonctionne aussi avec des entiers négatifs. On travaille sur une liste non vide.</textarea>
+          <div id="exercise-field">
+            <label class="sr-only" for="exercise">Exercice</label>
+            <select id="exercise" title="Choisir l’exercice"></select>
+          </div>
+          <p id="objective" class="sr-only"></p>
+        </section>
+
+        <section class="panel learning" aria-labelledby="learning-title">
+          <header class="panel-title">
+            <svg aria-hidden="true"><use href="/assets/controls.svg#spark"></use></svg>
+            <h2 id="learning-title">État de l’apprentissage</h2>
+            <small id="progress-example">Exemple</small>
+          </header>
+          <ol id="stages" aria-label="Progression des acquis">
+            <li data-state="done"><span></span>Résultat<br>observé</li>
+            <li data-state="done"><span></span>Résultat<br>attendu</li>
+            <li data-state="current" aria-current="step"><span></span>Comportement<br>de m</li>
+            <li><span></span>Correction</li>
+            <li><span></span>Cas limites</li>
+          </ol>
+        </section>
+      </div>
+    </div>
+
+    <section class="panel conversation" aria-labelledby="conversation-title">
+      <header class="chat-header">
+        <svg aria-hidden="true"><use href="/assets/controls.svg#teacher"></use></svg>
+        <h2 id="conversation-title">Atelier – Professeur NSI</h2>
+        <label class="sr-only" for="class">Classe</label>
+        <select id="class" title="Niveau NSI">
+          <option value="premiere">Niveau · Première NSI</option>
+          <option value="terminale">Niveau · Terminale NSI</option>
+        </select>
+      </header>
+      <div class="chat-tools" id="chat-tools" hidden>
+        <div><span id="active-stage">Comprendre</span><span id="pedagogical-objective" hidden></span></div>
+        <button type="button" id="reset" class="text-button" disabled>Recommencer</button>
+      </div>
+      <div id="history" role="log" aria-label="Historique du dialogue" aria-live="polite" tabindex="0">
+        <div id="example" aria-label="Exemple de dialogue, sans génération">
+          <div class="message demo learner">
+            <span class="avatar" aria-hidden="true"><svg><use href="/assets/controls.svg#user"></use></svg></span>
+            <div class="bubble"><p>Mon programme répond toujours 0 quand les nombres sont négatifs.</p></div>
+          </div>
+          <div class="message demo tutor-message">
+            <span class="avatar" aria-hidden="true"><img src="/assets/portrait-bd.webp" width="47" height="51" alt=""></span>
+            <div class="bubble">
+              <p>Tu as bien repéré le problème : la variable <code>m</code> est initialisée à 0. Si tous les nombres sont négatifs, aucun n’est supérieur à 0, donc le programme renvoie toujours 0.</p>
+              <p class="question"><strong>Quel est le résultat de l’appel de la fonction <code>maximum</code> avec la liste [-4, -2] ?</strong></p>
+            </div>
+          </div>
+          <div class="message demo learner">
+            <span class="avatar" aria-hidden="true"><svg><use href="/assets/controls.svg#user"></use></svg></span>
+            <div class="bubble"><p>Avec la fonction maximum, c’est 0 mais elle devrait répondre -2.</p></div>
+          </div>
+          <div class="message demo tutor-message">
+            <span class="avatar" aria-hidden="true"><img src="/assets/portrait-bd.webp" width="47" height="51" alt=""></span>
+            <div class="bubble">
+              <p>Exactement ! Tu as identifié le résultat observé et le résultat attendu. Maintenant, concentrons-nous sur l’évolution de la variable <code>m</code>.</p>
+              <p class="question"><strong>Quelle est la valeur de <code>m</code> après la première itération de la boucle ?</strong></p>
+            </div>
+          </div>
+          <p class="example-label"><span aria-hidden="true">● ● ●</span> Exemple de dialogue</p>
         </div>
-        <p id="editor-note" class="quiet editor-note">Le code est analysé comme du texte. Il reste sur cet ordinateur.</p>
+        <p id="empty" class="empty" hidden>Quelle partie du programme veux-tu comprendre&nbsp;?</p>
+      </div>
+      <details id="teacher-panel" hidden>
+        <summary>Suivi enseignant</summary>
+        <dl id="teacher-content"></dl>
+      </details>
+      <p id="feedback" class="chat-status" role="status" aria-live="polite"></p>
+      <form id="compose">
+        <button type="button" id="attach" class="text-button" aria-label="Joindre un texte ou un fichier Python" title="Joindre un texte ou un fichier Python"><svg aria-hidden="true"><use href="/assets/controls.svg#clip"></use></svg></button>
+        <input type="file" id="file" accept=".py,.txt,text/plain" hidden>
+        <label class="sr-only" for="question">Ta question ou ton observation</label>
+        <textarea id="question" maxlength="720" rows="1" placeholder="Écris ta réponse…" required></textarea>
+        <button type="submit" id="send" class="primary" aria-label="Demander un indice" title="Demander un indice" disabled><svg aria-hidden="true"><use href="/assets/controls.svg#send"></use></svg></button>
+      </form>
+    </section>
+
+    <aside class="rail" aria-label="Moteurs locaux et fonctionnement">
+      <section class="panel engines" aria-labelledby="engines-title">
+        <header class="panel-title"><svg aria-hidden="true"><use href="/assets/controls.svg#screen"></use></svg><h2 id="engines-title">Moteurs locaux</h2></header>
+        <p class="engine-line" id="jepa-line" data-state="idle"><span class="engine-dot" aria-hidden="true"></span><span><strong>JEPA</strong> <span id="jepa-status">Vérification…</span></span></p>
+        <p class="engine-line" id="llm-line" data-state="idle"><span class="engine-dot" aria-hidden="true"></span><span><strong>LLM</strong> <span id="llm-state">Vérification…</span><small id="model-identity"></small></span></p>
+        <label class="sr-only" for="mode">Mode d’aide</label>
+        <select id="mode">
+          <option value="guided">Parcours guidé</option>
+          <option value="conversation">Conversation locale</option>
+          <option value="hybrid">Profil hybride (expérimental)</option>
+        </select>
+        <p id="hybrid-badge" role="status" hidden>Hybride expérimental</p>
+        <p class="sr-only" id="model-state" role="status">Chargement des exercices</p>
+        <p class="engine-detail" id="model-detail" hidden></p>
       </section>
 
-      <section class="panel conversation" aria-labelledby="conversation-title">
-        <div class="panel-top">
-          <h2 id="conversation-title">Dialogue</h2>
-          <button type="button" id="reset" class="secondary" disabled>Recommencer</button>
-        </div>
-        <div class="progress" aria-label="Niveau d’aide">
-          <span id="active-stage">Comprendre</span>
-          <span id="pedagogical-objective" hidden></span>
-          <ol id="stages" aria-label="Étapes de l’aide">
-            <li aria-current="step" title="Comprendre">Comprendre</li>
-            <li title="Orienter">Orienter</li>
-            <li title="Expérimenter">Expérimenter</li>
-            <li title="Débloquer">Débloquer</li>
-            <li title="Consolider">Consolider</li>
-          </ol>
-        </div>
-        <div id="history" role="log" aria-label="Historique du dialogue" aria-live="polite" tabindex="0">
-          <p id="empty" class="empty">Quelle partie du programme veux-tu comprendre&nbsp;?</p>
-        </div>
-        <form id="compose">
-          <label for="question">Ta question ou ton observation</label>
-          <textarea id="question" maxlength="720" rows="2" placeholder="Par exemple, quelle liste pourrais-je tester ?" required></textarea>
-          <div class="form-footer">
-            <p id="feedback" class="quiet" role="status" aria-live="polite"></p>
-            <button type="submit" id="send" disabled>Demander un indice</button>
-          </div>
-        </form>
-        <details id="teacher-panel" hidden>
-          <summary>Suivi enseignant</summary>
-          <dl id="teacher-content"></dl>
-        </details>
+      <section class="panel how" aria-labelledby="how-title">
+        <header class="panel-title"><svg aria-hidden="true"><use href="/assets/controls.svg#info"></use></svg><h2 id="how-title">Comment ça marche ?</h2></header>
+        <ol>
+          <li>Analyse du code et suivi des acquis.</li>
+          <li>JEPA peut reclasser les questions autorisées.</li>
+          <li>Le LLM peut formuler un indice soumis à validation.</li>
+        </ol>
       </section>
-    </div>
+
+      <a class="panel research" href="/#resultats">
+        <img src="/assets/illustration-jepa.webp" width="239" height="174" alt="">
+        <span>JEPA : apprendre en prédisant des représentations plutôt que des mots.</span>
+        <strong>Bénéfice JEPA non démontré</strong>
+        <svg aria-hidden="true"><use href="/assets/controls.svg#open"></use></svg>
+      </a>
+    </aside>
   </main>
+  <footer id="illustration-credit">Personnage illustré inspiré de Yann LeCun — projet pédagogique indépendant, sans affiliation ni approbation revendiquée.</footer>
+
+  <dialog id="preferences" aria-labelledby="settings-title">
+    <header class="panel-title"><h2 id="settings-title">Paramètres de l’atelier</h2>
+      <button type="button" id="close-settings" aria-label="Fermer les paramètres">Fermer</button>
+    </header>
+    <p>Choisis le mode d’aide dans la colonne des moteurs. Le parcours guidé utilise des règles pédagogiques et des indices rédigés.</p>
+    <p>Sur le bureau, utilise <kbd>Ctrl</kbd> ou <kbd>⌘</kbd> + <kbd>Entrée</kbd> pour envoyer ta réponse. Les fichiers ajoutés et les échanges restent sur cet ordinateur.</p>
+    <a href="/#ressources">Consulter les ressources locales</a>
+  </dialog>
 </body>
 </html>

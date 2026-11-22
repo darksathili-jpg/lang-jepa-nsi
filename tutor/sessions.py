@@ -113,6 +113,7 @@ class Sessions:
                                             progress, sequence + 1, experiment=experiment)
             else:
                 answer, raw = respond(engine, request, history_limit=RECENT_TURNS)
+                answer["generation"] = "affiche"
                 answer["provenance"] = {
                     "hint": engine.status()["name"] + " · génération locale",
                     "diagnostic": "Analyse statique Python",

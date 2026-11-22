@@ -28,6 +28,12 @@ PAGES = {
     "/style.css": ("style.css", "text/css"),
     "/tutor.js": ("tutor.js", "text/javascript"),
     "/tutor.css": ("tutor.css", "text/css"),
+    "/design-tokens.css": (ROOT / "design/tokens.css", "text/css"),
+    "/assets/controls.svg": ("assets/controls.svg", "image/svg+xml"),
+    "/assets/scene-bd.webp": ("assets/scene-bd.webp", "image/webp"),
+    "/assets/illustration-jepa.webp": ("assets/illustration-jepa.webp", "image/webp"),
+    "/assets/portrait-bd.webp": ("assets/portrait-bd.webp", "image/webp"),
+    "/assets/marque-reseau.webp": ("assets/marque-reseau.webp", "image/webp"),
 }
 POLICY = (
     "default-src 'none'; script-src 'self'; style-src 'self'; "
@@ -40,11 +46,21 @@ class WorkshopServer(ThreadingHTTPServer):
     def __init__(self, port, engine, experiment=None):
         super().__init__(("127.0.0.1", port), Handler)
         self.engine = engine
-        self.dialogues = Sessions(experiment)
+        self.experiment = experiment
+        self.hybrid = Sessions(experiment) if experiment and experiment.mode == "c" else None
+        self.dialogues = Sessions(experiment if self.hybrid is None else None)
         self.engine_thread = None
         self.engine_lock = threading.Lock()
         self.host_header = f"127.0.0.1:{self.server_port}"
         self.origin = "http://" + self.host_header
+
+    def status(self):
+        llm = self.engine.status()
+        if llm["state"] == "loading" and self.engine_thread is None:
+            llm = llm | {"state": "standby", "detail": "Le moteur démarre en mode conversation."}
+        jepa = self.experiment.status() if self.hybrid else {"state": "inactive", "name": None,
+            "detail": "Le profil hybride se prépare avec les poids locaux P5."}
+        return llm | {"jepa": jepa}
 
     def start_engine(self):
         with self.engine_lock:
@@ -63,7 +79,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def reply(self, status, content, mime):
         self.send_response(status)
-        self.send_header("Content-Type", mime + "; charset=utf-8")
+        self.send_header("Content-Type", mime if mime.startswith("image/") else mime + "; charset=utf-8")
         self.send_header("Content-Length", str(len(content)))
         self.send_header("Cache-Control", "no-store")
         self.send_header("Content-Security-Policy", POLICY)
@@ -87,12 +103,10 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if not self.valid_host():
             return
-        if self.path == "/api/status":
-            self.server.start_engine()
-            experiment = self.server.dialogues.experiment
-            jepa = experiment.status() if experiment else {"mode": "Conversation locale P4",
-                "state": "inactive", "name": None, "detail": ""}
-            self.send_json(200, self.server.engine.status() | {"jepa": jepa})
+        if self.path in ("/api/status", "/api/engines"):
+            if self.path == "/api/status":
+                self.server.start_engine()
+            self.send_json(200, self.server.status())
         elif self.path == "/api/exercises":
             self.send_json(200, {level: for_level(level) for level in LEVELS})
         elif self.path in PAGES:
@@ -104,7 +118,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.valid_host():
             return
-        if self.path not in ("/api/tutor", "/api/guide"):
+        if self.path not in ("/api/tutor", "/api/guide", "/api/hybrid"):
             self.send_json(404, {"error": "Page introuvable."})
             return
         if self.headers.get("Origin") != self.server.origin:
@@ -125,9 +139,12 @@ class Handler(BaseHTTPRequestHandler):
 
         try:
             mode = "guided" if self.path == "/api/guide" else "conversation"
+            dialogues = self.server.hybrid if self.path == "/api/hybrid" else self.server.dialogues
+            if dialogues is None:
+                raise ContractError("Le profil hybride expérimental est indisponible. Choisis le parcours guidé ou la conversation locale.")
             if mode == "conversation":
                 self.server.start_engine()
-            answer = self.server.dialogues.turn(mode, payload, self.server.engine)
+            answer = dialogues.turn(mode, payload, self.server.engine)
         except SessionConflict as exc:
             self.send_json(409, {"error": str(exc)})
         except DialogueError as exc:
