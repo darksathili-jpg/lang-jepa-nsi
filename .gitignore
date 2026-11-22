@@ -1,4 +1,5 @@
 .venv/
+/logs/
 .venv-p5/
 __pycache__/
 .pytest_cache/

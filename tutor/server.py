@@ -1,15 +1,19 @@
 """Sert l’atelier sur l’interface de bouclage, sans dépendance web tierce."""
 
 import argparse
+import errno
+import hmac
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import os
 from pathlib import Path
 import signal
 import sys
 import threading
 
+from distribution.instance import identity, publish, read
 from p5.contract import ContractError
-from p5.orchestration import open_experiment
+from p5.orchestration import Experiment, open_experiment
 from pedagogy.catalogue import for_level
 from tutor.catalog import CATALOG, DEFAULT_ASSETS, ROOT
 from tutor.curriculum import LEVELS
@@ -34,6 +38,8 @@ PAGES = {
     "/assets/illustration-jepa.webp": ("assets/illustration-jepa.webp", "image/webp"),
     "/assets/portrait-bd.webp": ("assets/portrait-bd.webp", "image/webp"),
     "/assets/marque-reseau.webp": ("assets/marque-reseau.webp", "image/webp"),
+    "/assets/compagnon-regard.webp": ("assets/compagnon-regard.webp", "image/webp"),
+    "/assets/compagnon-geste.webp": ("assets/compagnon-geste.webp", "image/webp"),
 }
 POLICY = (
     "default-src 'none'; script-src 'self'; style-src 'self'; "
@@ -43,7 +49,7 @@ POLICY = (
 
 
 class WorkshopServer(ThreadingHTTPServer):
-    def __init__(self, port, engine, experiment=None):
+    def __init__(self, port, engine, experiment=None, control=None):
         super().__init__(("127.0.0.1", port), Handler)
         self.engine = engine
         self.experiment = experiment
@@ -53,6 +59,7 @@ class WorkshopServer(ThreadingHTTPServer):
         self.engine_lock = threading.Lock()
         self.host_header = f"127.0.0.1:{self.server_port}"
         self.origin = "http://" + self.host_header
+        self.control = control
 
     def status(self):
         llm = self.engine.status()
@@ -62,11 +69,20 @@ class WorkshopServer(ThreadingHTTPServer):
             "detail": "Le profil hybride se prépare avec les poids locaux P5."}
         return llm | {"jepa": jepa}
 
+    def authenticated(self, supplied):
+        return (self.control is not None and isinstance(supplied, str) and supplied.isascii()
+                and hmac.compare_digest(supplied, self.control["token"]))
+
     def start_engine(self):
         with self.engine_lock:
             if self.engine_thread is None and self.engine.state == "loading":
                 self.engine_thread = threading.Thread(target=self.engine.start, name="modele-cpu", daemon=True)
                 self.engine_thread.start()
+
+    def verify_jepa(self, directory):
+        result = open_experiment("c", directory)
+        self.hybrid.experiment = result
+        self.experiment = result
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -103,7 +119,15 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if not self.valid_host():
             return
-        if self.path in ("/api/status", "/api/engines"):
+        if self.path == "/api/build":
+            data = self.server.control or identity(ROOT)
+            self.send_json(200, {key: data[key] for key in ("application", "version", "build")})
+        elif self.path == "/api/instance":
+            if self.server.authenticated(self.headers.get("X-NSI-Instance")):
+                self.send_json(200, {key: value for key, value in self.server.control.items() if key != "token"})
+            else:
+                self.send_json(403, {"error": "Instance locale non reconnue."})
+        elif self.path in ("/api/status", "/api/engines"):
             if self.path == "/api/status":
                 self.server.start_engine()
             self.send_json(200, self.server.status())
@@ -117,6 +141,13 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         if not self.valid_host():
+            return
+        if self.path == "/api/instance/stop":
+            if not self.server.authenticated(self.headers.get("X-NSI-Instance")):
+                self.send_json(403, {"error": "Arrêt refusé pour cette instance."})
+                return
+            self.send_json(200, {"stopping": True})
+            threading.Thread(target=self.server.shutdown, daemon=True).start()
             return
         if self.path not in ("/api/tutor", "/api/guide", "/api/hybrid"):
             self.send_json(404, {"error": "Page introuvable."})
@@ -144,6 +175,10 @@ class Handler(BaseHTTPRequestHandler):
                 raise ContractError("Le profil hybride expérimental est indisponible. Choisis le parcours guidé ou la conversation locale.")
             if mode == "conversation":
                 self.server.start_engine()
+            if self.path == "/api/hybrid":
+                self.server.experiment.require_model()
+                if self.server.engine.status()["state"] != "ready":
+                    raise EngineError("SmolLM3 doit terminer sa vérification avant un tour hybride.")
             answer = dialogues.turn(mode, payload, self.server.engine)
         except SessionConflict as exc:
             self.send_json(409, {"error": str(exc)})
@@ -167,6 +202,8 @@ def main():
     parser.add_argument("--threads", type=int, default=2)
     parser.add_argument("--p5", choices=("a", "b", "c"), help="Profil de recherche P5. L’atelier normal reste la référence P4.")
     parser.add_argument("--jepa", type=Path, help="Dossier local de poids vérifiés pour le profil C.")
+    parser.add_argument("--control", type=Path, help=argparse.SUPPRESS)
+    parser.add_argument("--verified-runtime", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
     if not 1 <= args.threads <= 16 or not 0 <= args.port <= 65535:
         parser.error("Indiquez un nombre de fils entre 1 et 16 et un port TCP valide.")
@@ -179,10 +216,27 @@ def main():
         raise KeyboardInterrupt
 
     signal.signal(signal.SIGTERM, stop)
-    engine = LlamaEngine(args.assets.resolve(), args.model, args.threads)
-    experiment = open_experiment(args.p5, args.jepa) if args.p5 else None
+    engine = LlamaEngine(args.assets.resolve(), args.model, args.threads, require_runtime=args.verified_runtime)
+    experiment = (Experiment("c", error="Vérification du profil JEPA en cours.", state="loading") if args.p5 == "c"
+                  else open_experiment(args.p5, None) if args.p5 else None)
+    control = read(args.control) if args.control else None
+    if args.control and (set(control) != {"application", "version", "build", "installation", "instance", "token"}
+                         or any(not isinstance(value, str) for value in control.values())):
+        parser.error("Identité du lanceur invalide.")
     try:
-        with WorkshopServer(args.port, engine, experiment) as server:
+        try:
+            server = WorkshopServer(args.port, engine, experiment, control)
+        except OSError as exc:
+            if not control or (exc.errno != errno.EADDRINUSE and getattr(exc, "winerror", None) not in (10048, 10013)):
+                raise
+            server = WorkshopServer(0, engine, experiment, control)
+            print(f"Port {args.port} occupé par une autre instance. Nouveau port : {server.server_port}.", flush=True)
+        with server:
+            if control:
+                control.update(pid=os.getpid(), port=server.server_port)
+                publish(args.control, control)
+            if server.hybrid:
+                threading.Thread(target=server.verify_jepa, args=(args.jepa,), name="jepa-check", daemon=True).start()
             print(f"Professeur virtuel : {server.origin}/atelier", flush=True)
             server.serve_forever()
     except KeyboardInterrupt:
@@ -192,6 +246,8 @@ def main():
         return 1
     finally:
         engine.close()
+        if control and read(args.control).get("instance") == control["instance"]:
+            args.control.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,9 @@
 """Orchestration P5. Les règles bornent les choix avant l'appel du prédicteur."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from pathlib import Path
+import threading
+import time
 
 from p5.contract import ContractError, Decision, Situation, validate_scores
 from p5.data import static_facts
@@ -25,13 +27,19 @@ class Experiment:
     model: object = None
     error: str = ""
     donors: dict | None = None
+    state: str | None = None
+    checks: dict = field(default_factory=dict)
+    seconds: float | None = None
+    running: object = field(default_factory=threading.Lock, compare=False, repr=False)
 
     def status(self):
         if self.mode == "c":
+            status = self.state or ("ready" if self.model else "error" if self.error else "absent")
             return {"mode": "C · JEPA expérimental + orchestrateur + SmolLM3",
-                    "state": "ready" if self.model else "error" if self.error else "absent",
+                    "state": "working" if status == "ready" and self.running.locked() else status,
                     "name": self.model.identity if self.model else None,
-                    "detail": self.error or "Expérimentation sur le maximum de référence."}
+                    "detail": self.error or "Expérimentation sur le maximum de référence.",
+                    "checks": self.checks.copy(), "times": {"probe_s": self.seconds} if self.seconds is not None else {}}
         return {"mode": {"a": "A · LLM seul", "b": "B · Orchestrateur sans JEPA",
                          "neutralise": "C · Signal neutralisé", "melange": "C · Signal mélangé"}[self.mode],
                 "state": "inactive", "name": None, "detail": ""}
@@ -60,7 +68,8 @@ class Experiment:
             if self.mode == "melange" and donor is None:
                 raise ContractError("Représentation mélangée manquante pour ce tour.")
             donor = donor or situation
-            scores = validate_scores(self.model.scores(donor))
+            with self.running:
+                scores = validate_scores(self.model.scores(donor))
             ranked = sorted(options, key=lambda option: -scores[APPROACHES[option[0]]])
             source = "jepa" if self.mode == "c" else "melange"
         method, question = ranked[0]
@@ -72,13 +81,35 @@ class Experiment:
 
 
 def open_experiment(mode, directory: Path | None):
-    if mode != "c" or directory is None or not directory.is_dir():
+    if mode != "c":
         return Experiment(mode)
+    present = {"manifeste": bool(directory and (directory / "manifest.json").is_file()),
+               "poids": bool(directory and (directory / "weights.npz").is_file()),
+               "integrite": False, "chargement": False, "prediction": False, "selection": False}
+    if not (present["manifeste"] and present["poids"]):
+        state = "incomplete" if present["manifeste"] or present["poids"] else "absent"
+        error = "JEPA indisponible. Lance Installer-Modeles.cmd pour préparer les poids du profil expérimental."
+        return Experiment(mode, error=error, state=state, checks=present)
+    tick = time.monotonic()
     try:
         from p5.jepa import load
+        from pedagogy.catalogue import EXERCISES
+        from pedagogy.progress import Progress
+        from tutor.analysis import analyze
 
-        return Experiment(mode, load(directory))
+        model = load(directory)
+        present.update(integrite=True, chargement=True)
+        loaded = Experiment(mode, model, checks=present)
+        exercise = EXERCISES["maximum"]
+        request = {"class": "premiere", "statement": exercise["statement"], "code": exercise["code"],
+                   "question": "Le résultat observé vaut zéro."}
+        options = MAXIMUM_GOALS["observed"][2]
+        decision, question, _ = loaded.select(request, Progress(), analyze(request["code"]), [], 1, options)
+        if decision.source != "jepa" or (decision.intervention, question) not in options:
+            raise ContractError("La prédiction latente n’a pas produit de sélection admissible.")
+        present.update(prediction=True, selection=True)
+        return replace(loaded, seconds=round(time.monotonic() - tick, 4))
     except ImportError:
-        return Experiment(mode, error="Dépendance JEPA absente. Installez la pile NumPy P5 hors ligne.")
+        return Experiment(mode, error="La pile NumPy P5 est absente ou incompatible.", state="incompatible", checks=present)
     except ContractError as exc:
-        return Experiment(mode, error=str(exc))
+        return Experiment(mode, error=str(exc), state="error", checks=present)

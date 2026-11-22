@@ -8,6 +8,7 @@ const els = Object.fromEntries([
   'pedagogical-objective', 'teacher-panel', 'teacher-content', 'example', 'chat-tools', 'progress-example',
   'jepa-line', 'llm-state', 'llm-line', 'hybrid-badge', 'editor-feedback', 'execute', 'reset-code', 'copy',
   'attach', 'file', 'scene', 'scene-prompt', 'fullscreen', 'settings', 'preferences', 'close-settings', 'parcours-link',
+  'diagnostic-build', 'diagnostic-checks', 'diagnostic-turn',
 ].map((id) => [id, $(id)]));
 const labels = ['Comprendre', 'Orienter', 'Expérimenter', 'Débloquer', 'Consolider'];
 const themeButtons = [...document.querySelectorAll('button[data-theme]')];
@@ -71,6 +72,7 @@ let engineState = 'standby';
 let jepaState = 'inactive';
 let originalCode = els.code.value;
 let modelRequest = 0;
+let poseTimer;
 const paths = {guided: '/api/guide', conversation: '/api/tutor', hybrid: '/api/hybrid'};
 const greeting = [...els['scene-prompt'].childNodes].map((node) => node.cloneNode(true));
 let catalogue = null;
@@ -79,18 +81,35 @@ const guided = () => els.mode.value === 'guided';
 
 function updateActions() {
   const blocked = engineState !== 'ready' || (els.mode.value === 'hybrid' && jepaState !== 'ready');
+  const operational = (state) => ['ready', 'working'].includes(state);
   els.send.disabled = busy || (guided() ? !catalogue || !els.exercise.value : blocked);
   els.reset.disabled = busy || turn === 0;
   for (const id of ['class', 'mode', 'exercise', 'reset-code']) els[id].disabled = busy;
-  els['hybrid-badge'].hidden = els.mode.value !== 'hybrid' || blocked;
+  els['hybrid-badge'].hidden = els.mode.value !== 'hybrid' || !operational(engineState) || !operational(jepaState);
+}
+
+function renderDiagnostics(status) {
+  const checks = {executable: 'Exécutable présent', poids: 'Poids présents', manifeste: 'Manifeste présent',
+    integrite: 'Intégrité contrôlée', chargement: 'Chargement validé', processus: 'Processus actif',
+    inference: 'Inférence validée', prediction: 'Prédiction latente validée', selection: 'Sélection acceptée'};
+  const list = els['diagnostic-checks'];
+  list.replaceChildren();
+  for (const [engine, details] of [['SmolLM3', status], ['JEPA', status.jepa]]) {
+    for (const [check, value] of Object.entries(details.checks ?? {})) {
+      const line = document.createElement('li');
+      line.textContent = engine + ' · ' + checks[check] + ' · ' + (value ? 'confirmé' : 'non confirmé');
+      list.append(line);
+    }
+  }
 }
 
 async function updateModel() {
   const mode = els.mode.value;
   const request = ++modelRequest;
-  const labels = {absent: 'Modèle absent', standby: 'En veille', loading: 'Chargement du modèle',
-    ready: 'Modèle prêt', error: 'Erreur du modèle'};
-  const jepa = {ready: 'JEPA prêt', absent: 'JEPA absent', error: 'JEPA indisponible', inactive: 'Indisponible'};
+  const extra = {incomplete: 'Installation incomplète', loading: 'Vérification en cours',
+    working: 'En fonctionnement', incompatible: 'Incompatible'};
+  const labels = {...extra, absent: 'Modèle absent', standby: 'En veille', ready: 'Modèle prêt', error: 'Erreur du modèle'};
+  const jepa = {...extra, ready: 'JEPA prêt', absent: 'JEPA absent', error: 'JEPA indisponible', inactive: 'Indisponible'};
   const detail = els['model-detail'];
   try {
     const response = await fetch(mode === 'guided' ? '/api/engines' : '/api/status', {cache: 'no-store'});
@@ -106,6 +125,7 @@ async function updateModel() {
     els['jepa-status'].title = [status.jepa.name, status.jepa.detail].filter(Boolean).join(' · ');
     els['model-identity'].textContent = status.name + ' · ' + status.quantization;
     els['model-identity'].title = 'Révision ' + status.revision + ' · llama.cpp ' + status.runtime;
+    renderDiagnostics(status);
     detail.textContent = mode === 'hybrid' && jepaState !== 'ready' ? status.jepa.detail
       : mode !== 'guided' && engineState !== 'ready' ? status.detail : '';
   } catch {
@@ -114,6 +134,7 @@ async function updateModel() {
     els['llm-line'].dataset.state = els['jepa-line'].dataset.state = 'error';
     els['llm-state'].textContent = 'Service local indisponible';
     els['jepa-status'].textContent = 'JEPA indisponible';
+    els['diagnostic-checks'].replaceChildren();
     detail.textContent = 'Ouvre l’atelier avec le lanceur local, puis recharge la page.';
   }
   detail.hidden = !detail.textContent;
@@ -239,9 +260,16 @@ function displayProvenance(data) {
 }
 
 function setScene(pose, status) {
+  clearTimeout(poseTimer);
   els.scene.dataset.pose = pose;
   if (status) els['scene-prompt'].textContent = status;
+  else if (pose === 'ecoute') els['scene-prompt'].textContent = 'Je t’écoute. Décris ce que ton programme fait ou ce que tu veux vérifier.';
   else els['scene-prompt'].replaceChildren(...greeting.map((node) => node.cloneNode(true)));
+  if (pose === 'validation') {
+    poseTimer = setTimeout(() => setScene('encouragement', 'Tu avances ! Garde tes observations et essaie le prochain cas.'), 1100);
+  } else if (['accueil', 'encouragement', 'explication'].includes(pose)) {
+    poseTimer = setTimeout(() => setScene('repos'), 9000);
+  }
 }
 
 function editorFeedback(text) {
@@ -258,6 +286,7 @@ function reset(preview = false) {
   els['chat-tools'].hidden = true;
   els['editor-feedback'].hidden = true;
   els.feedback.textContent = '';
+  els['diagnostic-turn'].textContent = 'Aucun tour envoyé.';
   els.syntax.textContent = '';
   delete els.syntax.dataset.error;
   els['pedagogical-objective'].hidden = true;
@@ -309,7 +338,17 @@ els.file.addEventListener('change', async () => {
     els.feedback.dataset.error = 'true';
   }
 });
-els.settings.addEventListener('click', () => els.preferences.showModal());
+els.settings.addEventListener('click', async () => {
+  els.preferences.showModal();
+  try {
+    const response = await fetch('/api/build');
+    if (!response.ok) throw new Error();
+    const {version, build} = await response.json();
+    els['diagnostic-build'].textContent = 'Version ' + version + ' · build ' + build;
+  } catch {
+    els['diagnostic-build'].textContent = 'Identité du serveur indisponible.';
+  }
+});
 els['close-settings'].addEventListener('click', () => els.preferences.close());
 els.fullscreen.addEventListener('click', async () => {
   try {
@@ -383,6 +422,12 @@ els.compose.addEventListener('submit', async (event) => {
     els.example.hidden = true;
     els['chat-tools'].hidden = false;
     const {jepa, source} = displayProvenance(data);
+    const decision = data.pedagogie?.derniere_intervention;
+    const latent = decision?.source === 'jepa' ? 'JEPA sollicité. ' + jepa : 'JEPA non sollicité.';
+    const llm = {affiche: 'LLM sollicité, formulation affichée.', ecarte: 'LLM sollicité, formulation écartée.',
+      indisponible: 'LLM sollicité, intervention indisponible.'};
+    els['diagnostic-turn'].textContent = [latent, llm[data.generation] ?? 'LLM non sollicité.',
+      data.question ? 'Question retenue : ' + data.question : 'Aucune nouvelle question.'].join(' ');
     addMessage('learner', 'Toi', [['', question]]);
     addMessage('assistant', 'Professeur virtuel',
       [['', data.feedback], ['', data.indice], ['question', data.question]], source);
@@ -403,8 +448,8 @@ els.compose.addEventListener('submit', async (event) => {
     els.feedback.textContent = guided() ? 'Indice choisi localement.'
       : `Réponse locale en ${data.seconds.toFixed(1).replace('.', ',')} s`;
     const progressed = data.pedagogie?.evaluation.statut === 'correcte';
-    setScene(progressed ? 'encouragement' : 'explication', progressed
-      ? 'Tu avances ! Garde tes observations et essaie le prochain cas.'
+    setScene(progressed ? 'validation' : 'explication', progressed
+      ? 'Bonne observation ! Ta réponse valide une étape.'
       : 'Regarde la question proposée et ajoute ce que tu observes.');
   } catch (error) {
     els.feedback.dataset.error = 'true';
@@ -419,6 +464,7 @@ els.compose.addEventListener('submit', async (event) => {
 });
 
 showStage(1, null, true);
+setScene('accueil');
 els['exercise-field'].hidden = !guided();
 updateModel();
 loadExercises();

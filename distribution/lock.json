@@ -1,0 +1,23 @@
+{
+  "version": "0.6.1",
+  "python": {
+    "file": "python-3.13.16-embed-amd64.zip",
+    "url": "https://www.python.org/ftp/python/3.13.16/python-3.13.16-embed-amd64.zip",
+    "bytes": 11439094,
+    "sha256": "97dae5274cc54867065e8d5a3226e48c35017ed332a0fdb0e27d5b5821961297"
+  },
+  "numpy": {
+    "file": "numpy-2.3.5-cp313-cp313-win_amd64.whl",
+    "url": "https://files.pythonhosted.org/packages/0c/88/e2eaa6cffb115b85ed7c7c87775cb8bcf0816816bc98ca8dbfa2ee33fe6e/numpy-2.3.5-cp313-cp313-win_amd64.whl",
+    "bytes": 12779090,
+    "sha256": "00dc4e846108a382c5869e77c6ed514394bdeb3403461d25a829711041217d5b"
+  },
+  "llama_windows_archive_bytes": 25012254,
+  "jepa": {
+    "config": "fixe-24",
+    "seed": 17,
+    "epochs": 65,
+    "corpus_sha256": "caecb76c12dc8c6ccd720b1b06d77e34da092282827f92fc234c73452def70be",
+    "p5_sha256": "f4e854fcb1b973e2fbda8b60acdb9404ad1e68f2700b2930b36e88e627adad68"
+  }
+}

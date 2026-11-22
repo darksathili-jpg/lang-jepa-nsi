@@ -10,11 +10,16 @@ import subprocess
 import threading
 import time
 
-from tutor.catalog import CATALOG, runtime_path, verify_file
+from distribution.jobs import ChildJob
+from tutor.catalog import CATALOG, platform_key, runtime_path, verify_file
 from p5.contract import ACTIONS, SCHEMA
 
 
 class EngineError(RuntimeError):
+    pass
+
+
+class IncompatibleRuntime(EngineError):
     pass
 
 
@@ -65,11 +70,13 @@ _decision_schema["required"].extend(("schema", "approche"))
 
 
 class LlamaEngine:
-    def __init__(self, assets, model_key, threads, executable=None):
+    def __init__(self, assets, model_key, threads, executable=None, *, require_runtime=False):
         self.key = model_key
         self.model = CATALOG["models"][model_key]
         self.model_file = assets / self.model["file"]
         self.executable = executable or runtime_path(assets)
+        self.runtime = assets / "runtime"
+        self.require_runtime = require_runtime
         self.threads = threads
         self.process = None
         self.state = "loading"
@@ -79,22 +86,51 @@ class LlamaEngine:
         self.lock = threading.Lock()
         self.process_lock = threading.Lock()
         self.closed = threading.Event()
-        if not self.executable or not self.executable.is_file() or not self.model_file.is_file():
-            self.state = "absent"
-            self.detail = "Installez le moteur CPU et les poids locaux indiqués dans le guide P3."
+        self.job = ChildJob()
+        self.checks = {"executable": bool(self.executable and self.executable.is_file()),
+                       "poids": self.model_file.is_file(), "integrite": False,
+                       "processus": False, "inference": False}
+        self.timings = {}
+        if not (self.checks["executable"] and self.checks["poids"]):
+            self.state = "incomplete" if self.checks["executable"] or self.checks["poids"] else "absent"
+            self.detail = "Lance Installer-Modeles.cmd pour préparer le moteur CPU et le modèle."
+        elif require_runtime and not (self.runtime / "release-files.json").is_file():
+            self.state = "incomplete"
+            self.detail = "Le contrôle d’installation du moteur manque. Lance Installer-Modeles.cmd."
 
     def status(self):
         if self.state == "ready" and self.process.poll() is not None:
             self.state = "error"
             self.detail = "Le moteur local s’est arrêté. Redémarrez l’atelier."
         return {
-            "state": self.state,
+            "state": "working" if self.state == "ready" and self.lock.locked() else self.state,
             "detail": self.detail,
             "name": self.model["name"],
             "revision": self.model["revision"],
             "quantization": self.model["quantization"],
             "runtime": CATALOG["runtime"]["version"],
+            "checks": self.checks | {"processus": bool(self.process and self.process.poll() is None)},
+            "times": self.timings.copy(),
         }
+
+    def verify_runtime(self):
+        manifest = self.runtime / "release-files.json"
+        if not self.require_runtime:
+            return
+        data = json.loads(manifest.read_text(encoding="utf-8"))
+        expected = CATALOG["runtime"]["platforms"][platform_key()]
+        files = data.get("files")
+        if data.get("archive_sha256") != expected["sha256"] or not isinstance(files, dict) or not files:
+            raise IncompatibleRuntime("Le manifeste de llama.cpp ne correspond pas à cette plateforme.")
+        runtime = self.runtime.resolve()
+        actual = {item.relative_to(runtime).as_posix(): item for item in runtime.rglob("*")
+                  if item.is_file() and item.name != manifest.name}
+        if set(files) != set(actual) or self.executable.resolve() not in actual.values():
+            raise EngineError("Le moteur CPU contient des fichiers supplémentaires ou manquants. Consulte le guide Windows.")
+        for name, file in actual.items():
+            if not file.resolve().is_relative_to(runtime):
+                raise EngineError("Le runtime doit rester dans le dossier du paquet.")
+            verify_file(file, {"sha256": files[name]})
 
     def _request(self, path, payload=None, timeout=1):
         connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=timeout)
@@ -111,18 +147,25 @@ class LlamaEngine:
             connection.close()
 
     def start(self):
-        if self.state == "absent":
+        if self.state != "loading":
             return
         try:
+            tick = time.monotonic()
             verify_file(self.model_file, self.model)
+            self.verify_runtime()
+            self.checks["integrite"] = True
+            self.timings["integrity_s"] = round(time.monotonic() - tick, 3)
             expected = CATALOG["runtime"]
             env = {key: val for key, val in os.environ.items() if not key.startswith("LLAMA_ARG_")}
-            result = subprocess.run(
-                [str(self.executable), "--version"], capture_output=True, env=env, timeout=10,
-                encoding="utf-8", errors="replace", check=True,
-            )
+            launch_flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
+            try:
+                result = subprocess.run([str(self.executable), "--version"], capture_output=True, env=env, timeout=10,
+                                        encoding="utf-8", errors="replace", check=True, creationflags=launch_flags)
+            except (OSError, subprocess.CalledProcessError) as exc:
+                detail = " Vérifie le redistribuable Microsoft Visual C++ x64 (guide Windows)." if os.name == "nt" else ""
+                raise IncompatibleRuntime("Ce moteur CPU ne démarre pas sur cet ordinateur." + detail) from exc
             if f"build {expected['version'][1:]}, commit {expected['commit']}" not in result.stdout + result.stderr:
-                raise EngineError(f"Version llama.cpp {expected['version']} requise.")
+                raise IncompatibleRuntime(f"Version llama.cpp {expected['version']} requise.")
             with socket.socket() as reserved:
                 reserved.bind(("127.0.0.1", 0))
                 self.port = reserved.getsockname()[1]
@@ -136,31 +179,50 @@ class LlamaEngine:
                     "--offline", "--no-webui", "--no-ui-mcp-proxy", "--log-disable",
                     "--n-gpu-layers", "0", "--ctx-size", "4096", "--threads", str(self.threads),
                     "--parallel", "1", "--reasoning", "off", "--no-context-shift",
-                ], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env)
+                ], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env,
+                    creationflags=launch_flags)
+                self.job.assign(self.process)
             self.detail = "Chargement du modèle sur le processeur."
+            tick = time.monotonic()
             deadline = time.monotonic() + 90
             while not self.closed.wait(0.2) and time.monotonic() < deadline:
                 if self.process.poll() is not None:
                     raise EngineError("Le moteur CPU a quitté pendant le démarrage.")
                 try:
                     status, _ = self._request("/health")
-                    if status == 200:
-                        self.state = "ready"
-                        self.detail = "Le modèle répond sur cet ordinateur."
-                        return
                 except (OSError, ValueError, http.client.HTTPException):
                     continue
+                if status == 200:
+                    self.timings["load_s"] = round(time.monotonic() - tick, 3)
+                    self.detail = "Inférence locale de vérification en cours."
+                    tick = time.monotonic()
+                    try:
+                        code, reply = self._request("/v1/chat/completions", {
+                            "model": self.key, "messages": [{"role": "user", "content": "Dis bonjour en un mot."}],
+                            "temperature": 0, "max_tokens": 12, "cache_prompt": False,
+                        }, timeout=60)
+                        text = reply["choices"][0]["message"]["content"]
+                        if code != 200 or not isinstance(text, str) or not text.strip():
+                            raise ValueError("Réponse vide")
+                    except (OSError, ValueError, KeyError, TypeError, IndexError, http.client.HTTPException) as exc:
+                        raise EngineError("Le modèle a chargé, mais l’inférence de vérification a échoué.") from exc
+                    self.timings["probe_s"] = round(time.monotonic() - tick, 3)
+                    self.checks["inference"] = True
+                    self.state = "ready"
+                    self.detail = "Le modèle a répondu à une inférence sur cet ordinateur."
+                    return
             if not self.closed.is_set():
                 raise EngineError("Le modèle met trop de temps à démarrer.")
         except (EngineError, OSError, ValueError, subprocess.SubprocessError) as exc:
-            self.state = "error"
+            self.state = "incompatible" if isinstance(exc, IncompatibleRuntime) else "error"
             self.detail = str(exc) if isinstance(exc, (EngineError, ValueError)) else (
                 "Impossible de lancer le moteur CPU. Vérifiez l’installation locale de llama.cpp."
             )
             self.close()
 
     def generate(self, messages, contract=False, *, hint=False, decision=False):
-        if self.status()["state"] != "ready":
+        self.status()
+        if self.state != "ready":
             raise EngineError(self.detail)
         if not self.lock.acquire(blocking=False):
             raise EngineError("Le moteur traite déjà une demande. Réessayez après sa réponse.")
@@ -191,11 +253,13 @@ class LlamaEngine:
     def close(self):
         self.closed.set()
         with self.process_lock:
-            if self.process is None or self.process.poll() is not None:
-                return
-            self.process.terminate()
             try:
-                self.process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                self.process.kill()
-                self.process.wait()
+                if self.process is not None and self.process.poll() is None:
+                    self.process.terminate()
+                    try:
+                        self.process.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        self.process.kill()
+                        self.process.wait()
+            finally:
+                self.job.close()

@@ -3,7 +3,7 @@
 import hashlib
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,6 +29,18 @@ def main():
         for left, top, right, bottom in text_lines:
             draw.rectangle((left, top - 86, right, bottom - 86), fill=(253, 253, 253))
         scene.save(APP_ASSETS / "scene-bd.webp", lossless=True, method=6)
+        # Repères du dessin P6, dans le système de coordonnées de la scène.
+        for name, box, polygon in (
+            ("regard", (304, 181, 517, 249), ((6, 26), (55, 14), (102, 16), (157, 14), (205, 28),
+                                               (199, 48), (157, 60), (111, 50), (58, 57), (14, 46))),
+            ("geste", (261, 368, 449, 525), ((28, 9), (56, 6), (65, 71), (89, 81), (146, 73),
+                                               (175, 85), (170, 122), (122, 150), (26, 151), (8, 129))),
+        ):
+            detail = scene.crop(box).convert("RGBA")
+            mask = Image.new("L", detail.size)
+            ImageDraw.Draw(mask).polygon(polygon, fill=255)
+            detail.putalpha(mask.filter(ImageFilter.GaussianBlur(3)))
+            detail.save(APP_ASSETS / f"compagnon-{name}.webp", lossless=True, method=6)
         reference.crop((1416, 551, 1655, 725)).save(APP_ASSETS / "illustration-jepa.webp", lossless=True, method=6)
         reference.crop((908, 269, 955, 320)).save(APP_ASSETS / "portrait-bd.webp", lossless=True, method=6)
 

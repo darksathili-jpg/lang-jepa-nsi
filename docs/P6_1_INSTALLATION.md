@@ -1,0 +1,14 @@
+# LANG-JEPA NSI 0.6.1 · Démarrage Windows
+
+1. Télécharge le ZIP Windows x64 et extrais **tout** son contenu dans un dossier personnel où tu peux écrire. Ouvre le dossier `LANG-JEPA-NSI-Windows`. [Distribution](https://github.com/darksathili-jpg/lang-jepa-nsi/releases/tag/v0.6.1)
+2. Pour préparer le mode expérimental, lance **Installer-Modeles.cmd** avec Internet et confirme le téléchargement. Prévois au moins 2,2 Go disponibles. La progression, la vérification des fichiers et les sondes des modèles s’affichent dans la fenêtre. Une interruption peut être suivie d’une nouvelle exécution.
+3. Lance **Demarrer.cmd**. Le lanceur affiche l’adresse et ouvre l’atelier du dossier que tu viens de lancer. Le parcours guidé est actif à l’arrivée. Sélectionne **Profil hybride (expérimental)** pour solliciter les moteurs locaux.
+4. Lance **Arreter.cmd** pour fermer le serveur et son moteur. Tu peux fermer l’onglet du navigateur quand tu veux. Pour contrôler les deux moteurs et produire un journal, lance **Verifier.cmd**.
+
+Windows 10/11 x64 est la cible, avec 16 Go de RAM et un navigateur récent. Le ZIP contient CPython et NumPy. Toutes les commandes s’exécutent à partir du dossier extrait, avec des droits d’utilisateur standard. Le moteur Microsoft Visual C++ x64 est un prérequis distinct de llama.cpp. Si le diagnostic indique son absence, installe le redistribuable officiel conformément aux règles de ton établissement. Cette installation système peut nécessiter l’administrateur. [Redistribuable Microsoft officiel](https://learn.microsoft.com/fr-fr/cpp/windows/latest-supported-vc-redist)
+
+Les modèles restent dans `models/smollm3` et `models/jepa/fixe-24-17`. Préparer chaque nouveau dossier, ou réutiliser les archives officielles d’une autre installation avec `Installer-Modeles.cmd --import-from "C:\chemin\des\archives"`. En cas d’empreinte invalide, conserve le fichier concerné ailleurs avant de relancer. Une reprise utilise uniquement les fichiers temporaires `.part`. Les journaux de préparation et de vérification se trouvent dans `logs`. Ils donnent les identités des moteurs et les durées des sondes.
+
+Si une ancienne version écoute déjà sur 8765, laisse-la en place. Le lanceur confirme l’identité du nouveau serveur et annonce un autre port. Utilise l’adresse qu’il ouvre, avec `/atelier`. Le fichier `logs\instance-*.json` est réservé à la coordination locale, car il contient la clé d’arrêt de cette session. Les journaux `prepare.json` et `verify.json` peuvent servir au diagnostic.
+
+Le bouton **Exécuter** renseigne sur l’indisponibilité d’une exécution isolée de Python. Le tuteur s’appuie sur l’analyse statique. **Bénéfice JEPA non démontré** reste le verdict scientifique. Vérifie les preuves et les limites de la recette avant un usage en classe. [Rapport P6.1](https://github.com/darksathili-jpg/lang-jepa-nsi/blob/main/docs/P6_1_RAPPORT_FINAL.md)

@@ -11,7 +11,7 @@ from tutor_browser import ROOT, local_server, protect_page
 
 
 SIZES = ((1672, 941), (1440, 900), (1366, 768), (1024, 768), (390, 844), (360, 800))
-ZONES = {"entete": ".topbar", "scene": ".scene", "personnage": ".scene img", "bulle": ".speech",
+ZONES = {"entete": ".topbar", "scene": ".scene", "personnage": ".scene > img", "bulle": ".speech",
           "editeur": ".editor-panel", "exercice": "#exercise-panel", "progression": ".learning",
           "dialogue": ".conversation", "moteurs": ".engines", "explication": ".how", "jepa": ".research" }
 
@@ -30,9 +30,9 @@ def contrast(page, selector, foreground, background):
     return (high + .05) / (low + .05)
 
 
-def layouts(browser, origin, output):
+def layouts(browser, origin, output, *, sizes=SIZES):
     report = {}
-    for width, height in SIZES:
+    for width, height in sizes:
         page = browser.new_page(viewport={"width": width, "height": height}, device_scale_factor=1,
                                 reduced_motion="reduce")
         external, errors = protect_page(page, origin)
@@ -57,7 +57,7 @@ def layouts(browser, origin, output):
             assert min(contrast(page, "#execute", "--button-text", stop) for stop in ("--button", "--button-end")) >= 4.5
             if theme == "sombre":
                 report[f"{width}x{height}"] = {zone: page.locator(selector).bounding_box() for zone, selector in ZONES.items()}
-            if theme == "sombre" or (width, height) == SIZES[0]:
+            if theme == "sombre" or (width, height) == sizes[0]:
                 filename = f"atelier-{width}x{height}-{theme}.png"
                 page.screenshot(path=output / filename, animations="disabled",
                                 full_page=width <= 1024 or theme == "projecteur")

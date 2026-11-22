@@ -38,8 +38,12 @@
   <main class="workbench" id="main">
     <h1 class="sr-only">Atelier Python</h1>
     <div class="desk">
-      <figure class="scene" id="scene" aria-describedby="illustration-credit">
+      <figure class="scene" id="scene" data-pose="accueil" aria-describedby="illustration-credit">
         <img src="/assets/scene-bd.webp" width="881" height="525" alt="Professeur souriant aux lunettes noires et à la veste brune, dans une salle de classe éclairée en bleu, avec un petit hologramme.">
+        <div class="companion-motion" aria-hidden="true">
+          <img class="companion-eyes" src="/assets/compagnon-regard.webp" alt="" width="213" height="68">
+          <img class="companion-hand" src="/assets/compagnon-geste.webp" alt="" width="188" height="157">
+        </div>
         <div class="speech">
           <p>Bonjour !<br>Ton <strong>professeur virtuel.</strong></p>
           <p id="scene-prompt">Ensemble, explorons la<br> programmation <strong>Python</strong><br> et découvrons comment<br> les idées du <strong>JEPA</strong> peuvent<br> aider à mieux apprendre !</p>
@@ -200,6 +204,12 @@
     </header>
     <p>Choisis le mode d’aide dans la colonne des moteurs. Le parcours guidé utilise des règles pédagogiques et des indices rédigés.</p>
     <p>Sur le bureau, utilise <kbd>Ctrl</kbd> ou <kbd>⌘</kbd> + <kbd>Entrée</kbd> pour envoyer ta réponse. Les fichiers ajoutés et les échanges restent sur cet ordinateur.</p>
+    <details id="diagnostic-engines">
+      <summary>Diagnostic des moteurs</summary>
+      <p id="diagnostic-build"></p>
+      <ul id="diagnostic-checks"></ul>
+      <p id="diagnostic-turn">Aucun tour envoyé.</p>
+    </details>
     <a href="/#ressources">Consulter les ressources locales</a>
   </dialog>
 </body>
