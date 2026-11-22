@@ -1,0 +1,13 @@
+{
+  "ressource": "python-3.13.16-embed-amd64.zip",
+  "prefixe_octets": 1048576,
+  "http": [
+    {
+      "range": "bytes=1048576-",
+      "status": 206
+    }
+  ],
+  "sha256": "97dae5274cc54867065e8d5a3226e48c35017ed332a0fdb0e27d5b5821961297",
+  "taille_verifiee": 11439094,
+  "part_suppprime": true
+}

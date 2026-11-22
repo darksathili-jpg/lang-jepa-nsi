@@ -1,0 +1,194 @@
+{
+  "ensemble": {
+    "reference_px": [
+      0,
+      0,
+      1672,
+      941
+    ],
+    "reference_relative": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "mae_rgb_0_255": 15.894,
+    "pixels_ecart_gt_24_pct": 12.41
+  },
+  "entete": {
+    "reference_px": [
+      0,
+      0,
+      1672,
+      86
+    ],
+    "reference_relative": [
+      0.0,
+      0.0,
+      1.0,
+      0.0914
+    ],
+    "mae_rgb_0_255": 17.538,
+    "pixels_ecart_gt_24_pct": 12.05
+  },
+  "scene": {
+    "reference_px": [
+      0,
+      86,
+      881,
+      525
+    ],
+    "reference_relative": [
+      0.0,
+      0.0914,
+      0.5269,
+      0.5579
+    ],
+    "mae_rgb_0_255": 3.839,
+    "pixels_ecart_gt_24_pct": 2.62
+  },
+  "personnage": {
+    "reference_px": [
+      22,
+      175,
+      493,
+      435
+    ],
+    "reference_relative": [
+      0.0132,
+      0.186,
+      0.2949,
+      0.4623
+    ],
+    "mae_rgb_0_255": 0.0,
+    "pixels_ecart_gt_24_pct": 0.0
+  },
+  "bulle": {
+    "reference_px": [
+      479,
+      103,
+      324,
+      254
+    ],
+    "reference_relative": [
+      0.2865,
+      0.1095,
+      0.1938,
+      0.2699
+    ],
+    "mae_rgb_0_255": 21.578,
+    "pixels_ecart_gt_24_pct": 14.74
+  },
+  "editeur": {
+    "reference_px": [
+      20,
+      611,
+      408,
+      313
+    ],
+    "reference_relative": [
+      0.012,
+      0.6493,
+      0.244,
+      0.3326
+    ],
+    "mae_rgb_0_255": 17.561,
+    "pixels_ecart_gt_24_pct": 15.24
+  },
+  "exercice": {
+    "reference_px": [
+      438,
+      611,
+      432,
+      166
+    ],
+    "reference_relative": [
+      0.262,
+      0.6493,
+      0.2584,
+      0.1764
+    ],
+    "mae_rgb_0_255": 27.042,
+    "pixels_ecart_gt_24_pct": 22.78
+  },
+  "progression": {
+    "reference_px": [
+      438,
+      785,
+      432,
+      139
+    ],
+    "reference_relative": [
+      0.262,
+      0.8342,
+      0.2584,
+      0.1477
+    ],
+    "mae_rgb_0_255": 20.427,
+    "pixels_ecart_gt_24_pct": 16.27
+  },
+  "dialogue": {
+    "reference_px": [
+      881,
+      106,
+      516,
+      818
+    ],
+    "reference_relative": [
+      0.5269,
+      0.1126,
+      0.3086,
+      0.8693
+    ],
+    "mae_rgb_0_255": 22.107,
+    "pixels_ecart_gt_24_pct": 16.7
+  },
+  "moteurs": {
+    "reference_px": [
+      1409,
+      122,
+      251,
+      147
+    ],
+    "reference_relative": [
+      0.8427,
+      0.1296,
+      0.1501,
+      0.1562
+    ],
+    "mae_rgb_0_255": 37.327,
+    "pixels_ecart_gt_24_pct": 35.69
+  },
+  "explication": {
+    "reference_px": [
+      1409,
+      286,
+      251,
+      238
+    ],
+    "reference_relative": [
+      0.8427,
+      0.3039,
+      0.1501,
+      0.2529
+    ],
+    "mae_rgb_0_255": 38.673,
+    "pixels_ecart_gt_24_pct": 28.7
+  },
+  "jepa": {
+    "reference_px": [
+      1409,
+      542,
+      251,
+      265
+    ],
+    "reference_relative": [
+      0.8427,
+      0.576,
+      0.1501,
+      0.2816
+    ],
+    "mae_rgb_0_255": 14.4,
+    "pixels_ecart_gt_24_pct": 12.66
+  }
+}

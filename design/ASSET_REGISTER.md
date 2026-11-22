@@ -10,6 +10,7 @@ Les sept empreintes ont été contrôlées avec `sha256sum -c MANIFEST_SHA256.tx
 | `portrait-bd.webp` | 47 × 51 | Portrait de bande dessinée extrait de la conversation dessinée de la maquette. Sert aux avatars du professeur avec un contour CSS. |
 | `illustration-jepa.webp` | 239 × 174 | Illustration neuronale extraite de la colonne droite. Le texte et le lien de la carte sont en HTML. |
 | `marque-reseau.webp` | 76 × 76 | Symbole réseau extrait du coin supérieur gauche. L’opacité de fond est retirée. Le nom et le sous-titre restent en HTML. |
+| `compagnon-regard.webp` et `compagnon-geste.webp` | 213 × 68 et 188 × 157 | Calques transparents extraits du même dessin P6 pour les mouvements pédagogiques P6.1. Les repères et la création du contour sont dans le script d’extraction. |
 | `controls.svg` | Vue logique 24 × 24 par pictogramme | Formes vectorielles dessinées pour le projet. Les noms accessibles et les actions résident dans les contrôles HTML. |
 | Typographie | — | Arial et Consolas si installées. Liberation Sans et Liberation Mono comme substituts disponibles sur Linux, puis familles génériques. Aucun fichier de police ne circule et aucun CDN n’est appelé. |
 
