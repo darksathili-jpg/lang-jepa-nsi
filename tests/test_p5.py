@@ -144,6 +144,11 @@ class NumPyTests(TestCase):
                         stream.write(b"x")
                     with self.assertRaisesRegex(ContractError, "Empreinte"):
                         load(directory)
+                    model.target = model.target[:1]
+                    invalid = Path(tmp) / f"{config}-wrong-shape"
+                    save(model, invalid, {"graine": 17})
+                    with self.assertRaisesRegex(ContractError, "Dimensions"):
+                        load(invalid)
 
     def test_same_goals_at_10_20_30_turns_for_all_ablations(self):
         from p5.compare import read_dialogues, replay, shuffled_donors, summary

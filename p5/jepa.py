@@ -168,11 +168,21 @@ def load(directory):
             if (len(blobs) != len(SHAPES) or {x.filename for x in blobs} != {key + ".npy" for key in SHAPES}
                     or sum(x.file_size for x in blobs) > MAX_BYTES):
                 raise ContractError("Structure des poids JEPA invalide.")
-        with np.load(io.BytesIO(raw), allow_pickle=False) as weights:
-            arrays = {key: weights[key] for key in SHAPES}
-        for key, array in arrays.items():
-            if array.dtype != np.float32 or array.shape != SHAPES[key] or not np.isfinite(array).all():
-                raise ContractError("Dimensions ou valeurs des poids JEPA incompatibles.")
+            arrays = {}
+            for key, expected in SHAPES.items():
+                with archive.open(key + ".npy") as entry:
+                    if np.lib.format.read_magic(entry) != (1, 0):
+                        raise ContractError("Version du tableau de poids JEPA incompatible.")
+                    shape, fortran_order, dtype = np.lib.format.read_array_header_1_0(entry)
+                    if shape != expected or dtype != np.float32 or fortran_order:
+                        raise ContractError("Dimensions ou type des poids JEPA incompatibles.")
+                    data = entry.read()
+                    if len(data) != expected[0] * expected[1] * dtype.itemsize:
+                        raise ContractError("Taille du tableau de poids JEPA incompatible.")
+                    array = np.frombuffer(data, dtype=dtype).reshape(expected)
+                    if not np.isfinite(array).all():
+                        raise ContractError("Valeurs des poids JEPA incompatibles.")
+                    arrays[key] = array
     except (OSError, KeyError, UnicodeError, zipfile.BadZipFile, ValueError) as exc:
         if isinstance(exc, ContractError):
             raise
