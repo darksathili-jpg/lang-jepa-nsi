@@ -10,3 +10,4 @@ models/*
 wheelhouse/
 results/
 *.safetensors
+upstream.tar.gz
