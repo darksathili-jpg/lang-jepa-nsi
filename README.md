@@ -1,8 +1,12 @@
 # LANG-JEPA NSI
 
-Professeur virtuel local pour travailler le Python en Première et Terminale NSI. L’expérimentation scientifique LANG-JEPA reste accessible dans un laboratoire indépendant.
+Atelier local pour travailler le Python en Première et Terminale NSI et laboratoire pour mesurer ce que LANG-JEPA peut apporter au tutorat. Le modèle conversationnel issu de la livraison précédente reste accessible comme mode distinct.
 
-## Professeur virtuel · P3
+## Expérimentation LANG-JEPA
+
+Le mandat scientifique reprend les ressources figées en P2. Les expériences mesurent les représentations, la prédiction latente et le décodage séparément. [Audit et critères du pilote](docs/AUDIT-JEPA-NSI.md)
+
+## Mode conversationnel · livraison précédente
 
 L’atelier propose des questions et indices progressifs avec un modèle conversationnel qui s’exécute sur le processeur. Le code saisi relève d’une analyse statique locale. Le modèle sélectionné est SmolLM3-3B Q4_K_M. Le profil de déploiement est Windows x64, 16 Go de RAM.
 
