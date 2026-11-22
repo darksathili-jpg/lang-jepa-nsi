@@ -57,6 +57,10 @@ jobs:
           assert stats["platform"].startswith("Windows")
           assert stats["active_after_stop"] == 0 and stats["dialogue"]["turns"] == 30
           assert stats["engines"]["checks"]["inference"] and stats["engines"]["jepa"]["checks"]["selection"]
+          for filename in ("windows-mesures/mesures.json", "windows-captures/ecarts.json",
+                           "installe/LANG-JEPA-NSI-Windows/logs/prepare.json"):
+              evidence = Path("native") / filename
+              print(filename, json.dumps(json.loads(evidence.read_text(encoding="utf-8")), ensure_ascii=False))
           with zipfile.ZipFile("LANG-JEPA-NSI-0.6.1-Preuves-Windows.zip", "w", zipfile.ZIP_DEFLATED) as proof:
               for directory in ("windows-captures", "windows-mesures", "installe"):
                   for file in sorted((Path("native") / directory).rglob("*")):
