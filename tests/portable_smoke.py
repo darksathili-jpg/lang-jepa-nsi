@@ -42,9 +42,12 @@ def smoke(home, packaged, old_port):
     def run(action, *extra):
         command = (["cmd.exe", "/D", "/C", commands[action]] if packaged else
                    [sys.executable, "-m", "distribution.launcher", action])
-        result = subprocess.run([*command, "--home", str(home), *extra], env=env, cwd=cwd, check=True,
+        result = subprocess.run([*command, "--home", str(home), *extra], env=env, cwd=cwd,
                                 capture_output=True, encoding="utf-8", errors="replace", timeout=90)
         print(result.stdout, end="", flush=True)
+        if result.returncode:
+            print(result.stderr, end="", flush=True)
+            result.check_returncode()
         return result.stdout
 
     if packaged:

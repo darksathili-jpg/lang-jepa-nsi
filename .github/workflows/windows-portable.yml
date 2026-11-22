@@ -3,7 +3,7 @@ name: Recette Windows portable
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/windows-portable.yml']
+    paths: ['.github/workflows/windows-portable.yml', 'distribution/**', 'tests/portable_smoke.py']
   workflow_dispatch:
     inputs:
       modeles_reels:
@@ -38,6 +38,7 @@ jobs:
           python -m zipfile -e results\paquet\LANG-JEPA-NSI-0.6.1-Windows-x64.zip results\installe
       - name: Lancement sans Python externe
         run: |
+          results\installe\LANG-JEPA-NSI-Windows\runtime\python.exe -B -c "import sys, platform, numpy; print(sys.version, platform.machine(), numpy.__version__)" || exit /b 1
           set PYTHONPATH=%CD%
           python tests\portable_smoke.py --package results\installe\LANG-JEPA-NSI-Windows
       - name: Géométrie et contrôles sur Chromium Windows
