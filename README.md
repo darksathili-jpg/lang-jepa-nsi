@@ -12,6 +12,8 @@ Le projet propose trois expériences **distinctes** :
 
 > **À savoir :** le parcours guidé ne prétend pas être une IA générative. Le modèle conversationnel est **SmolLM3**, et non LANG-JEPA. Les expériences LANG-JEPA ont été menées sur un modèle miniature ; elles n'ont pas démontré un bénéfice fiable pour choisir les indices pédagogiques. [Résultats et limites](docs/EXPERIENCE-JEPA-NSI.md).
 
+**P5 · Prototype hybride.** Un JEPA pédagogique entraîné sur CPU peut reclasser les questions de l’orchestrateur avant la génération d’un indice par SmolLM3. L’essai sur `maximum(tab)` montre que ce classement change des interventions. Le bénéfice pédagogique reste à démontrer, donc le profil hybride s’active explicitement. [Rapport P5](docs/P5_RECETTE_FINALE.md) · [Préparation Windows et hors ligne](docs/P5_PERFORMANCES_WINDOWS.md)
+
 ## Sommaire
 
 1. [Configuration requise](#1-configuration-requise)
@@ -89,6 +91,8 @@ Professeur virtuel : http://127.0.0.1:8765/atelier
 ```
 
 Ouvrez ensuite **http://127.0.0.1:8765/atelier** dans votre navigateur.
+
+Sur Windows, le double-clic sur **scripts/tutor.cmd** lance le même atelier et vérifie la présence de Python 3.12 x64.
 
 - Gardez la fenêtre PowerShell ouverte : fermer la fenêtre arrête le serveur.
 - Pour arrêter proprement le serveur, utilisez **Ctrl+C**.
@@ -262,6 +266,8 @@ Consultez la [recette P3 scientifique](docs/RECETTE-JEPA-NSI.md) et le [rapport 
 - [Comparatif des modèles conversationnels](docs/COMPARATIF-P3.md)
 - [Rapport de validation du modèle conversationnel](docs/RAPPORT-P3.md)
 - [Correction du dialogue socratique et recette P4](docs/RAPPORT-P4.md)
+- [Architecture du prototype hybride P5](docs/P5_ARCHITECTURE_HYBRIDE.md)
+- [Entraînement et comparaison des profils P5](docs/P5_EVALUATION_ABC.md)
 - [Expérience scientifique LANG-JEPA : protocole et résultats](docs/EXPERIENCE-JEPA-NSI.md)
 - [Recette de la reprise scientifique](docs/RECETTE-JEPA-NSI.md)
 - [Audit et limites de LANG-JEPA](docs/AUDIT-JEPA-NSI.md)
