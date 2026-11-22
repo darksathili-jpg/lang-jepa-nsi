@@ -71,6 +71,21 @@ def companion(browser, origin, output):
     page.close()
 
 
+def browser_scales(browser, origin, output):
+    for factor in (1.25, 1.5):
+        page = browser.new_page(viewport={"width": 1672, "height": 941}, device_scale_factor=factor,
+                                reduced_motion="reduce")
+        external, errors = protect_page(page, origin)
+        page.goto(origin + "/atelier")
+        expect(page.locator("#model-state")).to_have_text("Parcours prêt")
+        assert page.evaluate("devicePixelRatio") == factor
+        assert page.evaluate("document.documentElement.scrollWidth === innerWidth")
+        assert page.get_by_role("button", name="Demander un indice").is_enabled()
+        page.screenshot(path=output / f"echelle-navigateur-{round(factor * 100)}.png", animations="disabled")
+        assert not external and not errors, (external, errors)
+        page.close()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
@@ -86,6 +101,7 @@ def main():
         layouts(browser, origin, args.output, sizes=(SIZES[0], (1920, 1080), *SIZES[1:]))
         interactions(browser, origin)
         companion(browser, origin, args.output)
+        browser_scales(browser, origin, args.output)
         if args.assets:
             with local_server(args.assets, "smol", "--p5", "c", "--jepa", str(args.weights), verify_shutdown=True) as live:
                 live_provenance(browser, live, args.output)

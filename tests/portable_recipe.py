@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import platform
 import statistics
 import subprocess
 import sys
@@ -60,7 +61,8 @@ def main():
                                 check=True, capture_output=True, encoding="utf-8", errors="replace", timeout=45)
         print(result.stdout, end="", flush=True)
 
-    stats = {}
+    stats = {"platform": platform.platform(), "logical_cpu": psutil.cpu_count(),
+             "physical_ram_bytes": psutil.virtual_memory().total}
     tick = time.monotonic()
     command("start", "--no-browser")
     stats["launch_s"] = round(time.monotonic() - tick, 3)
