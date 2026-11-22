@@ -1,0 +1,55 @@
+{
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "logical_cpu": 4,
+  "physical_ram_bytes": 17174360064,
+  "launch_s": 0.734,
+  "rss_peak_bytes": 4292722688,
+  "cpu_peak_percent_one_core": 246.3,
+  "samples": 659,
+  "contextual_turns": 9,
+  "engines": {
+    "state": "ready",
+    "detail": "Le modèle a répondu à une inférence sur cet ordinateur.",
+    "name": "SmolLM3-3B",
+    "revision": "4965cb60b150737b68a0408c36aeefb65078f894",
+    "quantization": "Q4_K_M",
+    "runtime": "b12600",
+    "checks": {
+      "executable": true,
+      "poids": true,
+      "integrite": true,
+      "processus": true,
+      "inference": true
+    },
+    "times": {
+      "integrity_s": 1.162,
+      "load_s": 1.694,
+      "probe_s": 1.144
+    },
+    "jepa": {
+      "mode": "C · JEPA expérimental + orchestrateur + SmolLM3",
+      "state": "ready",
+      "name": "P5 fixe-24 · c70aa1329633",
+      "detail": "Expérimentation sur le maximum de référence.",
+      "checks": {
+        "manifeste": true,
+        "poids": true,
+        "integrite": true,
+        "chargement": true,
+        "prediction": true,
+        "selection": true
+      },
+      "times": {
+        "probe_s": 0.0419
+      }
+    }
+  },
+  "dialogue": {
+    "turns": 30,
+    "median_all_s": 0.001,
+    "llm_requested": 10,
+    "median_llm_s": 6.6274999999999995,
+    "max_s": 7.199
+  },
+  "active_after_stop": 0
+}

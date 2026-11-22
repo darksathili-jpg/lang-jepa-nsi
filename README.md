@@ -2,7 +2,7 @@
 
 **Un atelier local pour apprendre Python en Première et Terminale NSI, accompagné d'un laboratoire de recherche sur LANG-JEPA.**
 
-**Windows x64 · Version portable 0.6.1.** Extrais le ZIP et lance `Demarrer.cmd` pour le parcours guidé. Pour préparer les moteurs locaux, lance `Installer-Modeles.cmd` avec Internet, puis utilise l’atelier hors ligne. `Verifier.cmd` contrôle les moteurs et `Arreter.cmd` ferme l’instance. Python et NumPy sont inclus. [Télécharger le ZIP](https://raw.githubusercontent.com/darksathili-jpg/lang-jepa-nsi/main/releases/0.6.1/LANG-JEPA-NSI-0.6.1-Windows-x64.zip) · [Guide Windows](docs/P6_1_INSTALLATION.md) · [Rapport de livraison](docs/P6_1_RAPPORT_FINAL.md)
+**Windows x64 · Version portable 0.6.2.** Extrais le ZIP et lance `Demarrer.cmd` pour le parcours guidé. Pour préparer les moteurs locaux, lance `Installer-Modeles.cmd` avec Internet, puis utilise l’atelier hors ligne. `Verifier.cmd` contrôle les moteurs et `Arreter.cmd` ferme l’instance. Python et NumPy sont inclus. [Télécharger le ZIP](https://raw.githubusercontent.com/darksathili-jpg/lang-jepa-nsi/main/releases/0.6.2/LANG-JEPA-NSI-0.6.2-Windows-x64.zip) · [Guide Windows](docs/P6_1_INSTALLATION.md) · [Recette du dialogue contextuel](docs/TOUR_CONTEXTUEL.md) · [Rapport P6.1](docs/P6_1_RAPPORT_FINAL.md)
 
 Le projet propose trois expériences **distinctes** :
 
