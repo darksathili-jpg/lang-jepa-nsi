@@ -11,9 +11,9 @@ import threading
 from pedagogy.catalogue import for_level
 from tutor.catalog import CATALOG, DEFAULT_ASSETS, ROOT
 from tutor.curriculum import LEVELS
-from tutor.dialogue import DialogueError, RejectedReply, respond
+from tutor.dialogue import DialogueError, RejectedReply
 from tutor.engine import EngineError, LlamaEngine
-from tutor.guided import respond_guided
+from tutor.sessions import SessionConflict, Sessions
 
 
 DEFAULT_MODEL = "smol"
@@ -38,6 +38,7 @@ class WorkshopServer(ThreadingHTTPServer):
     def __init__(self, port, engine):
         super().__init__(("127.0.0.1", port), Handler)
         self.engine = engine
+        self.dialogues = Sessions()
         self.engine_thread = None
         self.engine_lock = threading.Lock()
         self.host_header = f"127.0.0.1:{self.server_port}"
@@ -118,16 +119,12 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         try:
-            if self.path == "/api/guide":
-                answer = respond_guided(payload)
-            else:
+            mode = "guided" if self.path == "/api/guide" else "conversation"
+            if mode == "conversation":
                 self.server.start_engine()
-                answer, _ = respond(self.server.engine, payload)
-                answer["provenance"] = {
-                    "hint": self.server.engine.status()["name"] + " · génération locale",
-                    "diagnostic": "Analyse statique Python",
-                    "jepa": "Aucune contribution de LANG-JEPA à cet indice.",
-                }
+            answer = self.server.dialogues.turn(mode, payload, self.server.engine)
+        except SessionConflict as exc:
+            self.send_json(409, {"error": str(exc)})
         except DialogueError as exc:
             self.send_json(400, {"error": str(exc)})
         except RejectedReply as exc:

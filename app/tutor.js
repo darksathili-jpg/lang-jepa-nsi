@@ -4,7 +4,7 @@ const $ = (id) => document.getElementById(id);
 const els = Object.fromEntries([
   'class', 'statement', 'code', 'highlight', 'syntax', 'question', 'history', 'empty',
   'compose', 'send', 'reset', 'feedback', 'stages', 'active-stage', 'model-state',
-  'model-identity', 'model-detail', 'mode', 'exercise-field', 'exercise', 'objective',
+  'model-identity', 'model-detail', 'mode', 'exercise-field', 'exercise', 'objective', 'pedagogical-objective',
 ].map((id) => [id, $(id)]));
 const labels = ['Comprendre', 'Orienter', 'Expérimenter', 'Débloquer', 'Consolider'];
 const themeButtons = [...document.querySelectorAll('button[data-theme]')];
@@ -58,7 +58,8 @@ els.code.addEventListener('input', () => {
 els.code.addEventListener('scroll', syncEditor);
 colorCode();
 
-let history = [];
+let session = null;
+let turn = 0;
 let busy = false;
 let engineState = 'loading';
 let catalogue = null;
@@ -67,7 +68,7 @@ const guided = () => els.mode.value === 'guided';
 
 function updateActions() {
   els.send.disabled = busy || (guided() ? !catalogue || !els.exercise.value : engineState !== 'ready');
-  els.reset.disabled = busy || history.length === 0;
+  els.reset.disabled = busy || turn === 0;
   els.class.disabled = busy;
   els.mode.disabled = busy;
   els.exercise.disabled = busy;
@@ -169,16 +170,22 @@ function addMessage(kind, who, parts, provenance = '') {
     message.append(note);
   }
   els.history.append(message);
+  while (els.history.querySelectorAll('.message').length > 60) {
+    els.history.querySelector('.message').remove();
+  }
   els.history.scrollTop = els.history.scrollHeight;
 }
 
 function reset() {
-  history = [];
+  session = null;
+  turn = 0;
   els.history.replaceChildren(els.empty);
   els.empty.hidden = false;
   els.feedback.textContent = '';
   els.syntax.textContent = '';
   delete els.syntax.dataset.error;
+  els['pedagogical-objective'].hidden = true;
+  els['pedagogical-objective'].textContent = '';
   showStage(1);
   updateActions();
 }
@@ -215,21 +222,21 @@ els.compose.addEventListener('submit', async (event) => {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({class: els.class.value, exercise: els.exercise.value,
-        statement, code, question, history: history.slice(-3)}),
+        statement, code, question, session, turn}),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);
+    session = data.session;
+    turn = data.turn;
     els.empty.hidden = true;
     addMessage('learner', 'Toi', [question]);
     addMessage('assistant', guided() ? 'Indice et question' : 'Professeur virtuel',
-      [data.indice, data.question], data.provenance.hint + ' · ' + data.provenance.jepa);
-    history.push({
-      learner: question,
-      assistant: data.indice + ' ' + data.question,
-      stage: data.stage,
-      digest: data.analysis.digest,
-    });
+      [data.feedback, data.indice, data.question],
+      [data.provenance.hint, data.provenance.question, data.provenance.jepa].filter(Boolean).join(' · '));
     showStage(data.stage);
+    const objective = els['pedagogical-objective'];
+    objective.hidden = !data.pedagogie;
+    objective.textContent = data.pedagogie?.objectif_libelle ?? '';
     if (els.code.value === code) {
       els.syntax.dataset.error = String(data.analysis.syntax !== null);
       const diagnosis = data.diagnostic ?? (data.analysis.syntax === null

@@ -25,9 +25,9 @@ def complete(browser, origin, captures):
     code = page.get_by_label("Code Python")
     submit = page.get_by_role("button", name="Demander un indice")
     turns = (
-        "Par où commencer ?", "Je propose [4, 7] et je trouve 7.",
-        "Avec [-4, -2], je trouve 0.", "m reste à 0 après les deux passages.",
-        "J’obtiens -2 après ma modification.",
+        "Par où commencer ?", "Avec [-4, -2], la fonction renvoie 0.",
+        "La valeur attendue sur [-4, -2] est -2.", "m reste à 0 car 0 est supérieur à -4 et à -2.",
+        "Sur [-4, -2], j’obtiens -2 après ma modification.",
     )
     for index, question in enumerate(turns, 1):
         if index == 5:

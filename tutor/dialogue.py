@@ -2,10 +2,12 @@
 
 import json
 import re
+import time
 import unicodedata
 
+from pedagogy.progress import Assessment, assess, near_question, requested_topic
 from tutor.analysis import analyze
-from tutor.curriculum import LEVELS, STAGES, VOCABULARY, display_terms
+from tutor.curriculum import LEVELS, MAXIMUM_GOALS, STAGES, VOCABULARY, display_terms
 from tutor.engine import EngineError
 
 
@@ -39,7 +41,7 @@ def text_field(value, limit, label, required=False, preserve=False):
     return value if preserve else value.strip()
 
 
-def validate(payload):
+def validate(payload, *, history_limit=3):
     if not isinstance(payload, dict):
         raise DialogueError("La demande doit être structurée.")
     level = payload.get("class")
@@ -49,7 +51,7 @@ def validate(payload):
     code = text_field(payload.get("code"), 3600, "code", preserve=True)
     question = text_field(payload.get("question"), 720, "question", required=True)
     history = payload.get("history", [])
-    if not isinstance(history, list) or len(history) > 3:
+    if not isinstance(history, list) or len(history) > history_limit:
         raise DialogueError("Historique trop long.")
     cleaned = []
     for turn in history:
@@ -127,8 +129,8 @@ def make_messages(level, statement, code, question, history, facts, stage):
     messages = [{"role": "system", "content": system}]
     for turn in history:
         messages.extend([
-            {"role": "user", "content": turn["learner"]},
-            {"role": "assistant", "content": turn["assistant"]},
+            {"role": "user", "content": turn["learner"][:200]},
+            {"role": "assistant", "content": turn["assistant"][:260]},
         ])
     quoted = [
         label + "\n" + "\n".join("│ " + line for line in value.splitlines())
@@ -177,8 +179,8 @@ def read_reply(raw, facts):
     return {"indice": display_terms(hint), "question": display_terms(question)}
 
 
-def respond(engine, payload):
-    level, statement, code, question, history = validate(payload)
+def respond(engine, payload, *, history_limit=3):
+    level, statement, code, question, history = validate(payload, history_limit=history_limit)
     facts = analyze(code)
     stage = choose_stage(question, history, facts)
     messages = make_messages(level, statement, code, question, history, facts, stage)
@@ -221,4 +223,114 @@ def respond(engine, payload):
     return {
         **answer, "stage": stage, "stage_name": STAGES[stage][0], "analysis": facts,
         "seconds": raw["seconds"],
+    }, raw
+
+
+def read_maximum_hint(raw, goal, question, asked):
+    if raw["finish"] != "stop":
+        return ""
+    try:
+        hint = text_field(json.loads(raw["text"])["indice"], 105, "indice", required=True)
+    except (TypeError, KeyError, ValueError):
+        return ""
+    words = normalized(hint)
+    if not re.fullmatch(r"(?:compare|examine|observe|relis|cherche|distingue|imagine) [^.?!<>\d`()\[\]]+\.", words):
+        return ""
+    if re.search(r"\b(?:que|est|sont|soit|il faut|doi[st]|doivent|toujours|jamais|corrige|execut\w*|"
+                 r"premier (?:element|entier|nombre)|premiere valeur|moins l'infini|"
+                 r"initialis\w* (?:avec|par|a))\b", words):
+        return ""
+    if goal in ("assumption", "strategy", "verification", "contract") and re.search(
+        r"\b(?:trace\w*|valeurs? de m|m reste|chaque iteration)\b", words,
+    ):
+        return ""
+    if goal == "strategy":
+        if not re.search(r"depart|choix|initial|contrat|specification|enonce", words):
+            return ""
+        if re.search(r"superieur|inferieur|plus (?:grand|petit|haut|bas)|minimum|maximum provisoire", words):
+            return ""
+    if near_question(hint, question) or any(near_question(hint, previous) for _, _, previous in asked):
+        return ""
+    return display_terms(hint)
+
+
+def maximum_reply(engine, request, progress, turn):
+    """L'orchestrateur tranche la progression. Le modèle propose seulement un indice."""
+    started = time.perf_counter()
+    level, statement, code, learner, _ = validate(request)
+    facts = analyze(code)
+    topic = requested_topic(learner)
+    if topic:
+        assessment = Assessment("changement_notion", f"Changement de notion demandé · {topic}.")
+        question, strategy = "", None
+        hint = "Choisis un autre exercice dans le parcours guidé ou saisis son énoncé et son code dans Conversation locale."
+    else:
+        assessment = assess(progress, learner, code, facts, statement, turn)
+        question, strategy = progress.select_question() if not facts["syntax"] else ("", None)
+        if facts["syntax"]:
+            hint = f"Vérifie la syntaxe près de la ligne {facts['syntax']} avant de poursuivre l’essai."
+        elif progress.goal is None:
+            hint = "Le résultat du test et le rôle de la précondition sont consignés. Tu peux essayer une autre liste non vide."
+        elif not question:
+            hint = ("Pour vérifier cette version, note l’entrée et le résultat de l’essai négatif de référence."
+                    if progress.goal == "verification" else
+                    "Les approches proposées pour cet objectif ont été utilisées. Essaie une nouvelle idée ou change de notion.")
+        elif assessment.status == "incorrecte":
+            hint = "Vérifie les valeurs et le sens de la comparaison sur le cas demandé." if progress.goal != "verification" else (
+                "Compare la structure du programme puis note le résultat de l’essai sur la version modifiée."
+            )
+        else:
+            hint = ""
+
+    raw = None
+    model_used = False
+    model_status = "non_sollicite"
+    if engine is not None and question:
+        goal = MAXIMUM_GOALS[progress.goal][0]
+        # Résumé déterminé côté serveur. Le modèle ne reçoit aucune décision envoyée par le navigateur.
+        learned = ", ".join(MAXIMUM_GOALS[key][0] for key in MAXIMUM_GOALS if key in progress.confirmed)
+        messages = [
+            {"role": "system", "content": (
+                "Tu proposes un seul indice socratique en français pour l'objectif demandé par l'atelier. "
+                "Écris une invitation de cinq à douze mots à l'impératif, suivie d'un groupe nominal et d'un point. "
+                "Donne une action à essayer. Évite que, est, sont, les comparatifs et les affirmations. "
+                "Aucun code, chiffre, résultat ni solution. Ne répète pas la question de l'atelier."
+            )},
+            {"role": "user", "content": (
+                f"{LEVELS[level]}\nExercice : {statement[:420]}\n"
+                f"Objectifs acquis : {learned or 'aucun'}\nObjectif en cours : {goal}\n"
+                f"Approche : {strategy}\nQuestion retenue par l'atelier : {question}\n"
+                f"Réponse de l'élève : {json.dumps(learner[:240], ensure_ascii=False)}"
+            )},
+        ]
+        try:
+            raw = engine.generate(messages, hint=True)
+        except EngineError:
+            model_status = "indisponible"
+        else:
+            model_status = "ecarte"
+            suggestion = read_maximum_hint(raw, progress.goal, question, progress.questions)
+            # Le retour ciblé sur une erreur a priorité sur l'indice libre.
+            if suggestion and not hint:
+                hint = suggestion
+                model_used = True
+                model_status = "affiche"
+
+    phase = MAXIMUM_GOALS[progress.goal][1] if progress.goal else 5
+    feedback = assessment.message
+    if assessment.confirmed:
+        # Montrer le fait reconnu afin que l'élève puisse rectifier une interprétation.
+        feedback = "Relevé dans ta réponse ou ton code. " + " ".join(
+            progress.confirmed[key].criterion for key in assessment.confirmed
+        )
+    return {
+        "indice": hint, "question": question, "feedback": feedback,
+        "stage": phase, "stage_name": STAGES[phase][0], "analysis": facts,
+        "pedagogie": progress.snapshot(assessment) | {"notion_demandee": topic},
+        "provenance": {
+            "hint": engine.status()["name"] + " · indice généré localement" if model_used else "Règle pédagogique locale",
+            "question": "Question retenue par les règles pédagogiques",
+            "diagnostic": "Analyse statique Python", "jepa": "Aucune contribution de LANG-JEPA.",
+        },
+        "generation": model_status, "seconds": round(time.perf_counter() - started, 3),
     }, raw

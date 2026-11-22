@@ -38,6 +38,24 @@ CONTRACT_FORMAT["json_schema"]["schema"]["properties"]["indice"] = {
     "type": "string",
     "pattern": "^(La précondition|Une liste non vide|L'énoncé exige une liste non vide).{2,180}$",
 }
+HINT_FORMAT = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "socratic_hint",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "indice": {
+                    "type": "string",
+                    "pattern": "^(Compare|Examine|Observe|Relis|Cherche|Distingue|Imagine) .{8,90}[.]$",
+                },
+            },
+            "required": ["indice"],
+            "additionalProperties": False,
+        },
+    },
+}
 
 
 class LlamaEngine:
@@ -134,7 +152,7 @@ class LlamaEngine:
             )
             self.close()
 
-    def generate(self, messages, contract=False):
+    def generate(self, messages, contract=False, *, hint=False):
         if self.status()["state"] != "ready":
             raise EngineError(self.detail)
         if not self.lock.acquire(blocking=False):
@@ -143,7 +161,8 @@ class LlamaEngine:
         try:
             status, data = self._request("/v1/chat/completions", {
                 "model": self.key, "messages": messages, "temperature": 0, "seed": 42,
-                "max_tokens": 160, "response_format": CONTRACT_FORMAT if contract else REPLY_FORMAT,
+                "max_tokens": 85 if hint else 160,
+                "response_format": HINT_FORMAT if hint else CONTRACT_FORMAT if contract else REPLY_FORMAT,
                 "cache_prompt": False,
             }, timeout=110)
             if status == 400:

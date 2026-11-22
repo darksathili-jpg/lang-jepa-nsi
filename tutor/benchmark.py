@@ -11,8 +11,9 @@ import sys
 import time
 
 from tutor.catalog import CATALOG, DEFAULT_ASSETS, ROOT
-from tutor.dialogue import RejectedReply, normalized, respond
+from tutor.dialogue import RejectedReply, normalized
 from tutor.engine import EngineError, LlamaEngine
+from tutor.sessions import RECENT_TURNS, Sessions
 
 
 def peak_memory(pid):
@@ -67,30 +68,31 @@ def evidence(case, turn, answer, raw, code):
 
 
 def run_case(engine, case):
-    history = []
+    sessions = Sessions()
+    token, turn_number = None, 0
     code = case["code"]
     for index, turn in enumerate(case["turns"], 1):
         code = turn.get("code", code)
         payload = {
             "class": case["class"], "statement": case["statement"], "code": code,
-            "question": turn["question"], "history": history[-3:],
+            "question": turn["question"], "session": token, "turn": turn_number,
         }
         started = time.perf_counter()
+        history_count = min(turn_number, RECENT_TURNS)
+        captured = []
         try:
-            answer, raw = respond(engine, payload)
+            answer = sessions.turn("conversation", payload, engine, capture=captured)
+            token, turn_number = answer["session"], answer["turn"]
+            answer = {key: value for key, value in answer.items() if key != "session"}
+            raw = captured[0] or {}
             error = None
         except (RejectedReply, EngineError) as exc:
             answer = None
             raw = getattr(exc, "evidence", {})
             error = str(exc)
-        if answer:
-            history.append({
-                "learner": turn["question"], "assistant": answer["indice"] + " " + answer["question"],
-                "stage": answer["stage"], "digest": answer["analysis"]["digest"],
-            })
         yield {
             "kind": "turn", "model": engine.key, "case": case["id"], "turn": index,
-            "question": turn["question"], "history_count": len(payload["history"]),
+            "question": turn["question"], "history_count": history_count,
             "answer": answer, "error": error, "raw": raw,
             "elapsed_seconds": round(time.perf_counter() - started, 3),
             "peak_process_bytes": peak_memory(engine.process.pid),

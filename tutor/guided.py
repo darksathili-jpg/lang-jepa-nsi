@@ -6,7 +6,7 @@ import time
 from pedagogy.catalogue import EXERCISES
 from tutor.analysis import analyze
 from tutor.curriculum import STAGES
-from tutor.dialogue import DialogueError, normalized, validate
+from tutor.dialogue import DialogueError, maximum_reply, normalized, validate
 
 
 def guided_stage(exercise, words, history, facts):
@@ -34,13 +34,16 @@ def guided_stage(exercise, words, history, facts):
     return stage
 
 
-def respond_guided(payload):
+def respond_guided(payload, *, progress=None, turn=1, history_limit=3):
     started = time.perf_counter()
-    level, statement, code, question, history = validate(payload)
+    level, statement, code, question, history = validate(payload, history_limit=history_limit)
     exercise_id = payload.get("exercise")
     exercise = EXERCISES.get(exercise_id) if isinstance(exercise_id, str) else None
     if exercise is None or exercise["level"] != level:
         raise DialogueError("Choisissez un exercice du niveau indiqué.")
+    if exercise_id == "maximum" and progress is not None:
+        answer, _ = maximum_reply(None, payload | {"history": []}, progress, turn)
+        return answer
     facts = analyze(code)
     stage = guided_stage(exercise, normalized(question), history, facts)
     diagnostic = "Syntaxe analysée. Le résultat du programme reste à vérifier."

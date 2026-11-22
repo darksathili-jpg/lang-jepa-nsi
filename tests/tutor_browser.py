@@ -101,9 +101,9 @@ def live(browser, origin, captures):
     composer = page.get_by_label("Ta question ou ton observation")
     turns = [
         SCENARIO["turns"][0],
-        {"question": "Avec [-4, -2], je trouve 0. Quelles étapes de calcul puis-je observer ?"},
-        SCENARIO["turns"][1],
-        SCENARIO["turns"][2],
+        {"question": "Avec [-4, -2], je trouve 0 mais la valeur attendue est -2."},
+        {"question": "m reste à 0 car 0 est supérieur à -4 et à -2."},
+        SCENARIO["turns"][2] | {"question": "Sur [-4, -2], j'obtiens -2 après ma modification."},
     ]
     for index, turn in enumerate(turns, 1):
         if "code" in turn:
@@ -115,7 +115,7 @@ def live(browser, origin, captures):
         data = response.json()
         assert response.ok, data
         expect(page.locator(".assistant")).to_have_count(index)
-        text = data["indice"] + " " + data["question"]
+        text = " ".join((data.get("feedback", ""), data["indice"], data["question"]))
         print(index, data["stage"], text, flush=True)
         if index < len(turns):
             assert not re.search(r"tab\s*\[\s*0\s*\]|premier élément|\bmax\s*\(", text, re.I), text
