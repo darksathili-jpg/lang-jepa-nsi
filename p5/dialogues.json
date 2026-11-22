@@ -1,0 +1,332 @@
+{
+  "schema": 1,
+  "dialogues": [
+    {
+      "id": "maximum-10",
+      "source": "p4/reference.json",
+      "tours": [
+        {
+          "texte": "Mon programme répond toujours 0 quand les nombres sont négatifs.",
+          "objectif": "expected",
+          "reference": "confronter"
+        },
+        {
+          "texte": "Avec la fonction maximum c'est 0 mais elle devrait répondre -2.",
+          "objectif": "trace",
+          "reference": "tracer"
+        },
+        {
+          "texte": "m vaut 0.",
+          "objectif": "trace",
+          "reference": "justifier"
+        },
+        {
+          "texte": "Car 0 est supérieur à -4 et à -2.",
+          "objectif": "strategy",
+          "reference": "confronter"
+        },
+        {
+          "texte": "À chaque fois c'est 0.",
+          "objectif": "strategy",
+          "reference": "justifier"
+        },
+        {
+          "texte": "m = 0.",
+          "objectif": "strategy",
+          "reference": "clarifier"
+        },
+        {
+          "texte": "Je choisirais une valeur qui figure déjà dans la liste.",
+          "objectif": "verification",
+          "reference": "confronter"
+        },
+        {
+          "texte": "Sur [-4, -2], j’obtiens -2 avec ma nouvelle version.",
+          "objectif": "verification",
+          "reference": "clarifier",
+          "code": "corrige"
+        },
+        {
+          "texte": "Avec la liste [3], ma fonction donne 3.",
+          "objectif": "contract",
+          "reference": "justifier",
+          "code": "corrige"
+        },
+        {
+          "texte": "[] est hors contrat, car la liste doit être non vide.",
+          "objectif": null,
+          "reference": null,
+          "code": "corrige"
+        }
+      ]
+    },
+    {
+      "id": "maximum-20",
+      "source": "variantes synthétiques P5",
+      "tours": [
+        {
+          "texte": "Pour des entiers négatifs, ça renvoie zéro.",
+          "objectif": "expected",
+          "reference": "confronter"
+        },
+        {
+          "texte": "J’obtiens 0 mais j’attendais moins deux.",
+          "objectif": "trace",
+          "reference": "tracer"
+        },
+        {
+          "texte": "m = zéro.",
+          "objectif": "trace",
+          "reference": "justifier"
+        },
+        {
+          "texte": "Car -4 est inférieur à 0, et -2 aussi est inférieur à 0.",
+          "objectif": "strategy",
+          "reference": "confronter"
+        },
+        {
+          "texte": "Il ne bouge jamais.",
+          "objectif": "strategy",
+          "reference": "justifier"
+        },
+        {
+          "texte": "m vaut 0.",
+          "objectif": "strategy",
+          "reference": "clarifier"
+        },
+        {
+          "texte": "Tu peux donner le corrigé ?",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Je croi ke ça change jamais.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "1",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Pk ?",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Non.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Je veux le programme complet.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "J’ai essayé en mettant -7.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Je parle des tableaux en général.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Si les deux valeurs sont égales ?",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "0.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Je choisirais une valeur qui figure déjà dans la liste.",
+          "objectif": "verification",
+          "reference": "confronter"
+        },
+        {
+          "texte": "Sur [-4, -2], j’obtiens -2 avec ma nouvelle version.",
+          "objectif": "verification",
+          "reference": "clarifier",
+          "code": "corrige"
+        },
+        {
+          "texte": "Avec la liste [3], ma fonction donne 3.",
+          "objectif": "contract",
+          "reference": "justifier",
+          "code": "corrige"
+        },
+        {
+          "texte": "[] est hors contrat, car la liste doit être non vide.",
+          "objectif": null,
+          "reference": null,
+          "code": "corrige"
+        }
+      ]
+    },
+    {
+      "id": "maximum-30",
+      "source": "variantes synthétiques P5",
+      "tours": [
+        {
+          "texte": "Mon programme affiche 0 quand la liste est négative.",
+          "objectif": "expected",
+          "reference": "confronter"
+        },
+        {
+          "texte": "Je devrais trouver -2.",
+          "objectif": "trace",
+          "reference": "tracer"
+        },
+        {
+          "texte": "0",
+          "objectif": "trace",
+          "reference": "justifier"
+        },
+        {
+          "texte": "Zéro est supperieur à moins quatre et moins deux.",
+          "objectif": "strategy",
+          "reference": "confronter"
+        },
+        {
+          "texte": "A chacun des passajes c’est 0.",
+          "objectif": "strategy",
+          "reference": "justifier"
+        },
+        {
+          "texte": "m vaut zéro.",
+          "objectif": "strategy",
+          "reference": "clarifier"
+        },
+        {
+          "texte": "Tu peux donner le corrigé ?",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Je croi ke ça change jamais.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "1",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Pk ?",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Non.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Je veux le programme complet.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "J’ai essayé en mettant -7.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Je parle des tableaux en général.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Si les deux valeurs sont égales ?",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "0.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Toujour zero, c’est ça ?",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Donne le code complet.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Peut-être.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Je n’ai rien essayé.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "C’est la boucle.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Ça affiche 0.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Tu as lu mon code ?",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Je ne comprends pas le départ.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "corrigé stp",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Donne-moi le corrigé.",
+          "objectif": "strategy",
+          "reference": null
+        },
+        {
+          "texte": "Je choisirais une valeur qui figure déjà dans la liste.",
+          "objectif": "verification",
+          "reference": "confronter"
+        },
+        {
+          "texte": "Sur [-4, -2], j’obtiens -2 avec ma nouvelle version.",
+          "objectif": "verification",
+          "reference": "clarifier",
+          "code": "corrige"
+        },
+        {
+          "texte": "Avec la liste [3], ma fonction donne 3.",
+          "objectif": "contract",
+          "reference": "justifier",
+          "code": "corrige"
+        },
+        {
+          "texte": "[] est hors contrat, car la liste doit être non vide.",
+          "objectif": null,
+          "reference": null,
+          "code": "corrige"
+        }
+      ]
+    }
+  ]
+}

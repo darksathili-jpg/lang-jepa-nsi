@@ -1,0 +1,1136 @@
+{
+  "schema": 1,
+  "provenance": "p5/provenance.json",
+  "exercices": [
+    {
+      "famille": "type-saisie",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Affectation et types",
+      "enonce": "Convertir une durée saisie en minutes.",
+      "code": "duree = input()\nprint(duree + 1)",
+      "difficulte": "duree reçoit une chaîne",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "distinguer le type saisi du type requis",
+      "tours": [
+        {
+          "reponse": "input renvoie du texte alors que + 1 attend ici un entier",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "duree vaut « 15 » je crois",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "Python transforme tout seul ce que je tape",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "echange",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Affectation et types",
+      "enonce": "Échanger les contenus de a et b.",
+      "code": "a = 3\nb = 7\na = b\nb = a",
+      "difficulte": "deux affectations successives",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "retrouver la valeur perdue en suivant les deux affectations",
+      "tours": [
+        {
+          "reponse": "après la première affectation, a et b valent tous deux 7",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "je trouve deux fois 7",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "b récupère l’ancien a",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "seuil-tarif",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Conditions",
+      "enonce": "Accorder le tarif réduit jusqu’à 12 ans inclus.",
+      "code": "def reduit(age):\n    return age < 12",
+      "difficulte": "borne stricte",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "confronter 11, 12 et 13 à la phrase jusqu’à",
+      "tours": [
+        {
+          "reponse": "l’âge 12 est exclu avec le signe strict",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "ça rate à la limite",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "11 devrait être le seul cas incorrect",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "ou-inclusif",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Conditions",
+      "enonce": "Signaler un nom vide ou un mot de passe vide.",
+      "code": "if not nom and not passe:\n    print(\"incomplet\")",
+      "difficulte": "conjonction",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "produire un cas avec un seul champ vide",
+      "tours": [
+        {
+          "reponse": "avec seulement le nom vide les deux conditions ne sont pas vraies",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "j’ai essayé quand tout est vide",
+          "statut": "partielle",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "and suffit dès qu’un champ est vide",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "decompte-bornes",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Boucle bornée",
+      "enonce": "Afficher les entiers de 1 à n inclus.",
+      "code": "for i in range(1, n):\n    print(i)",
+      "difficulte": "borne de range",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "lister les valeurs réellement produites",
+      "tours": [
+        {
+          "reponse": "pour n=3 on produit 1, 2 et on n’atteint pas 3",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "ça s’arrête trop tôt",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "range contient toujours sa borne haute",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "somme-multiples",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Boucle bornée",
+      "enonce": "Additionner les multiples de trois rencontrés.",
+      "code": "s = 0\nfor n in valeurs:\n    if n % 3 == 0:\n        s = n",
+      "difficulte": "accumulateur écrasé",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "comparer affectation simple et accumulation sur deux valeurs",
+      "tours": [
+        {
+          "reponse": "pour 3 et 6, la somme intermédiaire 3 est remplacée par 6",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "ça renvoie le dernier",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "s garde automatiquement le total",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "attente-compteur",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Boucle non bornée",
+      "enonce": "Arrêter la boucle quand le compteur atteint la limite.",
+      "code": "i = 0\nwhile i < 5:\n    print(i)",
+      "difficulte": "variable de garde jamais affectée dans le corps",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "contrôler l’évolution de la condition d’arrêt",
+      "tours": [
+        {
+          "reponse": "i ne change pas donc la condition reste vraie",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "ça tourne",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "l’affichage fait avancer i",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "sa boucle tjr ?",
+          "statut": "ambigue",
+          "intervention": "clarifier"
+        }
+      ]
+    },
+    {
+      "famille": "jeu-sentinelle",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Boucle non bornée",
+      "enonce": "Lire des nombres jusqu’à la valeur sentinelle 0.",
+      "code": "nombre = int(input())\nwhile nombre != 0:\n    total += nombre",
+      "difficulte": "pas de nouvelle lecture dans la boucle",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "décrire quelle valeur décide de poursuivre",
+      "tours": [
+        {
+          "reponse": "seule la première saisie est lue, nombre reste le même",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "0 devrait arrêter",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "le prochain input est automatique pendant while",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "renvoi-moyenne",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Fonctions",
+      "enonce": "Calculer et réutiliser la moyenne de deux nombres.",
+      "code": "def moyenne(a, b):\n    print((a + b) / 2)",
+      "difficulte": "aucune valeur renvoyée explicitement",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "différencier affichage et valeur renvoyée",
+      "tours": [
+        {
+          "reponse": "le calcul est affiché mais l’appel donne None",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "je vois bien le résultat à l’écran",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "print renvoie le nombre qu’il affiche",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "parametres-ordre",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Fonctions",
+      "enonce": "Soustraire un prix remisé de son prix initial.",
+      "code": "def reduction(initial, remisé):\n    return initial - remisé\nreduction(60, 100)",
+      "difficulte": "arguments inversés à l’appel",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "associer chaque argument à son paramètre",
+      "tours": [
+        {
+          "reponse": "initial reçoit 60 même si le prix initial annoncé est 100",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "j’obtiens une réduction négative",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "les arguments se placent dans l’ordre des valeurs",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "copie-liste",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Listes",
+      "enonce": "Trier une liste sans modifier la liste originale.",
+      "code": "b = a\nb.sort()",
+      "difficulte": "deux références vers une liste",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "observer les deux variables après la mutation",
+      "tours": [
+        {
+          "reponse": "a et b désignent la même liste après l’affectation",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "les deux sont triées, bizarre",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "l’affectation fait une copie du contenu",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "indices-dernier",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Listes",
+      "enonce": "Afficher le dernier élément d’une liste non vide.",
+      "code": "print(valeurs[len(valeurs)])",
+      "difficulte": "longueur confondue avec indice",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "énumérer les indices d’un exemple de longueur deux",
+      "tours": [
+        {
+          "reponse": "pour deux éléments les indices sont 0 et 1",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "ça dit index error",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "l’indice 2 désigne le deuxième élément",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "initialisation-cle",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Dictionnaires",
+      "enonce": "Compter les apparitions des mots d’un texte.",
+      "code": "compte = {}\nfor mot in texte:\n    compte[mot] += 1",
+      "difficulte": "lecture de clé absente",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "distinguer première apparition et répétition",
+      "tours": [
+        {
+          "reponse": "la première fois le mot est absent donc la lecture précède toute insertion",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "il y a un KeyError",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "le += crée la première valeur",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "recherche-cle",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Recherche séquentielle",
+      "enonce": "Tester si un nombre figure dans une liste.",
+      "code": "def contient(liste, x):\n    for valeur in liste:\n        return valeur == x\n    return False",
+      "difficulte": "retour dans la boucle",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "confronter présence en deuxième position et absence",
+      "tours": [
+        {
+          "reponse": "on sort après la comparaison du premier élément",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "ça marche en position zéro",
+          "statut": "partielle",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "la boucle continue après return",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "division-vide",
+      "partage": "train",
+      "niveau": "premiere",
+      "notion": "Tests et cas limites",
+      "enonce": "Définir quand la moyenne d’une liste est calculable.",
+      "code": "def moyenne(liste):\n    return sum(liste) / len(liste)",
+      "difficulte": "dénominateur nul sur la liste vide",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "établir une précondition et distinguer les entrées admises",
+      "tours": [
+        {
+          "reponse": "la moyenne de la liste vide demanderait une division par zéro",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "je n’ai testé qu’avec une valeur",
+          "statut": "partielle",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "la somme vide est 0 donc le résultat vaut 0",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "base-factorielle",
+      "partage": "train",
+      "niveau": "terminale",
+      "notion": "Récursivité",
+      "enonce": "Calculer la factorielle à partir d’un entier naturel.",
+      "code": "def fact(n):\n    return n * fact(n - 1)",
+      "difficulte": "aucun arrêt explicite",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "décrire jusqu’où descendent les appels en l’absence de cas de base",
+      "tours": [
+        {
+          "reponse": "fact 0 appelle fact moins un, aucune branche ne s’arrête",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "ça rappelle la fonction",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "en rencontrant 0 la multiplication arrête l’appel",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "pile-navigation",
+      "partage": "train",
+      "niveau": "terminale",
+      "notion": "Piles et files",
+      "enonce": "Retirer la dernière page visitée d’un historique.",
+      "code": "pages.pop(0)",
+      "difficulte": "suppression en tête",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "tester trois visites et l’ordre de sortie",
+      "tours": [
+        {
+          "reponse": "la première page sort alors qu’on doit retirer la dernière",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "ça retire une page",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "avec pop zéro je retire forcément le dernier",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "arbre-taille",
+      "partage": "train",
+      "niveau": "terminale",
+      "notion": "Arbres",
+      "enonce": "Compter les nœuds d’un arbre binaire.",
+      "code": "def taille(a):\n    if a is None: return 0\n    return 1 + taille(a.gauche)",
+      "difficulte": "sous-arbre droit absent",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "demander un arbre à une seule branche droite",
+      "tours": [
+        {
+          "reponse": "la racine et la branche gauche seulement contribuent",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "sur un arbre à gauche j’obtiens le bon compte",
+          "statut": "partielle",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "la récursion visite implicitement la branche droite",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "visite-cycle",
+      "partage": "train",
+      "niveau": "terminale",
+      "notion": "Graphes",
+      "enonce": "Parcourir un graphe contenant des cycles.",
+      "code": "def dfs(g, s):\n    for v in g[s]:\n        dfs(g, v)",
+      "difficulte": "aucun ensemble des sommets visités",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "tracer un cycle court et expliquer le rôle d’un marquage",
+      "tours": [
+        {
+          "reponse": "de A on appelle B puis A, rien ne l’interdit",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "ça déborde",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "les sommets ne sont traités qu’une fois par définition",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "insertion-invariant",
+      "partage": "train",
+      "niveau": "terminale",
+      "notion": "Correction d’algorithme",
+      "enonce": "Justifier le tri par insertion.",
+      "code": "for i in range(1, len(t)):\n    inserer(t, i)",
+      "difficulte": "fragment d’une preuve de correction",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "formuler la propriété préservée par une insertion",
+      "tours": [
+        {
+          "reponse": "avant et après l’insertion le préfixe traité est trié",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "j’ai vérifié sur deux tableaux",
+          "statut": "partielle",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "deux tests prouvent le tri pour tous les tableaux",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "concat-saisie",
+      "partage": "dev",
+      "niveau": "premiere",
+      "notion": "Affectation et types",
+      "enonce": "Calculer le prix total à partir de deux saisies.",
+      "code": "p = input()\nq = input()\nprint(p + q)",
+      "difficulte": "opérateur sur deux chaînes",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "distinguer addition et concaténation par une entrée",
+      "tours": [
+        {
+          "reponse": "2 et 3 donnent le texte 23",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "il affiche un nombre à deux caractères",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "le signe plus impose toujours une addition",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "intervalle-borne",
+      "partage": "dev",
+      "niveau": "premiere",
+      "notion": "Conditions",
+      "enonce": "Vérifier qu’une note est comprise entre 0 et 20.",
+      "code": "def valide(n):\n    return n >= 0 or n <= 20",
+      "difficulte": "conditions reliées par ou",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "produire un cas négatif qui passe à tort",
+      "tours": [
+        {
+          "reponse": "moins un valide n <= 20 donc l’expression est vraie",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "pour 12 ça marche",
+          "statut": "partielle",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "pour −1 les deux tests sont faux",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "pas-pair",
+      "partage": "dev",
+      "niveau": "premiere",
+      "notion": "Boucle bornée",
+      "enonce": "Lister les nombres pairs strictement inférieurs à huit.",
+      "code": "for i in range(0, 8):\n    print(i)",
+      "difficulte": "pas de un",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "suivre les trois premières itérations",
+      "tours": [
+        {
+          "reponse": "je vois 0, 1, 2, le 1 devrait être exclu",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "des nombres de trop sont affichés",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "le pas s’adapte aux nombres pairs",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "sortie-recherche",
+      "partage": "dev",
+      "niveau": "premiere",
+      "notion": "Recherche séquentielle",
+      "enonce": "Chercher un élève par son nom.",
+      "code": "trouve = False\nfor nom in noms:\n    trouve = nom == cible",
+      "difficulte": "résultat écrasé par le dernier test",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "retrouver l’origine d’un vrai puis faux",
+      "tours": [
+        {
+          "reponse": "après la cible trouve vaut True puis est écrasé",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "je crois que le résultat dépend du dernier nom",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "True reste mémorisé si on trouve le nom",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "copie-file",
+      "partage": "dev",
+      "niveau": "terminale",
+      "notion": "Piles et files",
+      "enonce": "Traiter les demandes dans l’ordre d’arrivée.",
+      "code": "file = [\"a\", \"b\", \"c\"]\nfile.pop()",
+      "difficulte": "retrait en fin de file",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "comparer l’ordre attendu et observé",
+      "tours": [
+        {
+          "reponse": "c sort alors que a est la première demande",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "a attend encore",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "pop retire le premier par défaut",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "liste-adjacence",
+      "partage": "dev",
+      "niveau": "terminale",
+      "notion": "Graphes",
+      "enonce": "Représenter une liaison non orientée entre deux postes.",
+      "code": "g[\"a\"].append(\"b\")",
+      "difficulte": "une seule incidence ajoutée",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "tester la présence de l’arête en sens inverse",
+      "tours": [
+        {
+          "reponse": "a voit b sans que b voie a",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "le dessin a juste un trait",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "l’ajout à a met aussi b à jour",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "base-profondeur",
+      "partage": "dev",
+      "niveau": "terminale",
+      "notion": "Arbres",
+      "enonce": "Calculer la hauteur d’un arbre avec hauteur vide nulle.",
+      "code": "def h(a):\n    return 1 + max(h(a.gauche), h(a.droite))",
+      "difficulte": "aucun arrêt sur un sous-arbre vide",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "comparer le contrat et la lecture d’un attribut",
+      "tours": [
+        {
+          "reponse": "h(None) tente de lire gauche sans vérifier le cas vide",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "ça donne une erreur en feuille",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "une feuille ne peut avoir de sous-arbre vide",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "collision-cle",
+      "partage": "dev",
+      "niveau": "premiere",
+      "notion": "Dictionnaires",
+      "enonce": "Mémoriser toutes les villes par code postal.",
+      "code": "villes[code] = ville",
+      "difficulte": "valeur antérieure écrasée",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "comparer deux villes avec la même clé",
+      "tours": [
+        {
+          "reponse": "la seconde affectation remplace la première si le code est identique",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "il manque des villes dans les résultats",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "une clé répétée ajoute automatiquement une deuxième valeur",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "somme-texte",
+      "partage": "test",
+      "niveau": "premiere",
+      "notion": "Affectation et types",
+      "enonce": "Réunir un numéro de salle avec le préfixe en toutes lettres.",
+      "code": "salle = 24\nnom = \"Salle \" + salle",
+      "difficulte": "concaténation d’un texte et d’un entier",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "justifier par les types la présence d’une erreur",
+      "tours": [
+        {
+          "reponse": "le préfixe est une chaîne mais salle est une variable de type entier",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "le plus ne marche pas",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "Python additionne 24 à la longueur du préfixe",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "remise-double",
+      "partage": "test",
+      "niveau": "premiere",
+      "notion": "Conditions",
+      "enonce": "Choisir une seule remise dans deux catégories exclusives.",
+      "code": "if montant >= 50:\n    remise = 5\nif montant >= 100:\n    remise = 10",
+      "difficulte": "deux conditions indépendantes",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "suivre les affectations pour 110",
+      "tours": [
+        {
+          "reponse": "sur 110 les deux instructions s’exécutent et la seconde remplace la première",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "pour 110 j’en vois deux",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "la seconde condition ne s’exécute jamais si la première est vraie",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "produit-zero",
+      "partage": "test",
+      "niveau": "premiere",
+      "notion": "Boucle bornée",
+      "enonce": "Calculer le produit des éléments non nuls.",
+      "code": "p = 0\nfor n in nombres:\n    if n != 0:\n        p = p * n",
+      "difficulte": "élément absorbant de la multiplication",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "tracer le produit sur deux non-zéros et expliquer l’invariant",
+      "tours": [
+        {
+          "reponse": "dès la première multiplication le zéro impose le résultat à chaque étape",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "la variable p vaut zéro",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "le premier nombre remplace automatiquement le zéro",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "sentinelle-incorrecte",
+      "partage": "test",
+      "niveau": "premiere",
+      "notion": "Boucle non bornée",
+      "enonce": "Boucler jusqu’à ce que le joueur propose exactement fin.",
+      "code": "while mot == \"fin\":\n    mot = input()",
+      "difficulte": "égalité dans la garde",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "tester le démarrage avec un mot quelconque puis fin",
+      "tours": [
+        {
+          "reponse": "mot égal à bonjour donne une condition fausse dès le début",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "j’ai essayé avec bonjour",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "la boucle part avec n’importe quel mot",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        }
+      ]
+    },
+    {
+      "famille": "portee-score",
+      "partage": "test",
+      "niveau": "premiere",
+      "notion": "Fonctions",
+      "enonce": "Renvoyer un score calculé pour le rendre accessible après l’appel.",
+      "code": "def calculer(x):\n    score = x * 2\ncalculer(6)\nprint(score)",
+      "difficulte": "variable locale à la fonction",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "associer la portée de score à son lieu d’affectation",
+      "tours": [
+        {
+          "reponse": "score est définie dans la fonction et indisponible ici",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "l’affichage ne trouve pas score",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "l’appel enregistre score comme variable globale",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "liste-mutation",
+      "partage": "test",
+      "niveau": "premiere",
+      "notion": "Listes",
+      "enonce": "Supprimer tous les zéros d’une liste.",
+      "code": "for valeur in valeurs:\n    if valeur == 0:\n        valeurs.remove(valeur)",
+      "difficulte": "modification pendant le parcours",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "Comparer deux zéros adjacents et deux séparés",
+      "tours": [
+        {
+          "reponse": "un zéro adjacent peut être sauté parce que les positions changent",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "sur une liste avec un seul zéro ça semble marcher",
+          "statut": "partielle",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "la boucle visite chaque position initiale sans changement",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "inversion-repertoire",
+      "partage": "test",
+      "niveau": "premiere",
+      "notion": "Dictionnaires",
+      "enonce": "Construire la correspondance couleur et liste d’objets.",
+      "code": "inverse[couleur] = objet",
+      "difficulte": "objets de couleur identique écrasés",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "comparer deux objets associés à la même couleur",
+      "tours": [
+        {
+          "reponse": "le deuxième objet remplace le premier sous la même clé",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "les couleurs uniques fonctionnent",
+          "statut": "partielle",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "la clé contient tous les objets sans autre manipulation",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "distribue-recursion",
+      "partage": "test",
+      "niveau": "terminale",
+      "notion": "Récursivité",
+      "enonce": "Compter les chiffres d’un entier naturel.",
+      "code": "def chiffres(n):\n    if n < 10: return 1\n    return 1 + chiffres(n)",
+      "difficulte": "argument inchangé à chaque appel",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "tracer un petit entier à deux chiffres et expliquer la décroissance attendue",
+      "tours": [
+        {
+          "reponse": "pour 42 l’appel reçoit encore 42, on n’atteint pas le cas de base",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "il y a une condition d’arrêt",
+          "statut": "partielle",
+          "intervention": "tracer"
+        },
+        {
+          "reponse": "le 1 ajouté fait décroître n",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "pile-delimiteurs",
+      "partage": "test",
+      "niveau": "terminale",
+      "notion": "Piles et files",
+      "enonce": "Vérifier qu’une chaîne ferme chaque parenthèse dans le bon ordre.",
+      "code": "if char == \")\":\n    pile.pop()",
+      "difficulte": "retrait possible sur pile vide",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "essayer une fermeture seule et formuler la précondition du retrait",
+      "tours": [
+        {
+          "reponse": "sur une fermeture en premier, la pile est encore vide",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "sur une paire ça fonctionne",
+          "statut": "partielle",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "une fermeture crée une ouverture si la pile est vide",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "graphe-court",
+      "partage": "test",
+      "niveau": "terminale",
+      "notion": "Graphes",
+      "enonce": "Trouver le chemin le plus court en nombre d’arêtes.",
+      "code": "sommet = en_attente.pop()",
+      "difficulte": "pile au lieu d’une file",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "confronter un détour visité avant un chemin court",
+      "tours": [
+        {
+          "reponse": "explorer un voisin jusqu’au bout peut retrouver un détour avant le lien court",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "on visite quand même les voisins",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "la première solution trouvée en profondeur est toujours la plus courte",
+          "statut": "incorrecte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "juste pk ?",
+          "statut": "ambigue",
+          "intervention": "clarifier"
+        }
+      ]
+    },
+    {
+      "famille": "invariant-recherche-dicho",
+      "partage": "test",
+      "niveau": "terminale",
+      "notion": "Correction d’algorithme",
+      "enonce": "Préserver la position possible de la cible à chaque itération d’une recherche dichotomique.",
+      "code": "if t[milieu] < cible:\n    haut = milieu - 1",
+      "difficulte": "demi-intervalle incorrect",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "justifier quelle moitié peut encore contenir la cible",
+      "tours": [
+        {
+          "reponse": "la cible peut se trouver à droite du milieu donc on perd les indices possibles",
+          "statut": "correcte",
+          "intervention": "justifier"
+        },
+        {
+          "reponse": "je ne sais plus de quel côté elle est",
+          "statut": "partielle",
+          "intervention": "clarifier"
+        },
+        {
+          "reponse": "quand le milieu vaut trop peu on garde les plus petits",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    },
+    {
+      "famille": "arbre-feuilles",
+      "partage": "test",
+      "niveau": "terminale",
+      "notion": "Arbres",
+      "enonce": "Compter les feuilles d’un arbre binaire non vide.",
+      "code": "def feuilles(a):\n    if not a.gauche: return 1\n    return feuilles(a.gauche) + feuilles(a.droite)",
+      "difficulte": "test partiel de feuille",
+      "objectif": "Expliquer le comportement du programme et vérifier son contrat.",
+      "critere": "fournir un arbre à enfant droit seul",
+      "tours": [
+        {
+          "reponse": "sans enfant gauche on peut pourtant avoir un enfant droit",
+          "statut": "correcte",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "je l’ai testé sur une seule racine",
+          "statut": "partielle",
+          "intervention": "confronter"
+        },
+        {
+          "reponse": "un nœud sans enfant gauche est forcément une feuille",
+          "statut": "incorrecte",
+          "intervention": "tracer"
+        }
+      ]
+    }
+  ]
+}

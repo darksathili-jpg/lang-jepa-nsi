@@ -1,0 +1,3120 @@
+{
+  "schema": 1,
+  "versions": {
+    "python": "3.12.14",
+    "numpy": "2.3.5"
+  },
+  "machine": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "processeur": "x86_64"
+  },
+  "corpus_sha256": "caecb76c12dc8c6ccd720b1b06d77e34da092282827f92fc234c73452def70be",
+  "epoques": 65,
+  "graines": [
+    17,
+    43,
+    97
+  ],
+  "series": {
+    "train": 61,
+    "dev": 24,
+    "test": 37
+  },
+  "verite_test": [
+    {
+      "famille": "somme-texte",
+      "statut": "correcte",
+      "intervention": "justifier"
+    },
+    {
+      "famille": "somme-texte",
+      "statut": "partielle",
+      "intervention": "clarifier"
+    },
+    {
+      "famille": "somme-texte",
+      "statut": "incorrecte",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "remise-double",
+      "statut": "correcte",
+      "intervention": "justifier"
+    },
+    {
+      "famille": "remise-double",
+      "statut": "partielle",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "remise-double",
+      "statut": "incorrecte",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "produit-zero",
+      "statut": "correcte",
+      "intervention": "justifier"
+    },
+    {
+      "famille": "produit-zero",
+      "statut": "partielle",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "produit-zero",
+      "statut": "incorrecte",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "sentinelle-incorrecte",
+      "statut": "correcte",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "sentinelle-incorrecte",
+      "statut": "partielle",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "sentinelle-incorrecte",
+      "statut": "incorrecte",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "portee-score",
+      "statut": "correcte",
+      "intervention": "justifier"
+    },
+    {
+      "famille": "portee-score",
+      "statut": "partielle",
+      "intervention": "clarifier"
+    },
+    {
+      "famille": "portee-score",
+      "statut": "incorrecte",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "liste-mutation",
+      "statut": "correcte",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "liste-mutation",
+      "statut": "partielle",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "liste-mutation",
+      "statut": "incorrecte",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "inversion-repertoire",
+      "statut": "correcte",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "inversion-repertoire",
+      "statut": "partielle",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "inversion-repertoire",
+      "statut": "incorrecte",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "distribue-recursion",
+      "statut": "correcte",
+      "intervention": "justifier"
+    },
+    {
+      "famille": "distribue-recursion",
+      "statut": "partielle",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "distribue-recursion",
+      "statut": "incorrecte",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "pile-delimiteurs",
+      "statut": "correcte",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "pile-delimiteurs",
+      "statut": "partielle",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "pile-delimiteurs",
+      "statut": "incorrecte",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "graphe-court",
+      "statut": "correcte",
+      "intervention": "justifier"
+    },
+    {
+      "famille": "graphe-court",
+      "statut": "partielle",
+      "intervention": "clarifier"
+    },
+    {
+      "famille": "graphe-court",
+      "statut": "incorrecte",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "graphe-court",
+      "statut": "ambigue",
+      "intervention": "clarifier"
+    },
+    {
+      "famille": "invariant-recherche-dicho",
+      "statut": "correcte",
+      "intervention": "justifier"
+    },
+    {
+      "famille": "invariant-recherche-dicho",
+      "statut": "partielle",
+      "intervention": "clarifier"
+    },
+    {
+      "famille": "invariant-recherche-dicho",
+      "statut": "incorrecte",
+      "intervention": "tracer"
+    },
+    {
+      "famille": "arbre-feuilles",
+      "statut": "correcte",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "arbre-feuilles",
+      "statut": "partielle",
+      "intervention": "confronter"
+    },
+    {
+      "famille": "arbre-feuilles",
+      "statut": "incorrecte",
+      "intervention": "tracer"
+    }
+  ],
+  "references": {
+    "aleatoire": {
+      "correct": 13,
+      "n": 37,
+      "exactitude": 0.35135135135135137,
+      "choix": [
+        "tracer",
+        "confronter",
+        "tracer",
+        "confronter",
+        "tracer",
+        "confronter",
+        "confronter",
+        "tracer",
+        "justifier",
+        "clarifier",
+        "clarifier",
+        "clarifier",
+        "justifier",
+        "tracer",
+        "tracer",
+        "justifier",
+        "clarifier",
+        "tracer",
+        "clarifier",
+        "confronter",
+        "tracer",
+        "clarifier",
+        "confronter",
+        "tracer",
+        "tracer",
+        "confronter",
+        "confronter",
+        "justifier",
+        "clarifier",
+        "clarifier",
+        "justifier",
+        "clarifier",
+        "justifier",
+        "clarifier",
+        "justifier",
+        "confronter",
+        "tracer"
+      ]
+    },
+    "regles": {
+      "correct": 12,
+      "n": 37,
+      "exactitude": 0.32432432432432434,
+      "choix": [
+        "justifier",
+        "clarifier",
+        "justifier",
+        "justifier",
+        "clarifier",
+        "confronter",
+        "justifier",
+        "clarifier",
+        "clarifier",
+        "justifier",
+        "clarifier",
+        "justifier",
+        "justifier",
+        "clarifier",
+        "justifier",
+        "justifier",
+        "justifier",
+        "justifier",
+        "justifier",
+        "clarifier",
+        "justifier",
+        "justifier",
+        "justifier",
+        "clarifier",
+        "justifier",
+        "clarifier",
+        "justifier",
+        "justifier",
+        "clarifier",
+        "confronter",
+        "clarifier",
+        "justifier",
+        "justifier",
+        "justifier",
+        "justifier",
+        "justifier",
+        "justifier"
+      ]
+    },
+    "tfidf": {
+      "correct": 14,
+      "n": 37,
+      "exactitude": 0.3783783783783784,
+      "choix": [
+        "justifier",
+        "justifier",
+        "confronter",
+        "tracer",
+        "tracer",
+        "justifier",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "confronter",
+        "confronter",
+        "confronter",
+        "justifier",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "clarifier",
+        "clarifier",
+        "clarifier",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "justifier",
+        "confronter",
+        "confronter",
+        "confronter",
+        "confronter"
+      ]
+    },
+    "ridge": {
+      "correct": 15,
+      "n": 37,
+      "exactitude": 0.40540540540540543,
+      "choix": [
+        "justifier",
+        "tracer",
+        "tracer",
+        "justifier",
+        "tracer",
+        "justifier",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "confronter",
+        "tracer",
+        "tracer",
+        "confronter",
+        "confronter",
+        "confronter",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "confronter",
+        "tracer",
+        "confronter",
+        "tracer",
+        "confronter",
+        "tracer",
+        "tracer",
+        "tracer",
+        "tracer",
+        "justifier",
+        "justifier",
+        "confronter",
+        "confronter",
+        "confronter",
+        "confronter"
+      ]
+    }
+  },
+  "essais": [
+    {
+      "config": "ema-24",
+      "graine": 17,
+      "empreinte": "fbbee373e83e4372b830c9b6f4b426d1f4b243f4d2f3486b3537855d6f9d5995",
+      "dev": {
+        "correct": 5,
+        "n": 24,
+        "exactitude": 0.20833333333333334,
+        "choix": [
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "justifier",
+          "clarifier",
+          "justifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "justifier",
+          "clarifier",
+          "clarifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "justifier",
+          "justifier",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer"
+        ]
+      },
+      "test": {
+        "correct": 15,
+        "n": 37,
+        "exactitude": 0.40540540540540543,
+        "choix": [
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "tracer",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "clarifier",
+          "tracer",
+          "justifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter"
+        ]
+      },
+      "encodeur_seul": {
+        "correct": 14,
+        "n": 37,
+        "exactitude": 0.3783783783783784,
+        "choix": [
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "justifier",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "confronter",
+          "tracer",
+          "tracer",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter"
+        ]
+      },
+      "melange": {
+        "correct": 8,
+        "n": 37,
+        "exactitude": 0.21621621621621623,
+        "choix": [
+          "confronter",
+          "justifier",
+          "clarifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "tracer",
+          "confronter",
+          "justifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "confronter",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "clarifier",
+          "tracer",
+          "clarifier",
+          "clarifier",
+          "confronter",
+          "justifier",
+          "justifier"
+        ]
+      },
+      "predictions": {
+        "ecart_type_moyen": 0.2757488787174225,
+        "rang_effectif": 6.990544319152832,
+        "cosinus_hors_diagonale": 0.36584845185279846
+      },
+      "cibles": {
+        "ecart_type_moyen": 0.2380744367837906,
+        "rang_effectif": 8.334227561950684,
+        "cosinus_hors_diagonale": 0.3766191601753235
+      },
+      "delta_tfidf_ic95_points": [
+        -8.333333333333332,
+        13.513513513513514
+      ],
+      "pertes": [
+        [
+          0.1664515845477581,
+          0.0442646499723196
+        ],
+        [
+          0.11980938911437988,
+          0.03803933272138238
+        ],
+        [
+          0.10133382491767406,
+          0.03631468676030636
+        ],
+        [
+          0.08937958627939224,
+          0.027300860732793808
+        ],
+        [
+          0.07840880937874317,
+          0.0229644812643528
+        ],
+        [
+          0.06985793076455593,
+          0.015644995495676994
+        ],
+        [
+          0.06257159635424614,
+          0.012188876629807055
+        ],
+        [
+          0.05610031448304653,
+          0.008812679443508387
+        ],
+        [
+          0.05045624915510416,
+          0.007232671487145126
+        ],
+        [
+          0.04527212679386139,
+          0.005297301220707595
+        ],
+        [
+          0.040872846730053425,
+          0.006084883236326277
+        ],
+        [
+          0.03683570120483637,
+          0.004130781948333606
+        ],
+        [
+          0.0337225659750402,
+          0.004533001454547048
+        ],
+        [
+          0.0308658042922616,
+          0.006699409685097635
+        ],
+        [
+          0.028495456092059612,
+          0.0059859276516363025
+        ],
+        [
+          0.02646953659132123,
+          0.005230427137576044
+        ],
+        [
+          0.02470730571076274,
+          0.005498916434589773
+        ],
+        [
+          0.02295989077538252,
+          0.003091251594014466
+        ],
+        [
+          0.021424362901598215,
+          0.0030923353042453527
+        ],
+        [
+          0.019939283840358257,
+          0.0053636207594536245
+        ],
+        [
+          0.01861588191241026,
+          0.0030742041999474168
+        ],
+        [
+          0.017428216990083456,
+          0.005125813418999314
+        ],
+        [
+          0.01643514260649681,
+          0.00413695111637935
+        ],
+        [
+          0.015238978201523423,
+          0.0030608776723966002
+        ],
+        [
+          0.014344557886943221,
+          0.00364684994565323
+        ],
+        [
+          0.01342981867492199,
+          0.003062122210394591
+        ],
+        [
+          0.012563017662614584,
+          0.002980285556986928
+        ],
+        [
+          0.011732426937669516,
+          0.0042427213047631085
+        ],
+        [
+          0.011026613181456923,
+          0.004949390597175807
+        ],
+        [
+          0.010444012703374028,
+          0.004117109056096524
+        ],
+        [
+          0.009913498535752296,
+          0.00411289423936978
+        ],
+        [
+          0.009279619669541717,
+          0.0043932091211900115
+        ],
+        [
+          0.008768402272835374,
+          0.003311406879220158
+        ],
+        [
+          0.008236913941800594,
+          0.0035690158256329596
+        ],
+        [
+          0.007772575714625418,
+          0.0030418892856687307
+        ],
+        [
+          0.007312490022741258,
+          0.0030958784045651555
+        ],
+        [
+          0.006964222760871053,
+          0.00311121012782678
+        ],
+        [
+          0.006685889791697264,
+          0.004596271901391447
+        ],
+        [
+          0.006348596652969718,
+          0.003919316281098872
+        ],
+        [
+          0.006055970559827983,
+          0.0037501705810427666
+        ],
+        [
+          0.005771853495389223,
+          0.003355685097631067
+        ],
+        [
+          0.005496357684023678,
+          0.003964620584156364
+        ],
+        [
+          0.005261114449240267,
+          0.0031245207646861672
+        ],
+        [
+          0.005039920215494931,
+          0.0034948060056194663
+        ],
+        [
+          0.004840309091378003,
+          0.0034979102201759815
+        ],
+        [
+          0.004609237017575651,
+          0.0026187164476141334
+        ],
+        [
+          0.004384427680633962,
+          0.0030302535742521286
+        ],
+        [
+          0.004173187131527811,
+          0.00451654486823827
+        ],
+        [
+          0.003990328928921372,
+          0.004304946342017502
+        ],
+        [
+          0.003854355192743242,
+          0.003917464229743928
+        ],
+        [
+          0.0037431811215355992,
+          0.0028775534010492265
+        ],
+        [
+          0.0036140214651823044,
+          0.0025670456525404006
+        ],
+        [
+          0.0034635276533663273,
+          0.0033052940852940083
+        ],
+        [
+          0.0032937260111793876,
+          0.005296212679240853
+        ],
+        [
+          0.0031841887976042926,
+          0.0032576852827332914
+        ],
+        [
+          0.0031026165816001594,
+          0.0036739749484695494
+        ],
+        [
+          0.003014527086634189,
+          0.003132161102257669
+        ],
+        [
+          0.0029002150404267013,
+          0.003257756936363876
+        ],
+        [
+          0.002814905601553619,
+          0.0022339103161357343
+        ],
+        [
+          0.00266952469246462,
+          0.0038088337751105428
+        ],
+        [
+          0.0026136578526347876,
+          0.0029285301570780575
+        ],
+        [
+          0.0025521188508719206,
+          0.003375039144884795
+        ],
+        [
+          0.002434983034618199,
+          0.0026251961244270205
+        ],
+        [
+          0.00232193322153762,
+          0.0028885052306577563
+        ],
+        [
+          0.0022328003542497754,
+          0.002675374795217067
+        ]
+      ],
+      "secondes": 0.1145768729984411
+    },
+    {
+      "config": "ema-24",
+      "graine": 43,
+      "empreinte": "d4d2fd4db94419ef10ca99f6309609c33bb16544a2ba098a2393c79e506c6789",
+      "dev": {
+        "correct": 5,
+        "n": 24,
+        "exactitude": 0.20833333333333334,
+        "choix": [
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer"
+        ]
+      },
+      "test": {
+        "correct": 14,
+        "n": 37,
+        "exactitude": 0.3783783783783784,
+        "choix": [
+          "justifier",
+          "confronter",
+          "tracer",
+          "confronter",
+          "confronter",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "justifier",
+          "justifier",
+          "confronter",
+          "tracer",
+          "confronter",
+          "clarifier",
+          "justifier",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter"
+        ]
+      },
+      "encodeur_seul": {
+        "correct": 6,
+        "n": 37,
+        "exactitude": 0.16216216216216217,
+        "choix": [
+          "justifier",
+          "confronter",
+          "tracer",
+          "confronter",
+          "confronter",
+          "confronter",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "justifier",
+          "confronter",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "justifier",
+          "justifier",
+          "justifier",
+          "confronter",
+          "confronter",
+          "tracer",
+          "confronter",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter"
+        ]
+      },
+      "melange": {
+        "correct": 8,
+        "n": 37,
+        "exactitude": 0.21621621621621623,
+        "choix": [
+          "confronter",
+          "justifier",
+          "tracer",
+          "confronter",
+          "confronter",
+          "confronter",
+          "justifier",
+          "justifier",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "justifier",
+          "tracer",
+          "justifier",
+          "tracer",
+          "confronter",
+          "tracer",
+          "tracer",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "clarifier",
+          "justifier",
+          "confronter",
+          "confronter"
+        ]
+      },
+      "predictions": {
+        "ecart_type_moyen": 0.2855261266231537,
+        "rang_effectif": 5.380897045135498,
+        "cosinus_hors_diagonale": 0.32739153504371643
+      },
+      "cibles": {
+        "ecart_type_moyen": 0.2737216055393219,
+        "rang_effectif": 6.714219093322754,
+        "cosinus_hors_diagonale": 0.3009939193725586
+      },
+      "delta_tfidf_ic95_points": [
+        -13.88888888888889,
+        15.789473684210526
+      ],
+      "pertes": [
+        [
+          0.1796412207186222,
+          0.04593470320105553
+        ],
+        [
+          0.13638897240161896,
+          0.04205441940575838
+        ],
+        [
+          0.11714362911880016,
+          0.032256646547466516
+        ],
+        [
+          0.10466115362942219,
+          0.029129381757229567
+        ],
+        [
+          0.09359755925834179,
+          0.019529104232788086
+        ],
+        [
+          0.08386871218681335,
+          0.015224942239001393
+        ],
+        [
+          0.07597471587359905,
+          0.01176887727342546
+        ],
+        [
+          0.06897128000855446,
+          0.010749191045761108
+        ],
+        [
+          0.0622171051800251,
+          0.007015971816144884
+        ],
+        [
+          0.05666459817439318,
+          0.01040432055015117
+        ],
+        [
+          0.051648455671966076,
+          0.004946086497511715
+        ],
+        [
+          0.04754589032381773,
+          0.005467609676998109
+        ],
+        [
+          0.044302113354206085,
+          0.005627454142086208
+        ],
+        [
+          0.04109512083232403,
+          0.005273150862194598
+        ],
+        [
+          0.038577414117753506,
+          0.006001433474011719
+        ],
+        [
+          0.03622176870703697,
+          0.003773570351768285
+        ],
+        [
+          0.03365773754194379,
+          0.004949633206706494
+        ],
+        [
+          0.031359778717160225,
+          0.0030091627850197256
+        ],
+        [
+          0.029471492394804955,
+          0.003870369342621416
+        ],
+        [
+          0.02770224306732416,
+          0.005664522759616375
+        ],
+        [
+          0.02608488406985998,
+          0.002813014143612236
+        ],
+        [
+          0.024193758610635996,
+          0.0032878630445338786
+        ],
+        [
+          0.02264420920982957,
+          0.00440168590284884
+        ],
+        [
+          0.021193535067141056,
+          0.0047908787382766604
+        ],
+        [
+          0.019685876090079546,
+          0.005096748820506036
+        ],
+        [
+          0.01847988599911332,
+          0.003495458251563832
+        ],
+        [
+          0.017204318661242723,
+          0.003105495241470635
+        ],
+        [
+          0.015975706512108445,
+          0.00475224299589172
+        ],
+        [
+          0.01512595871463418,
+          0.00328178599011153
+        ],
+        [
+          0.014035635627806187,
+          0.0030294472235254943
+        ],
+        [
+          0.012929185526445508,
+          0.003317407739814371
+        ],
+        [
+          0.012099788524210453,
+          0.002759619936114177
+        ],
+        [
+          0.011212617857381701,
+          0.002811025711707771
+        ],
+        [
+          0.01041184482164681,
+          0.003303134290035814
+        ],
+        [
+          0.009792984463274479,
+          0.0036355711054056883
+        ],
+        [
+          0.008970029186457396,
+          0.004244183772243559
+        ],
+        [
+          0.008528583450242877,
+          0.002519133617170155
+        ],
+        [
+          0.007928462466225028,
+          0.0031928378739394248
+        ],
+        [
+          0.007447646697983146,
+          0.003614131943322718
+        ],
+        [
+          0.006967041525058448,
+          0.0046881146263331175
+        ],
+        [
+          0.006631486117839813,
+          0.005697526736184955
+        ],
+        [
+          0.0063372948206961155,
+          0.0026942556141875684
+        ],
+        [
+          0.0060566343599930406,
+          0.0030365665443241596
+        ],
+        [
+          0.005740336258895695,
+          0.0030827786249574274
+        ],
+        [
+          0.005482214619405568,
+          0.0037225582636892796
+        ],
+        [
+          0.005197314545512199,
+          0.002696002193260938
+        ],
+        [
+          0.004937634337693453,
+          0.002631810639286414
+        ],
+        [
+          0.004687579057645053,
+          0.0026389759150333703
+        ],
+        [
+          0.004464309837203473,
+          0.0027662814827635884
+        ],
+        [
+          0.0042923405999317765,
+          0.0027967828209511936
+        ],
+        [
+          0.004129082430154085,
+          0.0028720140107907355
+        ],
+        [
+          0.00397178455023095,
+          0.0037366641336120665
+        ],
+        [
+          0.003816733369603753,
+          0.002193148829974234
+        ],
+        [
+          0.003682503302115947,
+          0.0025158528005704284
+        ],
+        [
+          0.003522978338878602,
+          0.002987824671436101
+        ],
+        [
+          0.003383259696420282,
+          0.0021716453484259546
+        ],
+        [
+          0.0032838070183061063,
+          0.0031354858074337244
+        ],
+        [
+          0.0031894802232272923,
+          0.002986046893056482
+        ],
+        [
+          0.003094329498708248,
+          0.0027755257906392217
+        ],
+        [
+          0.0030047508189454675,
+          0.003014508169144392
+        ],
+        [
+          0.0029377566534094512,
+          0.0034737688256427646
+        ],
+        [
+          0.0028824761393480003,
+          0.0027127194043714553
+        ],
+        [
+          0.0028195541817694902,
+          0.0045611069072037935
+        ],
+        [
+          0.0027758803335018456,
+          0.0028624547994695604
+        ],
+        [
+          0.0027194363647140563,
+          0.0026741789188236
+        ]
+      ],
+      "secondes": 0.09216871399985394
+    },
+    {
+      "config": "ema-24",
+      "graine": 97,
+      "empreinte": "ca962244adce429b19541565195fc1c91f5bbacae149860a0a0931f07a427115",
+      "dev": {
+        "correct": 8,
+        "n": 24,
+        "exactitude": 0.3333333333333333,
+        "choix": [
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "justifier",
+          "confronter",
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer",
+          "confronter",
+          "justifier",
+          "justifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer"
+        ]
+      },
+      "test": {
+        "correct": 15,
+        "n": 37,
+        "exactitude": 0.40540540540540543,
+        "choix": [
+          "clarifier",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "tracer",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "tracer",
+          "confronter",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "tracer"
+        ]
+      },
+      "encodeur_seul": {
+        "correct": 18,
+        "n": 37,
+        "exactitude": 0.4864864864864865,
+        "choix": [
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "justifier",
+          "tracer",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer",
+          "clarifier",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "tracer",
+          "confronter",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "confronter"
+        ]
+      },
+      "melange": {
+        "correct": 7,
+        "n": 37,
+        "exactitude": 0.1891891891891892,
+        "choix": [
+          "tracer",
+          "justifier",
+          "justifier",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "clarifier",
+          "tracer",
+          "confronter",
+          "tracer",
+          "confronter",
+          "tracer",
+          "tracer",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "tracer",
+          "justifier",
+          "clarifier",
+          "tracer",
+          "confronter"
+        ]
+      },
+      "predictions": {
+        "ecart_type_moyen": 0.25332117080688477,
+        "rang_effectif": 8.338339805603027,
+        "cosinus_hors_diagonale": 0.35494083166122437
+      },
+      "cibles": {
+        "ecart_type_moyen": 0.2614566385746002,
+        "rang_effectif": 7.281527519226074,
+        "cosinus_hors_diagonale": 0.35550495982170105
+      },
+      "delta_tfidf_ic95_points": [
+        -16.216216216216218,
+        21.62162162162162
+      ],
+      "pertes": [
+        [
+          0.21793897449970245,
+          0.05144440662115812
+        ],
+        [
+          0.14907969906926155,
+          0.04544899519532919
+        ],
+        [
+          0.12355852499604225,
+          0.03995240665972233
+        ],
+        [
+          0.1065341904759407,
+          0.03286868613213301
+        ],
+        [
+          0.09529266878962517,
+          0.025572763290256262
+        ],
+        [
+          0.08575642481446266,
+          0.018923409981653094
+        ],
+        [
+          0.07780370488762856,
+          0.016837610164657235
+        ],
+        [
+          0.07050851918756962,
+          0.0089358976110816
+        ],
+        [
+          0.0642488831654191,
+          0.008655426790937781
+        ],
+        [
+          0.05851040780544281,
+          0.009136076550930738
+        ],
+        [
+          0.053532649762928486,
+          0.008957740850746632
+        ],
+        [
+          0.04889002721756697,
+          0.006697477656416595
+        ],
+        [
+          0.045369463972747326,
+          0.004467135004233569
+        ],
+        [
+          0.04223564825952053,
+          0.004152833949774504
+        ],
+        [
+          0.039593737572431564,
+          0.0051985205500386655
+        ],
+        [
+          0.036561962217092514,
+          0.006734404480084777
+        ],
+        [
+          0.03421575203537941,
+          0.0025720158882904798
+        ],
+        [
+          0.03190712817013264,
+          0.0036230653640814126
+        ],
+        [
+          0.02978031849488616,
+          0.005124942981638014
+        ],
+        [
+          0.02773270895704627,
+          0.003927011915948242
+        ],
+        [
+          0.026097788009792566,
+          0.003475229605101049
+        ],
+        [
+          0.024437827989459038,
+          0.003403587033972144
+        ],
+        [
+          0.022734204307198524,
+          0.004197895468678325
+        ],
+        [
+          0.021269415505230427,
+          0.0028764722228515893
+        ],
+        [
+          0.019891588017344475,
+          0.00393813697155565
+        ],
+        [
+          0.018433553632348776,
+          0.0034519584733061492
+        ],
+        [
+          0.017281014705076814,
+          0.002044785360340029
+        ],
+        [
+          0.01606597355566919,
+          0.0023047138238325715
+        ],
+        [
+          0.015035803895443678,
+          0.0031637103529646993
+        ],
+        [
+          0.01394776813685894,
+          0.0037149207782931626
+        ],
+        [
+          0.01310738013125956,
+          0.002787311503197998
+        ],
+        [
+          0.012261386262252927,
+          0.00332671613432467
+        ],
+        [
+          0.011560007696971297,
+          0.0036415503709577024
+        ],
+        [
+          0.010824114782735705,
+          0.004718431446235627
+        ],
+        [
+          0.010295459302142262,
+          0.003371187543962151
+        ],
+        [
+          0.009745686315000057,
+          0.0029286665376275778
+        ],
+        [
+          0.009222820401191711,
+          0.0031132107542362064
+        ],
+        [
+          0.008705453015863895,
+          0.0041947406134568155
+        ],
+        [
+          0.008271171012893319,
+          0.0028786263428628445
+        ],
+        [
+          0.007884782971814275,
+          0.00431564322207123
+        ],
+        [
+          0.00759743619710207,
+          0.003861223056446761
+        ],
+        [
+          0.00717438873834908,
+          0.0032658162526786327
+        ],
+        [
+          0.0068702331045642495,
+          0.003168430586811155
+        ],
+        [
+          0.006531293387524784,
+          0.003829701221548021
+        ],
+        [
+          0.0062608650187030435,
+          0.0034738420508801937
+        ],
+        [
+          0.006027535768225789,
+          0.0030323141836561263
+        ],
+        [
+          0.005772884585894644,
+          0.0030118501745164394
+        ],
+        [
+          0.005469039431773126,
+          0.002682663034647703
+        ],
+        [
+          0.005211972747929394,
+          0.002519126603147015
+        ],
+        [
+          0.004985616484191269,
+          0.0030579688609577715
+        ],
+        [
+          0.0047503195237368345,
+          0.0025819744914770126
+        ],
+        [
+          0.004569550743326545,
+          0.0046315903891809285
+        ],
+        [
+          0.004376363242045045,
+          0.0039171272655949
+        ],
+        [
+          0.004232324718032032,
+          0.005095311731565744
+        ],
+        [
+          0.004149908141698688,
+          0.002730512002017349
+        ],
+        [
+          0.004034819372463971,
+          0.0021506375342141837
+        ],
+        [
+          0.003908222308382392,
+          0.002528474054997787
+        ],
+        [
+          0.003720164706464857,
+          0.0026361748459748924
+        ],
+        [
+          0.0035705124028027058,
+          0.002774766879156232
+        ],
+        [
+          0.0034236452192999423,
+          0.003532038244884461
+        ],
+        [
+          0.0033203898929059505,
+          0.0032710922532714903
+        ],
+        [
+          0.003221708524506539,
+          0.0024460111744701862
+        ],
+        [
+          0.003108362201601267,
+          0.003112061764113605
+        ],
+        [
+          0.002989092783536762,
+          0.0031772398797329515
+        ],
+        [
+          0.002904919325374067,
+          0.0032204173621721566
+        ]
+      ],
+      "secondes": 0.08877184799894167
+    },
+    {
+      "config": "fixe-24",
+      "graine": 17,
+      "empreinte": "f4e854fcb1b973e2fbda8b60acdb9404ad1e68f2700b2930b36e88e627adad68",
+      "dev": {
+        "correct": 5,
+        "n": 24,
+        "exactitude": 0.20833333333333334,
+        "choix": [
+          "tracer",
+          "clarifier",
+          "clarifier",
+          "justifier",
+          "clarifier",
+          "justifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "justifier",
+          "clarifier",
+          "justifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "justifier",
+          "justifier",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer"
+        ]
+      },
+      "test": {
+        "correct": 16,
+        "n": 37,
+        "exactitude": 0.43243243243243246,
+        "choix": [
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "clarifier",
+          "tracer",
+          "justifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter"
+        ]
+      },
+      "encodeur_seul": {
+        "correct": 17,
+        "n": 37,
+        "exactitude": 0.4594594594594595,
+        "choix": [
+          "justifier",
+          "confronter",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "tracer",
+          "justifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter"
+        ]
+      },
+      "melange": {
+        "correct": 8,
+        "n": 37,
+        "exactitude": 0.21621621621621623,
+        "choix": [
+          "confronter",
+          "justifier",
+          "tracer",
+          "tracer",
+          "justifier",
+          "justifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "tracer",
+          "confronter",
+          "clarifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "confronter",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "clarifier",
+          "tracer",
+          "clarifier",
+          "tracer",
+          "confronter",
+          "justifier",
+          "justifier"
+        ]
+      },
+      "predictions": {
+        "ecart_type_moyen": 0.27942749857902527,
+        "rang_effectif": 6.385888576507568,
+        "cosinus_hors_diagonale": 0.32909032702445984
+      },
+      "cibles": {
+        "ecart_type_moyen": 0.2477986365556717,
+        "rang_effectif": 7.565433025360107,
+        "cosinus_hors_diagonale": 0.27139541506767273
+      },
+      "delta_tfidf_ic95_points": [
+        -8.333333333333332,
+        21.052631578947366
+      ],
+      "pertes": [
+        [
+          0.16640138626098633,
+          0.04426415637135506
+        ],
+        [
+          0.11976148374378681,
+          0.03803614992648363
+        ],
+        [
+          0.10149171203374863,
+          0.03629249148070812
+        ],
+        [
+          0.08970929309725761,
+          0.027248877566307783
+        ],
+        [
+          0.07879842817783356,
+          0.022893167566508055
+        ],
+        [
+          0.07023649848997593,
+          0.015550497686490417
+        ],
+        [
+          0.06288574170321226,
+          0.012125700479373336
+        ],
+        [
+          0.056438157334923744,
+          0.008735773852095008
+        ],
+        [
+          0.05081567633897066,
+          0.007140499423258007
+        ],
+        [
+          0.04566136468201876,
+          0.005212453077547252
+        ],
+        [
+          0.04130155872553587,
+          0.006054826080799103
+        ],
+        [
+          0.03730298113077879,
+          0.004118278680834919
+        ],
+        [
+          0.034254658967256546,
+          0.0044526412966661155
+        ],
+        [
+          0.03143421886488795,
+          0.006586093106307089
+        ],
+        [
+          0.02911311201751232,
+          0.005756714497692883
+        ],
+        [
+          0.02716652536764741,
+          0.0051079445402137935
+        ],
+        [
+          0.025396802462637424,
+          0.005540461163036525
+        ],
+        [
+          0.02367382775992155,
+          0.003125045623164624
+        ],
+        [
+          0.022162925451993942,
+          0.0030102675082162023
+        ],
+        [
+          0.02066531078889966,
+          0.005077084351796657
+        ],
+        [
+          0.01933429203927517,
+          0.0030693896114826202
+        ],
+        [
+          0.01811996311880648,
+          0.004905578913167119
+        ],
+        [
+          0.017110335174947977,
+          0.004113502101972699
+        ],
+        [
+          0.01580726564861834,
+          0.0029982800479047
+        ],
+        [
+          0.014841686002910137,
+          0.0038164613652043045
+        ],
+        [
+          0.013883351814001799,
+          0.0029102196567691863
+        ],
+        [
+          0.012946023838594556,
+          0.0030097353737801313
+        ],
+        [
+          0.01198236458003521,
+          0.004276680701877922
+        ],
+        [
+          0.011243512155488133,
+          0.005033040069974959
+        ],
+        [
+          0.010613783029839396,
+          0.00411773199448362
+        ],
+        [
+          0.01005024928599596,
+          0.00404835504014045
+        ],
+        [
+          0.009398365044035017,
+          0.004152026085648686
+        ],
+        [
+          0.008769876905716956,
+          0.003266426268965006
+        ],
+        [
+          0.008213291643187404,
+          0.003765942470636219
+        ],
+        [
+          0.007713878876529634,
+          0.0031954559381119907
+        ],
+        [
+          0.0072217012057080865,
+          0.002847925730748102
+        ],
+        [
+          0.006826714030466974,
+          0.003240179968997836
+        ],
+        [
+          0.006505465833470225,
+          0.0047571283066645265
+        ],
+        [
+          0.0061347681330516934,
+          0.003915860434062779
+        ],
+        [
+          0.005825819098390639,
+          0.0035761377366725355
+        ],
+        [
+          0.005526977125555277,
+          0.0032320452737621963
+        ],
+        [
+          0.005226249573752284,
+          0.003848548571113497
+        ],
+        [
+          0.004966423846781254,
+          0.0031868594815023243
+        ],
+        [
+          0.004694837145507336,
+          0.0035930886515416205
+        ],
+        [
+          0.004483572032768279,
+          0.003669149416964501
+        ],
+        [
+          0.004255993873812258,
+          0.002596776932477951
+        ],
+        [
+          0.004026072274427861,
+          0.002928467351011932
+        ],
+        [
+          0.003815624106209725,
+          0.004132535483222455
+        ],
+        [
+          0.003617145062889904,
+          0.0035420096246525645
+        ],
+        [
+          0.0034836582490243018,
+          0.004450855718459934
+        ],
+        [
+          0.00337464758194983,
+          0.0028337325202301145
+        ],
+        [
+          0.003255771822296083,
+          0.002845383685780689
+        ],
+        [
+          0.0030971593223512173,
+          0.003518834477290511
+        ],
+        [
+          0.002966848958749324,
+          0.0051323193474672735
+        ],
+        [
+          0.002885328489355743,
+          0.0032530967728234828
+        ],
+        [
+          0.0028501570341177285,
+          0.0041075138142332435
+        ],
+        [
+          0.0027603774797171354,
+          0.0032328834931831807
+        ],
+        [
+          0.002629983297083527,
+          0.0033566359197720885
+        ],
+        [
+          0.002537149586714804,
+          0.002288399206008762
+        ],
+        [
+          0.002393340750131756,
+          0.003895447764080018
+        ],
+        [
+          0.0023576896637678146,
+          0.002852311125025153
+        ],
+        [
+          0.0022750472999177873,
+          0.003617385751567781
+        ],
+        [
+          0.002204249583883211,
+          0.0028980920906178653
+        ],
+        [
+          0.0021175673173274845,
+          0.0029824860394001007
+        ],
+        [
+          0.0020629184145946056,
+          0.0024286643601953983
+        ]
+      ],
+      "secondes": 0.08745229899977858
+    },
+    {
+      "config": "fixe-24",
+      "graine": 43,
+      "empreinte": "61be51fab8964855ba8e824ba54e2e8acb9882bf4e2610e445a7e43b4c2a0653",
+      "dev": {
+        "correct": 5,
+        "n": 24,
+        "exactitude": 0.20833333333333334,
+        "choix": [
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer",
+          "justifier",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer"
+        ]
+      },
+      "test": {
+        "correct": 14,
+        "n": 37,
+        "exactitude": 0.3783783783783784,
+        "choix": [
+          "justifier",
+          "confronter",
+          "tracer",
+          "confronter",
+          "confronter",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "justifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "confronter",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter"
+        ]
+      },
+      "encodeur_seul": {
+        "correct": 12,
+        "n": 37,
+        "exactitude": 0.32432432432432434,
+        "choix": [
+          "justifier",
+          "confronter",
+          "tracer",
+          "confronter",
+          "confronter",
+          "justifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "confronter",
+          "tracer",
+          "confronter",
+          "confronter",
+          "confronter",
+          "justifier",
+          "tracer",
+          "confronter",
+          "confronter",
+          "justifier",
+          "confronter",
+          "confronter",
+          "justifier",
+          "justifier",
+          "justifier",
+          "confronter",
+          "confronter",
+          "tracer",
+          "confronter",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter"
+        ]
+      },
+      "melange": {
+        "correct": 12,
+        "n": 37,
+        "exactitude": 0.32432432432432434,
+        "choix": [
+          "confronter",
+          "justifier",
+          "tracer",
+          "confronter",
+          "confronter",
+          "confronter",
+          "justifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "tracer",
+          "justifier",
+          "tracer",
+          "confronter",
+          "tracer",
+          "tracer",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "tracer",
+          "justifier",
+          "confronter",
+          "tracer"
+        ]
+      },
+      "predictions": {
+        "ecart_type_moyen": 0.28456854820251465,
+        "rang_effectif": 5.159112930297852,
+        "cosinus_hors_diagonale": 0.274763822555542
+      },
+      "cibles": {
+        "ecart_type_moyen": 0.2783292531967163,
+        "rang_effectif": 6.834271430969238,
+        "cosinus_hors_diagonale": 0.2470935434103012
+      },
+      "delta_tfidf_ic95_points": [
+        -13.88888888888889,
+        15.789473684210526
+      ],
+      "pertes": [
+        [
+          0.17961427569389343,
+          0.04593471623957157
+        ],
+        [
+          0.1363302767276764,
+          0.042051167227327824
+        ],
+        [
+          0.11718015559017658,
+          0.03223645221441984
+        ],
+        [
+          0.10473917424678802,
+          0.02909698709845543
+        ],
+        [
+          0.09362789615988731,
+          0.01948363077826798
+        ],
+        [
+          0.08376113325357437,
+          0.015166435157880187
+        ],
+        [
+          0.07573515363037586,
+          0.011826922884210944
+        ],
+        [
+          0.06868241541087627,
+          0.010710919508710504
+        ],
+        [
+          0.06187887117266655,
+          0.006940255989320576
+        ],
+        [
+          0.05620746687054634,
+          0.010241235955618322
+        ],
+        [
+          0.05113644804805517,
+          0.004831908212509006
+        ],
+        [
+          0.04689703416079283,
+          0.005528064910322428
+        ],
+        [
+          0.043544281274080276,
+          0.005533429037313908
+        ],
+        [
+          0.040250472724437714,
+          0.005277812364511192
+        ],
+        [
+          0.037598587572574615,
+          0.005938268615864217
+        ],
+        [
+          0.03521487256512046,
+          0.0037816533003933728
+        ],
+        [
+          0.03264105133712292,
+          0.0050367359654046595
+        ],
+        [
+          0.030318148899823427,
+          0.0029237851849757135
+        ],
+        [
+          0.0283891255967319,
+          0.003720307082403451
+        ],
+        [
+          0.0266115739941597,
+          0.005614180816337466
+        ],
+        [
+          0.024981975089758635,
+          0.0027767998981289566
+        ],
+        [
+          0.02310946024954319,
+          0.0031453235424123704
+        ],
+        [
+          0.02158125303685665,
+          0.004345847468357533
+        ],
+        [
+          0.02017819043248892,
+          0.004715552146080881
+        ],
+        [
+          0.01865768153220415,
+          0.005364148295484483
+        ],
+        [
+          0.01748612802475691,
+          0.003460497420746833
+        ],
+        [
+          0.016272920183837414,
+          0.003153707424644381
+        ],
+        [
+          0.015097136609256268,
+          0.004785053140949458
+        ],
+        [
+          0.014281784417107701,
+          0.003291985485702753
+        ],
+        [
+          0.013244475005194545,
+          0.0032260401640087366
+        ],
+        [
+          0.01216315315105021,
+          0.0034369220957159996
+        ],
+        [
+          0.011393519351258874,
+          0.002672393893590197
+        ],
+        [
+          0.010546325473114848,
+          0.0026745463837869465
+        ],
+        [
+          0.009766897419467568,
+          0.0032003402011469007
+        ],
+        [
+          0.009172812104225159,
+          0.003411392623092979
+        ],
+        [
+          0.008378636091947556,
+          0.0038871856522746384
+        ],
+        [
+          0.007936294889077544,
+          0.0023002706293482333
+        ],
+        [
+          0.007376838009804487,
+          0.0031468456145375967
+        ],
+        [
+          0.006888567586429417,
+          0.004045275971293449
+        ],
+        [
+          0.006433172267861664,
+          0.0048279426991939545
+        ],
+        [
+          0.006111617898568511,
+          0.0053942230879329145
+        ],
+        [
+          0.005836127558723092,
+          0.0025939486804418266
+        ],
+        [
+          0.005560830817557871,
+          0.002765440323855728
+        ],
+        [
+          0.005220859777182341,
+          0.0029914664628449827
+        ],
+        [
+          0.004974275594577193,
+          0.003561442019417882
+        ],
+        [
+          0.004697458236478269,
+          0.0029909475124441087
+        ],
+        [
+          0.004396146512590349,
+          0.0024436508829239756
+        ],
+        [
+          0.004126953426748514,
+          0.002733863308094442
+        ],
+        [
+          0.003913209191523492,
+          0.002580540836788714
+        ],
+        [
+          0.0037348298355937004,
+          0.0025596068298909813
+        ],
+        [
+          0.0035620499402284622,
+          0.0027250239509157836
+        ],
+        [
+          0.0034062819904647768,
+          0.00361758514191024
+        ],
+        [
+          0.0032501762616448104,
+          0.0021086433553136885
+        ],
+        [
+          0.003136918996460736,
+          0.0025334873935207725
+        ],
+        [
+          0.0029721190221607685,
+          0.002897297090385109
+        ],
+        [
+          0.0028740387060679495,
+          0.0023195978137664497
+        ],
+        [
+          0.0027818920207209885,
+          0.0030435988446697593
+        ],
+        [
+          0.002692438749363646,
+          0.0026824939996004105
+        ],
+        [
+          0.002635791606735438,
+          0.002810589619912207
+        ],
+        [
+          0.0025378850987181067,
+          0.0031146146648097783
+        ],
+        [
+          0.00247148668859154,
+          0.0037227116408757865
+        ],
+        [
+          0.0024431562051177025,
+          0.0031887742807157338
+        ],
+        [
+          0.0023953840136528015,
+          0.0040987556567415595
+        ],
+        [
+          0.002320950268767774,
+          0.0027584409690462053
+        ],
+        [
+          0.002293977595400065,
+          0.002584567992016673
+        ]
+      ],
+      "secondes": 0.08680744499906723
+    },
+    {
+      "config": "fixe-24",
+      "graine": 97,
+      "empreinte": "769a2d98c7ef9fae921b6ff7bde851633d21d4360c7c60c538fc336d5172795e",
+      "dev": {
+        "correct": 9,
+        "n": 24,
+        "exactitude": 0.375,
+        "choix": [
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "justifier",
+          "tracer",
+          "justifier",
+          "justifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "tracer",
+          "confronter",
+          "justifier",
+          "justifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer"
+        ]
+      },
+      "test": {
+        "correct": 15,
+        "n": 37,
+        "exactitude": 0.40540540540540543,
+        "choix": [
+          "clarifier",
+          "tracer",
+          "clarifier",
+          "confronter",
+          "tracer",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "clarifier",
+          "confronter",
+          "justifier",
+          "tracer",
+          "confronter",
+          "confronter",
+          "confronter",
+          "justifier",
+          "tracer",
+          "tracer",
+          "justifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer",
+          "confronter",
+          "clarifier",
+          "clarifier",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "tracer"
+        ]
+      },
+      "encodeur_seul": {
+        "correct": 14,
+        "n": 37,
+        "exactitude": 0.3783783783783784,
+        "choix": [
+          "clarifier",
+          "clarifier",
+          "justifier",
+          "justifier",
+          "tracer",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "justifier",
+          "justifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter",
+          "confronter",
+          "tracer",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "justifier",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "clarifier",
+          "tracer",
+          "tracer",
+          "tracer",
+          "tracer",
+          "confronter"
+        ]
+      },
+      "melange": {
+        "correct": 8,
+        "n": 37,
+        "exactitude": 0.21621621621621623,
+        "choix": [
+          "tracer",
+          "justifier",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "confronter",
+          "confronter",
+          "tracer",
+          "confronter",
+          "tracer",
+          "tracer",
+          "tracer",
+          "justifier",
+          "tracer",
+          "clarifier",
+          "confronter",
+          "tracer",
+          "confronter",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "tracer",
+          "confronter",
+          "clarifier",
+          "justifier",
+          "confronter",
+          "tracer",
+          "tracer",
+          "confronter",
+          "clarifier",
+          "confronter",
+          "confronter",
+          "tracer",
+          "justifier",
+          "clarifier",
+          "confronter",
+          "confronter"
+        ]
+      },
+      "predictions": {
+        "ecart_type_moyen": 0.25637930631637573,
+        "rang_effectif": 8.197917938232422,
+        "cosinus_hors_diagonale": 0.28181737661361694
+      },
+      "cibles": {
+        "ecart_type_moyen": 0.26649564504623413,
+        "rang_effectif": 7.183650016784668,
+        "cosinus_hors_diagonale": 0.2744572162628174
+      },
+      "delta_tfidf_ic95_points": [
+        -16.666666666666664,
+        25.0
+      ],
+      "pertes": [
+        [
+          0.21789105981588364,
+          0.05144437402486801
+        ],
+        [
+          0.1489388421177864,
+          0.04544589761644602
+        ],
+        [
+          0.12356582283973694,
+          0.03993403911590576
+        ],
+        [
+          0.10669577680528164,
+          0.03282594867050648
+        ],
+        [
+          0.09552178345620632,
+          0.02551650023087859
+        ],
+        [
+          0.08596036769449711,
+          0.018838566727936268
+        ],
+        [
+          0.0779552273452282,
+          0.016668656142428517
+        ],
+        [
+          0.07056816853582859,
+          0.008776940172538161
+        ],
+        [
+          0.06420202646404505,
+          0.008495900896377861
+        ],
+        [
+          0.05831941496580839,
+          0.008990936679765582
+        ],
+        [
+          0.05326114594936371,
+          0.008731088833883405
+        ],
+        [
+          0.04858749732375145,
+          0.006448811502195895
+        ],
+        [
+          0.04498299676924944,
+          0.004376157827209681
+        ],
+        [
+          0.04177749529480934,
+          0.00408717809477821
+        ],
+        [
+          0.03910103999078274,
+          0.005272491689538583
+        ],
+        [
+          0.03606884740293026,
+          0.0065614114864729345
+        ],
+        [
+          0.033786467276513577,
+          0.0025971269933506846
+        ],
+        [
+          0.03149483911693096,
+          0.0034265652066096663
+        ],
+        [
+          0.02939823502674699,
+          0.004892651515547186
+        ],
+        [
+          0.027322701644152403,
+          0.0037076410953886807
+        ],
+        [
+          0.025686440989375114,
+          0.003268495434895158
+        ],
+        [
+          0.023997941054403782,
+          0.0033537099952809513
+        ],
+        [
+          0.02234905632212758,
+          0.003906698490027338
+        ],
+        [
+          0.020849171560257673,
+          0.002819963527144864
+        ],
+        [
+          0.019488248974084854,
+          0.004063507833052427
+        ],
+        [
+          0.01799826603382826,
+          0.0033297661575488746
+        ],
+        [
+          0.016849129926413298,
+          0.0021386697189882398
+        ],
+        [
+          0.01560391136445105,
+          0.002286704839207232
+        ],
+        [
+          0.014525752048939466,
+          0.003120407520327717
+        ],
+        [
+          0.013428771635517478,
+          0.0037334912340156734
+        ],
+        [
+          0.012548567727208138,
+          0.0027383617707528174
+        ],
+        [
+          0.01169955893419683,
+          0.0032103920239023864
+        ],
+        [
+          0.01094273873604834,
+          0.0035234116367064416
+        ],
+        [
+          0.010185777209699154,
+          0.004550848912913352
+        ],
+        [
+          0.009588711429387331,
+          0.003132930549327284
+        ],
+        [
+          0.009009281871840358,
+          0.002767962811049074
+        ],
+        [
+          0.008457738324068487,
+          0.003196332574589178
+        ],
+        [
+          0.007910159649327397,
+          0.004509623919147998
+        ],
+        [
+          0.007482922985218465,
+          0.002642700099386275
+        ],
+        [
+          0.007065778481774032,
+          0.004071900271810591
+        ],
+        [
+          0.006762058008462191,
+          0.003771983669139445
+        ],
+        [
+          0.0063529511680826545,
+          0.0030460141715593636
+        ],
+        [
+          0.006026384187862277,
+          0.0029100452084094286
+        ],
+        [
+          0.00571732537355274,
+          0.003805220709182322
+        ],
+        [
+          0.005463068722747266,
+          0.0034936638840008527
+        ],
+        [
+          0.0052164733642712235,
+          0.0027864983421750367
+        ],
+        [
+          0.00495973729994148,
+          0.002798468980472535
+        ],
+        [
+          0.004690889036282897,
+          0.002617822145111859
+        ],
+        [
+          0.004458142328076065,
+          0.0026163988222833723
+        ],
+        [
+          0.004284362832549959,
+          0.0030186193180270493
+        ],
+        [
+          0.004072496376466006,
+          0.0023842541850171983
+        ],
+        [
+          0.003936233639251441,
+          0.004664943495299667
+        ],
+        [
+          0.003791479568462819,
+          0.0036538493586704135
+        ],
+        [
+          0.0036734246532432735,
+          0.005148742580786347
+        ],
+        [
+          0.003606857906561345,
+          0.002765168494079262
+        ],
+        [
+          0.003495389479212463,
+          0.0021618104074150324
+        ],
+        [
+          0.003366375167388469,
+          0.0024641804047860205
+        ],
+        [
+          0.0032142699928954244,
+          0.0028164341347292066
+        ],
+        [
+          0.003073243424296379,
+          0.002510461024940014
+        ],
+        [
+          0.0029686633497476578,
+          0.0034981812350451946
+        ],
+        [
+          0.0028802381712011993,
+          0.002910566807258874
+        ],
+        [
+          0.0027943792520090938,
+          0.0024421766865998507
+        ],
+        [
+          0.0026977788074873388,
+          0.003140450455248356
+        ],
+        [
+          0.002642116218339652,
+          0.003538425953593105
+        ],
+        [
+          0.0026023349491879344,
+          0.0029814071021974087
+        ]
+      ],
+      "secondes": 0.09034964100101206
+    }
+  ],
+  "courbes_apprentissage": [
+    {
+      "familles": 5,
+      "tours": 15,
+      "graine": 17,
+      "dev": 0.125
+    },
+    {
+      "familles": 5,
+      "tours": 15,
+      "graine": 43,
+      "dev": 0.2916666666666667
+    },
+    {
+      "familles": 5,
+      "tours": 15,
+      "graine": 97,
+      "dev": 0.3333333333333333
+    },
+    {
+      "familles": 10,
+      "tours": 31,
+      "graine": 17,
+      "dev": 0.25
+    },
+    {
+      "familles": 10,
+      "tours": 30,
+      "graine": 43,
+      "dev": 0.3333333333333333
+    },
+    {
+      "familles": 10,
+      "tours": 30,
+      "graine": 97,
+      "dev": 0.2916666666666667
+    },
+    {
+      "familles": 20,
+      "tours": 61,
+      "graine": 17,
+      "dev": 0.20833333333333334
+    },
+    {
+      "familles": 20,
+      "tours": 61,
+      "graine": 43,
+      "dev": 0.20833333333333334
+    },
+    {
+      "familles": 20,
+      "tours": 61,
+      "graine": 97,
+      "dev": 0.375
+    }
+  ],
+  "configuration_retenue_dev": "fixe-24",
+  "graine_recette": 17,
+  "secondes": 0.8849160719983047,
+  "pic_processus_octets": 31027200
+}

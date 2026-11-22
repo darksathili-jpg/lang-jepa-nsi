@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "sources": [
+    {"fichier": "p5/corpus.json", "origine": "Scénarios, fragments Python et formulations synthétiques rédigés pour P5", "donnees_eleves": false, "sources_externes": [], "usage": "Entraînement, validation et test"},
+    {"fichier": "p5/dialogues.json", "origine": "Rejeu synthétique du maximum de référence et prolongements rédigés pour P5", "donnees_eleves": false, "sources_externes": ["p4/reference.json"], "usage": "Évaluation conversationnelle exclusivement"}
+  ]
+}
