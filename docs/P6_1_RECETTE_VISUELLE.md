@@ -23,4 +23,20 @@ python tests/p61_browser.py --output results/p61
 python design/compare.py --capture results/p61/atelier-1672x941-sombre.png --output results/p61
 ```
 
-Les captures Linux documentent la composition. La mise à l’échelle Windows du système à 100 %, 125 % et 150 % relève de la recette Windows.
+## Chromium Windows Server x64
+
+La recette native a rempli la matrice des sept résolutions et trois thèmes, vérifié les interactions, puis produit les comparaisons à 1672 × 941 au même cadrage. Le côte à côte mesure 3344 × 941, soit deux images de 1672 × 941. La superposition, la carte et la capture mesurent 1672 × 941. Les mesures englobent les zones dynamiques. [Captures et mesures Windows](https://raw.githubusercontent.com/darksathili-jpg/lang-jepa-nsi/main/releases/0.6.1/LANG-JEPA-NSI-0.6.1-Preuves-Windows.zip) · [Archive de recette native](https://github.com/darksathili-jpg/lang-jepa-nsi/actions/runs/45061146459/artifacts/14769965016)
+
+| Zone | Écart RVB moyen sur 255 | Différence résiduelle |
+| --- | ---: | --- |
+| Ensemble | 17,577 | 13,34 % des pixels dépassent un écart de 24 sur au moins un canal. |
+| En-tête | 18,285 | Rendu des polices système et libellés des commandes. |
+| Scène et personnage | 3,933 et 0,000 | Le personnage conserve les mêmes pixels dans la zone définie. Les commandes et la bulle se superposent à la scène. |
+| Bulle du personnage | 22,107 | Texte rendu dans un élément HTML et anticrénelage Windows. |
+| Éditeur Python | 17,340 | Glyphes de la police monospace système, icônes et surbrillances de syntaxe. |
+| Exercice et progression | 28,064 et 21,406 | Énoncé HTML, état du parcours et retours à la ligne. |
+| Dialogue | 26,965 | Titres, bulles et état initial de la conversation fonctionnelle. |
+| Moteurs et explication | 39,330 et 40,898 | Statuts et décisions disponibles à l’ouverture, champs de diagnostic et tournures de texte. |
+| Laboratoire JEPA | 15,021 | Libellés HTML, typographie et verdict scientifique visibles. |
+
+Les facteurs 125 % et 150 % ont été vérifiés par émulation Chromium. La mise à l’échelle du bureau Windows à 100 %, 125 % et 150 % reste à vérifier sur le poste cible.
