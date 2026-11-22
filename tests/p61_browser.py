@@ -8,7 +8,7 @@ import tempfile
 from playwright.sync_api import expect, sync_playwright
 
 from p6_browser import SIZES, interactions, layouts, live_provenance
-from tutor_browser import local_server, protect_page
+from tutor_browser import ROOT, local_server, protect_page
 
 
 POSES = ("accueil", "repos", "ecoute", "reflexion", "explication", "validation", "encouragement")
@@ -60,7 +60,8 @@ def companion(browser, origin, output):
     assert hand.evaluate("(el) => getComputedStyle(el).animationName") == "none"
     page.get_by_role("button", name="Paramètres").click()
     page.get_by_text("Diagnostic des moteurs", exact=True).click()
-    expect(page.locator("#diagnostic-build")).to_contain_text("Version 0.6.1")
+    version = json.loads((ROOT / "distribution" / "lock.json").read_text(encoding="utf-8"))["version"]
+    expect(page.locator("#diagnostic-build")).to_contain_text(f"Version {version} · build ")
     expect(page.locator("#diagnostic-checks")).to_contain_text("Inférence validée · non confirmé")
     expect(page.locator("#diagnostic-turn")).to_contain_text("JEPA non sollicité")
     expect(page.locator("#diagnostic-turn")).to_contain_text("Question retenue")
