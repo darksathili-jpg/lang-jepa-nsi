@@ -37,9 +37,10 @@ class Session:
 
 
 class Sessions:
-    def __init__(self):
+    def __init__(self, experiment=None):
         self.items = OrderedDict()
         self.lock = threading.Lock()
+        self.experiment = experiment
 
     def pick(self, token, scope, statement):
         now = time.monotonic()
@@ -89,13 +90,18 @@ class Sessions:
             history = list(session.recent) if same_statement else []
             progress = deepcopy(session.progress) if same_statement else None
             facts = analyze(code)
+            experiment = self.experiment if mode == "conversation" else None
+            if experiment:
+                experiment.require_model()
             maximum = exercise == "maximum" or mode == "conversation" and (
                 progress is not None or facts["maximum_function"] and code_matches_maximum(code, "zero") and re.search(
                     r"maximum|plus grande valeur|plus grand entier", normalized(statement),
                 )
             )
+            if experiment and experiment.mode == "a":
+                maximum = False
             if maximum and progress is None:
-                progress = Progress()
+                progress = Progress(multi_test=bool(experiment))
 
             request = {"class": level, "exercise": exercise, "statement": statement,
                        "code": code, "question": question, "history": history}
@@ -103,7 +109,8 @@ class Sessions:
             if mode == "guided":
                 answer = respond_guided(request, progress=progress, turn=sequence + 1, history_limit=RECENT_TURNS)
             elif maximum:
-                answer, raw = maximum_reply(engine, request | {"history": []}, progress, sequence + 1)
+                answer, raw = maximum_reply(engine, request if experiment else request | {"history": []},
+                                            progress, sequence + 1, experiment=experiment)
             else:
                 answer, raw = respond(engine, request, history_limit=RECENT_TURNS)
                 answer["provenance"] = {
@@ -111,6 +118,8 @@ class Sessions:
                     "diagnostic": "Analyse statique Python",
                     "jepa": "Aucune contribution de LANG-JEPA.",
                 }
+                if experiment and experiment.mode != "a":
+                    answer["provenance"]["jepa"] = "Hors du scénario expérimental du maximum · Conversation locale sans JEPA."
 
             if not same_statement:
                 session.recent.clear()

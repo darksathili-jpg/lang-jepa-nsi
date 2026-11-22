@@ -4,7 +4,8 @@ const $ = (id) => document.getElementById(id);
 const els = Object.fromEntries([
   'class', 'statement', 'code', 'highlight', 'syntax', 'question', 'history', 'empty',
   'compose', 'send', 'reset', 'feedback', 'stages', 'active-stage', 'model-state',
-  'model-identity', 'model-detail', 'mode', 'exercise-field', 'exercise', 'objective', 'pedagogical-objective',
+  'model-identity', 'model-detail', 'jepa-status', 'mode', 'exercise-field', 'exercise', 'objective',
+  'pedagogical-objective', 'teacher-panel', 'teacher-content',
 ].map((id) => [id, $(id)]));
 const labels = ['Comprendre', 'Orienter', 'Expérimenter', 'Débloquer', 'Consolider'];
 const themeButtons = [...document.querySelectorAll('button[data-theme]')];
@@ -62,12 +63,13 @@ let session = null;
 let turn = 0;
 let busy = false;
 let engineState = 'loading';
+let jepaBlocked = false;
 let catalogue = null;
 let catalogueError = false;
 const guided = () => els.mode.value === 'guided';
 
 function updateActions() {
-  els.send.disabled = busy || (guided() ? !catalogue || !els.exercise.value : engineState !== 'ready');
+  els.send.disabled = busy || (guided() ? !catalogue || !els.exercise.value : engineState !== 'ready' || jepaBlocked);
   els.reset.disabled = busy || turn === 0;
   els.class.disabled = busy;
   els.mode.disabled = busy;
@@ -77,6 +79,7 @@ function updateActions() {
 
 async function updateModel() {
   if (guided()) {
+    els['jepa-status'].hidden = true;
     els['model-state'].textContent = catalogue ? 'Parcours prêt' : catalogueError ? 'Exercices indisponibles' : 'Chargement des exercices';
     els['model-state'].dataset.state = catalogue ? 'ready' : catalogueError ? 'error' : 'loading';
     els['model-identity'].textContent = catalogue ? 'Indices rédigés · Analyse Python' : '';
@@ -103,15 +106,52 @@ async function updateModel() {
     els['model-identity'].textContent = `${status.name} · ${status.quantization} · ${status.revision.slice(0, 8)}`;
     els['model-identity'].title = `Révision ${status.revision} · llama.cpp ${status.runtime}`;
     els['model-detail'].textContent = status.detail;
+    const jepa = status.jepa;
+    jepaBlocked = jepa && ['absent', 'error'].includes(jepa.state);
+    const jepaStates = {ready: 'JEPA prêt', absent: 'JEPA absent', error: 'JEPA indisponible', inactive: 'Sans JEPA'};
+    els['jepa-status'].textContent = jepa ? [jepa.mode, jepaStates[jepa.state], jepa.name, jepa.detail].filter(Boolean).join(' · ') : '';
+    els['jepa-status'].hidden = !jepa;
   } catch {
     if (guided()) return;
     engineState = 'error';
+    els['jepa-status'].hidden = true;
     els['model-state'].textContent = 'Service local indisponible';
     els['model-state'].dataset.state = 'error';
     els['model-detail'].textContent = 'Ouvre l’atelier depuis le lanceur local, puis recharge cette page.';
   } finally {
     updateActions();
   }
+}
+
+function showTeacherState(state, provenance) {
+  const panel = els['teacher-panel'];
+  const content = els['teacher-content'];
+  panel.hidden = !state;
+  content.replaceChildren();
+  if (!state) return;
+  const label = (key) => state.libelles_objectifs[key] ?? 'Parcours terminé';
+  const evidence = (items) => Object.entries(items).map(([goal, item]) =>
+    `${label(goal)} · tour ${item.tour} · ${item.critere}`);
+  const add = (title, values) => {
+    const heading = document.createElement('dt');
+    heading.textContent = title;
+    content.append(heading);
+    for (const value of values.length ? values : ['Aucun élément consigné']) {
+      const item = document.createElement('dd');
+      item.textContent = value;
+      content.append(item);
+    }
+  };
+  add('Objectif en cours', [state.objectif_libelle]);
+  add('Acquis confirmés par les critères de l’exercice', evidence(state.acquis));
+  add('Objectifs à démontrer', state.acquis_non_demontres.map(label));
+  add('Difficultés relevées', evidence(state.erreurs));
+  add('Derniers changements d’objectif', state.changements_objectif.slice(-4).map((item) =>
+    `Tour ${item.tour} · ${label(item.avant)} → ${label(item.apres)}`));
+  const decision = state.derniere_intervention;
+  add('Dernière intervention', decision ? [`${decision.approche} · ${decision.justification}`] : []);
+  add('Contribution JEPA', [provenance.jepa, ...(decision?.differe_des_regles ?
+    ['Le classement a changé la question par rapport à l’ordre des règles.'] : [])]);
 }
 
 function applyExercise() {
@@ -186,6 +226,8 @@ function reset() {
   delete els.syntax.dataset.error;
   els['pedagogical-objective'].hidden = true;
   els['pedagogical-objective'].textContent = '';
+  showTeacherState(null);
+  els['teacher-panel'].open = false;
   showStage(1);
   updateActions();
 }
@@ -237,6 +279,7 @@ els.compose.addEventListener('submit', async (event) => {
     const objective = els['pedagogical-objective'];
     objective.hidden = !data.pedagogie;
     objective.textContent = data.pedagogie?.objectif_libelle ?? '';
+    showTeacherState(data.pedagogie, data.provenance);
     if (els.code.value === code) {
       els.syntax.dataset.error = String(data.analysis.syntax !== null);
       const diagnosis = data.diagnostic ?? (data.analysis.syntax === null

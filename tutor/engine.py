@@ -11,6 +11,7 @@ import threading
 import time
 
 from tutor.catalog import CATALOG, runtime_path, verify_file
+from p5.contract import ACTIONS, SCHEMA
 
 
 class EngineError(RuntimeError):
@@ -56,6 +57,11 @@ HINT_FORMAT = {
         },
     },
 }
+DECISION_FORMAT = deepcopy(HINT_FORMAT)
+_decision_schema = DECISION_FORMAT["json_schema"]["schema"]
+_decision_schema["properties"].update({"schema": {"type": "integer", "enum": [SCHEMA]},
+                                      "approche": {"type": "string", "enum": list(ACTIONS)}})
+_decision_schema["required"].extend(("schema", "approche"))
 
 
 class LlamaEngine:
@@ -71,6 +77,7 @@ class LlamaEngine:
         self.port = None
         self.token = secrets.token_hex(24)
         self.lock = threading.Lock()
+        self.process_lock = threading.Lock()
         self.closed = threading.Event()
         if not self.executable or not self.executable.is_file() or not self.model_file.is_file():
             self.state = "absent"
@@ -120,7 +127,7 @@ class LlamaEngine:
                 reserved.bind(("127.0.0.1", 0))
                 self.port = reserved.getsockname()[1]
 
-            with self.lock:
+            with self.process_lock:
                 if self.closed.is_set():
                     return
                 self.process = subprocess.Popen([
@@ -152,7 +159,7 @@ class LlamaEngine:
             )
             self.close()
 
-    def generate(self, messages, contract=False, *, hint=False):
+    def generate(self, messages, contract=False, *, hint=False, decision=False):
         if self.status()["state"] != "ready":
             raise EngineError(self.detail)
         if not self.lock.acquire(blocking=False):
@@ -162,7 +169,8 @@ class LlamaEngine:
             status, data = self._request("/v1/chat/completions", {
                 "model": self.key, "messages": messages, "temperature": 0, "seed": 42,
                 "max_tokens": 85 if hint else 160,
-                "response_format": HINT_FORMAT if hint else CONTRACT_FORMAT if contract else REPLY_FORMAT,
+                "response_format": (DECISION_FORMAT if decision else HINT_FORMAT if hint else
+                                    CONTRACT_FORMAT if contract else REPLY_FORMAT),
                 "cache_prompt": False,
             }, timeout=110)
             if status == 400:
@@ -182,7 +190,7 @@ class LlamaEngine:
 
     def close(self):
         self.closed.set()
-        with self.lock:
+        with self.process_lock:
             if self.process is None or self.process.poll() is not None:
                 return
             self.process.terminate()

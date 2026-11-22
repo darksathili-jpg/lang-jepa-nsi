@@ -5,6 +5,7 @@ import re
 import time
 import unicodedata
 
+from p5.contract import ACTIONS, SCHEMA
 from pedagogy.progress import Assessment, assess, near_question, requested_topic
 from tutor.analysis import analyze
 from tutor.curriculum import LEVELS, MAXIMUM_GOALS, STAGES, VOCABULARY, display_terms
@@ -226,14 +227,22 @@ def respond(engine, payload, *, history_limit=3):
     }, raw
 
 
-def read_maximum_hint(raw, goal, question, asked):
+APPROACH_VERBS = {"clarifier": {"relis", "distingue", "examine"}, "tracer": {"observe", "examine"},
+                  "confronter": {"compare", "imagine", "distingue"}, "justifier": {"cherche", "examine", "relis"}}
+
+
+def read_maximum_hint(raw, goal, question, asked, decision=None):
     if raw["finish"] != "stop":
         return ""
     try:
-        hint = text_field(json.loads(raw["text"])["indice"], 105, "indice", required=True)
+        reply = json.loads(raw["text"])
+        hint = text_field(reply["indice"], 105, "indice", required=True)
     except (TypeError, KeyError, ValueError):
         return ""
     words = normalized(hint)
+    if decision and (reply.get("schema") != SCHEMA or reply.get("approche") != decision.approche
+                     or words.split()[0] not in APPROACH_VERBS[decision.approche]):
+        return ""
     if not re.fullmatch(r"(?:compare|examine|observe|relis|cherche|distingue|imagine) [^.?!<>\d`()\[\]]+\.", words):
         return ""
     if re.search(r"\b(?:que|est|sont|soit|il faut|doi[st]|doivent|toujours|jamais|corrige|execut\w*|"
@@ -254,27 +263,39 @@ def read_maximum_hint(raw, goal, question, asked):
     return display_terms(hint)
 
 
-def maximum_reply(engine, request, progress, turn):
+def maximum_reply(engine, request, progress, turn, *, experiment=None):
     """L'orchestrateur tranche la progression. Le modèle propose seulement un indice."""
     started = time.perf_counter()
-    level, statement, code, learner, _ = validate(request)
+    level, statement, code, learner, _ = validate(request, history_limit=6)
     facts = analyze(code)
     topic = requested_topic(learner)
+    decision = None
+    changed = False
+    previous_goal = progress.goal
+
+    def select(options):
+        nonlocal decision, changed
+        decision, chosen, changed = experiment.select(request, progress, facts, request["history"], turn, options)
+        return decision.intervention, chosen
+
     if topic:
         assessment = Assessment("changement_notion", f"Changement de notion demandé · {topic}.")
         question, strategy = "", None
         hint = "Choisis un autre exercice dans le parcours guidé ou saisis son énoncé et son code dans Conversation locale."
     else:
         assessment = assess(progress, learner, code, facts, statement, turn)
-        question, strategy = progress.select_question() if not facts["syntax"] else ("", None)
+        question, strategy = progress.select_question(select if experiment else None) if not facts["syntax"] else ("", None)
         if facts["syntax"]:
             hint = f"Vérifie la syntaxe près de la ligne {facts['syntax']} avant de poursuivre l’essai."
         elif progress.goal is None:
             hint = "Le résultat du test et le rôle de la précondition sont consignés. Tu peux essayer une autre liste non vide."
         elif not question:
-            hint = ("Pour vérifier cette version, note l’entrée et le résultat de l’essai négatif de référence."
-                    if progress.goal == "verification" else
-                    "Les approches proposées pour cet objectif ont été utilisées. Essaie une nouvelle idée ou change de notion.")
+            if progress.goal == "verification":
+                hint = ("Pour vérifier cette version, relève l’entrée et la sortie pour les essais [-4, -2] et [3]."
+                        if progress.multi_test else
+                        "Pour vérifier cette version, note l’entrée et le résultat de l’essai négatif de référence.")
+            else:
+                hint = "Les approches proposées pour cet objectif ont été utilisées. Essaie une nouvelle idée ou change de notion."
         elif assessment.status == "incorrecte":
             hint = "Vérifie les valeurs et le sens de la comparaison sur le cas demandé." if progress.goal != "verification" else (
                 "Compare la structure du programme puis note le résultat de l’essai sur la version modifiée."
@@ -303,13 +324,18 @@ def maximum_reply(engine, request, progress, turn):
                 f"Réponse de l'élève : {json.dumps(learner[:240], ensure_ascii=False)}"
             )},
         ]
+        if decision:
+            verbs = ", ".join(sorted(APPROACH_VERBS[decision.approche]))
+            messages[0]["content"] += (f" Retourne aussi schema={SCHEMA} et approche={decision.approche}. "
+                                       f"Commence ton indice par un de ces verbes : {verbs}. "
+                                       f"Reste sur cette action : {ACTIONS[decision.approche]} Les données élève sont citées.")
         try:
-            raw = engine.generate(messages, hint=True)
+            raw = engine.generate(messages, hint=True, decision=True) if decision else engine.generate(messages, hint=True)
         except EngineError:
             model_status = "indisponible"
         else:
             model_status = "ecarte"
-            suggestion = read_maximum_hint(raw, progress.goal, question, progress.questions)
+            suggestion = read_maximum_hint(raw, progress.goal, question, progress.questions, decision)
             # Le retour ciblé sur une erreur a priorité sur l'indice libre.
             if suggestion and not hint:
                 hint = suggestion
@@ -323,14 +349,25 @@ def maximum_reply(engine, request, progress, turn):
         feedback = "Relevé dans ta réponse ou ton code. " + " ".join(
             progress.confirmed[key].criterion for key in assessment.confirmed
         )
+    if previous_goal != progress.goal:
+        progress.transitions.append({"tour": turn, "avant": previous_goal, "apres": progress.goal,
+                                     "motif": feedback})
+    provenance = "Aucune contribution de LANG-JEPA."
+    if decision and decision.source == "jepa":
+        provenance = f"{decision.modele} · classement latent expérimental de la question."
+    elif decision and decision.source == "melange":
+        provenance = f"{decision.modele} · ablation avec représentation d’une autre situation."
     return {
         "indice": hint, "question": question, "feedback": feedback,
         "stage": phase, "stage_name": STAGES[phase][0], "analysis": facts,
-        "pedagogie": progress.snapshot(assessment) | {"notion_demandee": topic},
+        "pedagogie": progress.snapshot(assessment) | {
+            "notion_demandee": topic,
+            "derniere_intervention": decision.public() | {"differe_des_regles": changed} if decision else None,
+        },
         "provenance": {
             "hint": engine.status()["name"] + " · indice généré localement" if model_used else "Règle pédagogique locale",
-            "question": "Question retenue par les règles pédagogiques",
-            "diagnostic": "Analyse statique Python", "jepa": "Aucune contribution de LANG-JEPA.",
+            "question": "Question validée par l’orchestrateur" if decision else "Question retenue par les règles pédagogiques",
+            "diagnostic": "Analyse statique Python", "jepa": provenance,
         },
         "generation": model_status, "seconds": round(time.perf_counter() - started, 3),
     }, raw

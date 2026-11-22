@@ -90,6 +90,7 @@ h1 { font-size: clamp(2.15rem, 4.5vw, 3.35rem); letter-spacing: -.055em; line-he
 .model-card { display: grid; gap: .1rem; color: var(--quiet); font-size: .78rem; max-width: 28rem; }
 .model-card label { margin-bottom: 0; }
 .model-card select { width: fit-content; margin-bottom: .28rem; }
+#jepa-status { margin-top: .34rem; overflow-wrap: anywhere; }
 .model-state { width: fit-content; display: inline-flex; align-items: center; gap: .44rem; padding: .25rem .52rem; background: var(--panel); border: 1px solid var(--line); border-radius: 2rem; color: var(--text); font-weight: 750; }
 .model-state::before { content: ""; width: .56rem; height: .56rem; background: var(--quiet); border-radius: 50%; }
 .model-state[data-state="ready"]::before { background: var(--success); }
@@ -139,6 +140,11 @@ textarea::placeholder { color: var(--quiet); }
 .message > strong { display: block; font-size: .76rem; color: var(--accent); margin-bottom: .22rem; }
 .message p + p { margin-top: .4rem; font-weight: 650; }
 .message p.provenance { margin-top: .45rem; color: var(--quiet); font-size: .74rem; font-weight: 500; }
+#teacher-panel { border-top: 1px solid var(--line); margin-top: .85rem; padding-top: .68rem; }
+#teacher-panel summary { cursor: pointer; font-weight: 650; }
+#teacher-content { color: var(--quiet); font-size: .84rem; overflow-wrap: anywhere; }
+#teacher-content dt { color: var(--text); font-weight: 660; margin-top: .54rem; }
+#teacher-content dd { margin: .16rem 0 0; }
 .form-footer { margin-top: .6rem; }
 #send { flex: none; border: 1px solid var(--accent); border-radius: .45rem; background: var(--accent); color: var(--accent-ink); font-weight: 740; padding: .52rem .74rem; font-size: .86rem; }
 

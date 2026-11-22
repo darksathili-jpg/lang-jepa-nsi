@@ -79,6 +79,9 @@ class Progress:
     errors: dict[str, Evidence] = field(default_factory=dict)
     questions: deque = field(default_factory=lambda: deque(maxlen=28))
     code_digest: str | None = None
+    multi_test: bool = False
+    tests: dict[str, Evidence] = field(default_factory=dict)
+    transitions: deque = field(default_factory=lambda: deque(maxlen=32))
 
     @property
     def goal(self):
@@ -92,8 +95,12 @@ class Progress:
             "notion": self.notion, "objectif": self.goal,
             "objectif_suivant": pending[1] if len(pending) > 1 else None,
             "objectif_libelle": MAXIMUM_GOALS[self.goal][0] if self.goal else "Parcours terminé",
+            "libelles_objectifs": {key: value[0] for key, value in MAXIMUM_GOALS.items()},
             "acquis": {goal: evidence(item) for goal, item in self.confirmed.items()},
+            "acquis_non_demontres": pending,
             "erreurs": {goal: evidence(item) for goal, item in self.errors.items()},
+            "tests_declares": {case: evidence(item) for case, item in self.tests.items()},
+            "changements_objectif": list(self.transitions),
             "questions": [{"objectif": goal, "strategie": strategy, "texte": question}
                           for goal, strategy, question in self.questions],
             "evaluation": {"statut": assessment.status, "commentaire": assessment.message,
@@ -104,19 +111,29 @@ class Progress:
         self.confirmed.setdefault(key, Evidence(turn, text, criterion))
         self.errors.pop(key, None)
 
-    def select_question(self):
+    def select_question(self, selector=None):
         if self.goal is None:
             return "", None
         _, _, options = MAXIMUM_GOALS[self.goal]
+        if self.goal == "verification" and self.multi_test:
+            options = (
+                ("essai", "Quelles sorties observes-tu avec ton nouveau code pour [-4, -2] et pour [3] ?"),
+                ("rédaction", "Peux-tu noter séparément chaque entrée et sa valeur renvoyée ?"),
+                ("cas discriminant", "Quel essai permet de distinguer les deux versions du programme, et pourquoi ?"),
+            )
         previous = self.questions[-1] if self.questions else None
+        available = []
         for strategy, question in options:
             if previous and previous[0] == self.goal and previous[1] == strategy:
                 continue
             if any(near_question(question, asked) for _, _, asked in self.questions):
                 continue
-            self.questions.append((self.goal, strategy, question))
-            return question, strategy
-        return "", None
+            available.append((strategy, question))
+        if not available:
+            return "", None
+        strategy, question = selector(available) if selector else available[0]
+        self.questions.append((self.goal, strategy, question))
+        return question, strategy
 
 
 def value_after(pattern, text):
@@ -137,7 +154,7 @@ def compare_zero(text):
     if re.search(r"\b(?:pas|jamais)\s+(?:s[uou]p|plus grand|inf|que\b)", text):
         return False
     greater = r"(?<![-\w])0\b\s*(?:est\s+)?(?:strictement\s+)?" + GREATER + r"\s*"
-    smaller = r"\s*(?:(?:est|sont)\s+)?(?:strictement\s+)?" + SMALLER + r"\s*0\b"
+    smaller = r"\s*(?:aussi\s+)?(?:(?:est|sont)\s+)?(?:strictement\s+)?" + SMALLER + r"\s*0\b"
     together = re.search(greater + NEGATIVE_PAIR, text) or re.search(NEGATIVE_PAIR + smaller, text)
     separate = all(re.search(greater + value + r"(?!\d)", text) or re.search(value + smaller, text)
                    for value in ("-4", "-2"))
@@ -195,6 +212,7 @@ def assess(progress, answer, code, facts, statement, turn):
         for key in ("verification", "contract"):
             progress.confirmed.pop(key, None)
             progress.errors.pop(key, None)
+        progress.tests.clear()
     progress.code_digest = facts["structure_digest"]
     if facts["syntax"]:
         return Assessment("ambigue", "Le parseur ne permet pas encore d’examiner cette version du programme.")
@@ -253,9 +271,20 @@ def assess(progress, answer, code, facts, statement, turn):
         confirm("strategy", "Proposition d’une valeur issue de la liste, dans la réponse ou l’AST.")
     previous_test = progress.questions and progress.questions[-1][0] == "verification" and "[-4, -2]" in progress.questions[-1][2]
     observed_fix = (actual == -2 or goal == "verification" and short == -2) and (
-        explicit_test or previous_test and not re.search(r"\[[^\]]*\]", words)
+        explicit_test or previous_test and not progress.multi_test and not input_lists
     )
-    if corrected and observed_fix and {"observed", "expected", "trace", "assumption", "strategy"} <= progress.confirmed.keys():
+    ready_for_test = corrected and {"observed", "expected", "trace", "assumption", "strategy"} <= progress.confirmed.keys()
+    if ready_for_test and progress.multi_test:
+        cases = {"[-4, -2]": observed_fix,
+                 "[3]": actual == 3 and bool(input_lists) and all(re.fullmatch(r"\[\s*3\s*\]", item) for item in input_lists)}
+        for case, success in cases.items():
+            if success:
+                progress.tests.setdefault(case, Evidence(turn, excerpt, "Entrée et sortie cohérentes déclarées sur la version reconnue."))
+        if len(progress.tests) == len(cases):
+            confirm("verification", "Forme reconnue statiquement et sorties cohérentes déclarées sur [-4, -2] et [3].")
+        elif any(cases.values()):
+            return Assessment("partielle", "Ce test est cohérent. Un deuxième cas reste à vérifier.")
+    elif ready_for_test and observed_fix:
         confirm("verification", "Forme d’accumulation reconnue statiquement et −2 déclaré pour le test de référence.")
     if "verification" in progress.confirmed and contract and "non vide" in normalize(statement):
         confirm("contract", "La réponse relie l’exclusion de [] à la précondition non vide.")

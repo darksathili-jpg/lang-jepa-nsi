@@ -37,6 +37,7 @@
         <span id="model-state" class="model-state" data-state="loading" role="status">Chargement des exercices</span>
         <span id="model-identity"></span>
         <span id="model-detail"></span>
+        <span id="jepa-status" hidden></span>
       </div>
     </section>
 
@@ -103,6 +104,10 @@
             <button type="submit" id="send" disabled>Demander un indice</button>
           </div>
         </form>
+        <details id="teacher-panel" hidden>
+          <summary>Suivi enseignant</summary>
+          <dl id="teacher-content"></dl>
+        </details>
       </section>
     </div>
   </main>

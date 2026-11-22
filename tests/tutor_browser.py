@@ -19,10 +19,10 @@ SCENARIO = next(case for case in json.loads((ROOT / "p3" / "scenarios.json").rea
 
 
 @contextmanager
-def local_server(assets, model):
+def local_server(assets, model, *options, verify_shutdown=False):
     command = [
         sys.executable, "-m", "tutor.server", "--port", "0",
-        "--assets", str(assets), "--model", model, "--threads", "2",
+        "--assets", str(assets), "--model", model, "--threads", "2", *options,
     ]
     with subprocess.Popen(command, cwd=ROOT, text=True, encoding="utf-8", stdout=subprocess.PIPE) as process:
         try:
@@ -30,6 +30,11 @@ def local_server(assets, model):
             assert line.startswith("Professeur virtuel : http://127.0.0.1:"), line
             yield line.split()[-1].removesuffix("/atelier")
         finally:
+            child_ids = []
+            if verify_shutdown and sys.platform == "linux":
+                children = subprocess.run(["ps", "-o", "pid=", "--ppid", str(process.pid)], capture_output=True,
+                                          text=True, check=False)
+                child_ids = children.stdout.split()
             if process.poll() is None:
                 if sys.platform == "win32":
                     # La recette native du navigateur est lancée depuis le terminal local.
@@ -38,6 +43,8 @@ def local_server(assets, model):
                 else:
                     process.terminate()
                 process.wait(timeout=15)
+            if verify_shutdown and sys.platform == "linux":
+                assert child_ids and not any(Path(f"/proc/{pid}").exists() for pid in child_ids), child_ids
 
 
 def protect_page(page, origin):

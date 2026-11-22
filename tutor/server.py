@@ -8,6 +8,8 @@ import signal
 import sys
 import threading
 
+from p5.contract import ContractError
+from p5.orchestration import open_experiment
 from pedagogy.catalogue import for_level
 from tutor.catalog import CATALOG, DEFAULT_ASSETS, ROOT
 from tutor.curriculum import LEVELS
@@ -35,10 +37,10 @@ POLICY = (
 
 
 class WorkshopServer(ThreadingHTTPServer):
-    def __init__(self, port, engine):
+    def __init__(self, port, engine, experiment=None):
         super().__init__(("127.0.0.1", port), Handler)
         self.engine = engine
-        self.dialogues = Sessions()
+        self.dialogues = Sessions(experiment)
         self.engine_thread = None
         self.engine_lock = threading.Lock()
         self.host_header = f"127.0.0.1:{self.server_port}"
@@ -87,7 +89,10 @@ class Handler(BaseHTTPRequestHandler):
             return
         if self.path == "/api/status":
             self.server.start_engine()
-            self.send_json(200, self.server.engine.status())
+            experiment = self.server.dialogues.experiment
+            jepa = experiment.status() if experiment else {"mode": "Conversation locale P4",
+                "state": "inactive", "name": None, "detail": ""}
+            self.send_json(200, self.server.engine.status() | {"jepa": jepa})
         elif self.path == "/api/exercises":
             self.send_json(200, {level: for_level(level) for level in LEVELS})
         elif self.path in PAGES:
@@ -131,6 +136,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(422, {"error": f"{exc} Reformulez votre question pour réessayer."})
         except EngineError as exc:
             self.send_json(503, {"error": str(exc)})
+        except ContractError as exc:
+            self.send_json(503, {"error": str(exc)})
         else:
             self.send_json(200, answer)
 
@@ -141,17 +148,24 @@ def main():
     parser.add_argument("--assets", type=Path, default=DEFAULT_ASSETS)
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--threads", type=int, default=2)
+    parser.add_argument("--p5", choices=("a", "b", "c"), help="Profil de recherche P5. L’atelier normal reste la référence P4.")
+    parser.add_argument("--jepa", type=Path, help="Dossier local de poids vérifiés pour le profil C.")
     args = parser.parse_args()
     if not 1 <= args.threads <= 16 or not 0 <= args.port <= 65535:
         parser.error("Indiquez un nombre de fils entre 1 et 16 et un port TCP valide.")
+    if args.p5 and args.model != "smol":
+        parser.error("Les profils comparatifs P5 utilisent SmolLM3.")
+    if args.jepa and args.p5 != "c":
+        parser.error("L’option --jepa s’utilise avec --p5 c.")
 
     def stop(_signal, _frame):
         raise KeyboardInterrupt
 
     signal.signal(signal.SIGTERM, stop)
     engine = LlamaEngine(args.assets.resolve(), args.model, args.threads)
+    experiment = open_experiment(args.p5, args.jepa) if args.p5 else None
     try:
-        with WorkshopServer(args.port, engine) as server:
+        with WorkshopServer(args.port, engine, experiment) as server:
             print(f"Professeur virtuel : {server.origin}/atelier", flush=True)
             server.serve_forever()
     except KeyboardInterrupt:
