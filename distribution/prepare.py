@@ -28,7 +28,8 @@ def prepare_jepa(destination):
     from p5.jepa import save, train
 
     config = LOCK["jepa"]
-    digest = hashlib.sha256((ROOT / "corpus.json").read_bytes()).hexdigest()
+    # Git peut convertir les fins de ligne sur un poste Windows. Le verrou porte sur le corpus LF de P5.
+    digest = hashlib.sha256((ROOT / "corpus.json").read_bytes().replace(b"\r\n", b"\n")).hexdigest()
     if config["corpus_sha256"] != digest:
         raise ValueError("Le corpus ne correspond pas à la révision du profil P5.")
     print("Entraînement local du modèle pédagogique JEPA P5…", flush=True)

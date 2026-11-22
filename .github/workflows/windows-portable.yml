@@ -40,7 +40,7 @@ jobs:
         run: |
           results\installe\LANG-JEPA-NSI-Windows\runtime\python.exe -B -c "import sys, platform, numpy; print(sys.version, platform.machine(), numpy.__version__)" || exit /b 1
           set PYTHONPATH=%CD%
-          python tests\portable_smoke.py --package results\installe\LANG-JEPA-NSI-Windows
+          python -X utf8 tests\portable_smoke.py --package results\installe\LANG-JEPA-NSI-Windows
       - name: Géométrie et contrôles sur Chromium Windows
         run: |
           python tests\p61_browser.py --output results\windows-captures || exit /b 1
