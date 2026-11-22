@@ -12,6 +12,7 @@ import time
 import webbrowser
 
 from distribution.instance import BUILD_FILE, LOCK, identity, local_request, lock, publish, read, recognized
+from distribution.jobs import stop_waiter
 from distribution.prepare import assets_for, prepare, verify_engine
 from p5.orchestration import open_experiment
 from tutor.catalog import ROOT
@@ -61,14 +62,16 @@ def stop(expected, state_file):
             raise ValueError("Une autre instance occupe ce port. Aucun arrêt ne lui a été envoyé.")
         print("Aucune instance reconnue à arrêter.")
         return
-    reply = local_request(state["port"], "/api/instance/stop", token=state["token"], method="POST")
-    if reply != {"stopping": True}:
-        raise ValueError("Le serveur n’a pas confirmé l’arrêt. Consulte les journaux.")
-    deadline = time.monotonic() + 15
-    while state_file.exists() and time.monotonic() < deadline:
-        time.sleep(.15)
-    if state_file.exists():
-        raise ValueError("La fin de l’arrêt n’a pas été confirmée. Consulte les journaux.")
+    with stop_waiter(state["pid"]) as wait_exit:
+        reply = local_request(state["port"], "/api/instance/stop", token=state["token"], method="POST")
+        if reply != {"stopping": True}:
+            raise ValueError("Le serveur n’a pas confirmé l’arrêt. Consulte les journaux.")
+        deadline = time.monotonic() + 15
+        while state_file.exists() and time.monotonic() < deadline:
+            time.sleep(.15)
+        if state_file.exists():
+            raise ValueError("La fin de l’arrêt n’a pas été confirmée. Consulte les journaux.")
+        wait_exit(deadline - time.monotonic())
     print("Arrêt confirmé du serveur et de son moteur local.")
 
 

@@ -1,6 +1,7 @@
 """Encadre le moteur Windows par un Job Object pour libérer ses descendants."""
 
 import os
+from contextlib import contextmanager
 
 
 class ChildJob:
@@ -54,3 +55,35 @@ class ChildJob:
         if self.handle:
             self.close_handle(self.handle)
             self.handle = None
+
+
+@contextmanager
+def stop_waiter(pid):
+    """Ouvrir le processus authentifié avant l’arrêt et attendre sa sortie sur Windows."""
+    if os.name != "nt":
+        yield lambda _seconds: None
+        return
+    import ctypes as c
+    from ctypes import wintypes as w
+
+    kernel = c.WinDLL("kernel32", use_last_error=True)
+    kernel.OpenProcess.argtypes = (w.DWORD, w.BOOL, w.DWORD)
+    kernel.OpenProcess.restype = w.HANDLE
+    kernel.WaitForSingleObject.argtypes = (w.HANDLE, w.DWORD)
+    kernel.WaitForSingleObject.restype = w.DWORD
+    kernel.CloseHandle.argtypes = (w.HANDLE,)
+    handle = kernel.OpenProcess(0x00100000, False, pid)  # SYNCHRONIZE uniquement
+    if not handle:
+        raise c.WinError(c.get_last_error())
+
+    def wait(seconds):
+        outcome = kernel.WaitForSingleObject(handle, max(0, int(seconds * 1000)))
+        if outcome == 258:  # WAIT_TIMEOUT
+            raise ValueError("Windows n’a pas confirmé la sortie du serveur dans le délai prévu.")
+        if outcome != 0:
+            raise c.WinError(c.get_last_error())
+
+    try:
+        yield wait
+    finally:
+        kernel.CloseHandle(handle)
