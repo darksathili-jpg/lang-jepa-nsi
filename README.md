@@ -261,6 +261,7 @@ Consultez la [recette P3 scientifique](docs/RECETTE-JEPA-NSI.md) et le [rapport 
 - [Architecture du professeur virtuel](docs/ARCHITECTURE-P3.md)
 - [Comparatif des modèles conversationnels](docs/COMPARATIF-P3.md)
 - [Rapport de validation du modèle conversationnel](docs/RAPPORT-P3.md)
+- [Correction du dialogue socratique et recette P4](docs/RAPPORT-P4.md)
 - [Expérience scientifique LANG-JEPA : protocole et résultats](docs/EXPERIENCE-JEPA-NSI.md)
 - [Recette de la reprise scientifique](docs/RECETTE-JEPA-NSI.md)
 - [Audit et limites de LANG-JEPA](docs/AUDIT-JEPA-NSI.md)
