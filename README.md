@@ -14,6 +14,8 @@ Le projet propose trois expériences **distinctes** :
 
 **P5 · Prototype hybride.** Un JEPA pédagogique entraîné sur CPU peut reclasser les questions de l’orchestrateur avant la génération d’un indice par SmolLM3. L’essai sur `maximum(tab)` montre que ce classement change des interventions. Le bénéfice pédagogique reste à démontrer, donc le profil hybride s’active explicitement. [Rapport P5](docs/P5_RECETTE_FINALE.md) · [Préparation Windows et hors ligne](docs/P5_PERFORMANCES_WINDOWS.md)
 
+**P6 · Atelier illustré.** `scripts\tutor.cmd` lance l’atelier local en parcours guidé. Les sélecteurs de niveau, d’exercice et de mode sont accessibles depuis la page. Les thèmes clair, sombre et projecteur fonctionnent hors ligne. Le bouton **Exécuter** indique l’indisponibilité d’une exécution Python isolée. [Recette visuelle P6 et captures](docs/P6_RECETTE_VISUELLE.md)
+
 ## Sommaire
 
 1. [Configuration requise](#1-configuration-requise)
@@ -266,6 +268,7 @@ Consultez la [recette P3 scientifique](docs/RECETTE-JEPA-NSI.md) et le [rapport 
 - [Comparatif des modèles conversationnels](docs/COMPARATIF-P3.md)
 - [Rapport de validation du modèle conversationnel](docs/RAPPORT-P3.md)
 - [Correction du dialogue socratique et recette P4](docs/RAPPORT-P4.md)
+- [Composition P6, comparaison et contrôles Chromium](docs/P6_RECETTE_VISUELLE.md)
 - [Architecture du prototype hybride P5](docs/P5_ARCHITECTURE_HYBRIDE.md)
 - [Entraînement et comparaison des profils P5](docs/P5_EVALUATION_ABC.md)
 - [Expérience scientifique LANG-JEPA : protocole et résultats](docs/EXPERIENCE-JEPA-NSI.md)

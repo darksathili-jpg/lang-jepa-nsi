@@ -27,7 +27,7 @@ set OPENBLAS_NUM_THREADS=1
 scripts\tutor.cmd --p5 c --jepa results\p5\fixe-24-17
 ```
 
-Dans le navigateur, sélectionner **Conversation locale**. Le profil C signale séparément **Modèle prêt** et **JEPA prêt**. Le profil B se lance avec `scripts\tutor.cmd --p5 b`. Le double-clic ordinaire conserve le parcours stable. Le mode C reste expérimental. Son choix d’interventions n’a pas montré de bénéfice. Pour reproduire les tests navigateur, ajouter Playwright et un Chromium compatible aux ressources préparées sur le poste connecté. [Comparaison P5](P5_EVALUATION_ABC.md)
+Dans le navigateur, sélectionner **Profil hybride (expérimental)** dans la colonne des moteurs. L’atelier affiche **Hybride expérimental** lorsque JEPA et SmolLM3 sont prêts. Le profil B se lance avec `scripts\tutor.cmd --p5 b`, puis **Conversation locale**. Le double-clic ordinaire ouvre le parcours guidé. Pour reproduire les tests navigateur, ajouter Playwright et un Chromium compatible aux ressources préparées sur le poste connecté. [Comparaison P5](P5_EVALUATION_ABC.md) · [Interface P6](P6_RECETTE_VISUELLE.md)
 
 ## Dépannage
 
