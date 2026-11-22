@@ -14,6 +14,7 @@ import time
 import psutil
 from playwright.sync_api import sync_playwright
 
+from context_browser import replay as contextual_replay
 from distribution.instance import local_request, read
 from hybrid_browser import hybrid
 from p5.compare import read_dialogues
@@ -49,6 +50,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--package", type=Path)
     parser.add_argument("--chromium", type=Path)
+    parser.add_argument("--context", action="store_true")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
 
@@ -79,6 +81,11 @@ def main():
         with sync_playwright() as playwright, evidence.open("x", encoding="utf-8") as stream:
             browser = playwright.chromium.launch(executable_path=args.chromium)
             hybrid(browser, origin, stream, None, case)
+            if args.context:
+                contextual_path = args.output / "tour-contextuel.jsonl"
+                with contextual_path.open("x", encoding="utf-8") as contextual:
+                    contextual_replay(browser, origin, contextual)
+                stats["contextual_turns"] = len(contextual_path.read_text(encoding="utf-8").splitlines())
             browser.close()
         stats["engines"] = local_request(state["port"], "/api/engines")
     finally:

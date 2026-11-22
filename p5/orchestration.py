@@ -18,6 +18,8 @@ APPROACHES = {
     "propriété": "justifier", "validation": "clarifier", "contrainte": "justifier",
     "rédaction": "clarifier", "cas discriminant": "confronter", "contrat": "justifier",
     "domaine": "clarifier",
+    "portee": "clarifier", "separer": "tracer", "consequence": "justifier",
+    "branche": "clarifier", "chaine": "tracer",
 }
 
 

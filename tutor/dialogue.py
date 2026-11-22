@@ -284,7 +284,7 @@ def maximum_reply(engine, request, progress, turn, *, experiment=None):
         hint = "Choisis un autre exercice dans le parcours guidé ou saisis son énoncé et son code dans Conversation locale."
     else:
         assessment = assess(progress, learner, code, facts, statement, turn)
-        question, strategy = progress.select_question(select if experiment else None) if not facts["syntax"] else ("", None)
+        question, strategy = progress.select_question(select if experiment else None, followup=assessment.followup) if not facts["syntax"] else ("", None)
         if facts["syntax"]:
             hint = f"Vérifie la syntaxe près de la ligne {facts['syntax']} avant de poursuivre l’essai."
         elif progress.goal is None:
@@ -303,6 +303,7 @@ def maximum_reply(engine, request, progress, turn, *, experiment=None):
         else:
             hint = ""
 
+    progress.remember_question(strategy, turn, code)
     raw = None
     model_used = False
     model_status = "non_sollicite"
@@ -353,10 +354,14 @@ def maximum_reply(engine, request, progress, turn, *, experiment=None):
         progress.transitions.append({"tour": turn, "avant": previous_goal, "apres": progress.goal,
                                      "motif": feedback})
     provenance = "Aucune contribution de LANG-JEPA."
-    if decision and decision.source == "jepa":
-        provenance = f"{decision.modele} · classement latent expérimental de la question."
+    question_source = "Question retenue par les règles pédagogiques" if question else ""
+    if decision and decision.source == "jepa" and changed:
+        provenance = f"{decision.modele} · reclassement latent expérimental de la question servie."
+        question_source = "Question reclassée par JEPA et validée par l’orchestrateur"
     elif decision and decision.source == "melange":
         provenance = f"{decision.modele} · ablation avec représentation d’une autre situation."
+        if changed:
+            question_source = "Question reclassée par l’ablation et validée par l’orchestrateur"
     return {
         "indice": hint, "question": question, "feedback": feedback,
         "stage": phase, "stage_name": STAGES[phase][0], "analysis": facts,
@@ -366,7 +371,7 @@ def maximum_reply(engine, request, progress, turn, *, experiment=None):
         },
         "provenance": {
             "hint": engine.status()["name"] + " · indice généré localement" if model_used else "Règle pédagogique locale",
-            "question": "Question validée par l’orchestrateur" if decision else "Question retenue par les règles pédagogiques",
+            "question": question_source,
             "diagnostic": "Analyse statique Python", "jepa": provenance,
         },
         "generation": model_status, "seconds": round(time.perf_counter() - started, 3),

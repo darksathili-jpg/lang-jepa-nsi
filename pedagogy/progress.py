@@ -6,7 +6,10 @@ from dataclasses import dataclass, field
 import re
 import unicodedata
 
-from tutor.curriculum import MAXIMUM_GOALS
+from tutor.curriculum import MAXIMUM_GOALS, TRACE_CONSEQUENCES, TRACE_SCOPE, TRACE_TARGETS, TRACE_VALUE
+
+
+NEGATIVE_CASE = (-4, -2)
 
 
 def normalize(text):
@@ -59,10 +62,22 @@ def requested_topic(text):
 
 
 @dataclass(frozen=True)
+class TraceQuestion:
+    turn: int
+    target: str
+    code_digest: str
+    case: tuple[int, int] = NEGATIVE_CASE
+
+    def public(self):
+        return {"tour": self.turn, "cible": self.target, "code_structure": self.code_digest, "entree": list(self.case)}
+
+
+@dataclass(frozen=True)
 class Evidence:
     turn: int
     excerpt: str
     criterion: str
+    question: TraceQuestion | None = None
 
 
 @dataclass(frozen=True)
@@ -70,6 +85,7 @@ class Assessment:
     status: str
     message: str
     confirmed: tuple[str, ...] = ()
+    followup: str | None = None
 
 
 @dataclass
@@ -82,6 +98,8 @@ class Progress:
     multi_test: bool = False
     tests: dict[str, Evidence] = field(default_factory=dict)
     transitions: deque = field(default_factory=lambda: deque(maxlen=32))
+    trace_question: TraceQuestion | None = None
+    trace_facts: dict[str, Evidence] = field(default_factory=dict)
 
     @property
     def goal(self):
@@ -89,7 +107,9 @@ class Progress:
 
     def snapshot(self, assessment):
         def evidence(item):
-            return {"tour": item.turn, "extrait": item.excerpt, "critere": item.criterion}
+            return {"tour": item.turn, "extrait": item.excerpt, "critere": item.criterion} | (
+                {"question": item.question.public()} if item.question else {}
+            )
         pending = [goal for goal in MAXIMUM_GOALS if goal not in self.confirmed]
         return {
             "notion": self.notion, "objectif": self.goal,
@@ -97,6 +117,8 @@ class Progress:
             "objectif_libelle": MAXIMUM_GOALS[self.goal][0] if self.goal else "Parcours terminé",
             "libelles_objectifs": {key: value[0] for key, value in MAXIMUM_GOALS.items()},
             "acquis": {goal: evidence(item) for goal, item in self.confirmed.items()},
+            "faits_trace": {key: evidence(item) for key, item in self.trace_facts.items()},
+            "contexte_question": self.trace_question.public() if self.trace_question else None,
             "acquis_non_demontres": pending,
             "erreurs": {goal: evidence(item) for goal, item in self.errors.items()},
             "tests_declares": {case: evidence(item) for case, item in self.tests.items()},
@@ -107,14 +129,21 @@ class Progress:
                            "methode": "Critères textuels et statiques du cas de référence"},
         }
 
-    def acknowledge(self, key, turn, text, criterion):
-        self.confirmed.setdefault(key, Evidence(turn, text, criterion))
+    def acknowledge(self, key, turn, text, criterion, question=None):
+        self.confirmed.setdefault(key, Evidence(turn, text, criterion, question))
         self.errors.pop(key, None)
 
-    def select_question(self, selector=None):
+    def select_question(self, selector=None, *, followup=None):
         if self.goal is None:
             return "", None
         _, _, options = MAXIMUM_GOALS[self.goal]
+        if self.goal == "trace":
+            if "comparaison_fausse" in self.trace_facts:
+                options = TRACE_CONSEQUENCES
+            elif followup == "portee":
+                options = (TRACE_SCOPE, *options)
+            elif followup == "valeur_m":
+                options = (TRACE_VALUE, *options)
         if self.goal == "verification" and self.multi_test:
             options = (
                 ("essai", "Quelles sorties observes-tu avec ton nouveau code pour [-4, -2] et pour [3] ?"),
@@ -131,9 +160,15 @@ class Progress:
             available.append((strategy, question))
         if not available:
             return "", None
+        if self.goal == "trace" and (followup, available[0][0]) in {("portee", "portee"), ("valeur_m", "separer")}:
+            available = available[:1]
         strategy, question = selector(available) if selector else available[0]
         self.questions.append((self.goal, strategy, question))
         return question, strategy
+
+    def remember_question(self, strategy, turn, code):
+        target = TRACE_TARGETS.get(strategy) if self.goal == "trace" and code_matches_maximum(code, "zero") else None
+        self.trace_question = TraceQuestion(turn, target, self.code_digest) if target else None
 
 
 def value_after(pattern, text):
@@ -166,6 +201,55 @@ def compare_zero(text):
 def wrong_comparison(text):
     return bool(re.search(r"\b0\b\s*(?:est\s+)?(?:strictement\s+)?" + SMALLER + r".{0,20}-[24]", text)
                 or re.search(r"-[24].{0,36}" + GREATER + r"\s*0\b", text))
+
+
+FALSE = r"(?:false|faux|fausse)"
+CONDITION = r"(?:la condition|le test|la comparaison)(?:\s+valeur\s*>\s*m)?"
+ASSIGNMENT = r"(?:(?:l'affectation|l'instruction)(?:\s+m\s*=\s*valeur)?|m\s*=\s*valeur|elle)"
+M_VALUE = r"\bm\s*(?:vaut|reste(?:\s+(?:a|egal a))?|=|prend|garde)"
+TRACE_PAIR = r"(?:-4\s*(?:puis|et|,)\s*(?:pour\s+)?-2|-2\s*(?:puis|et|,)\s*(?:pour\s+)?-4)"
+FALSE_BOTH = re.compile(
+    rf"(?:(?:{CONDITION}\s+(?:est|donne|vaut)\s+)?(?:toujours\s+{FALSE}|"
+    rf"{FALSE}\s+(?:dans les deux cas|aux deux passages|pour (?:les deux valeurs|{TRACE_PAIR})))|"
+    rf"{CONDITION}\s+(?:(?:n'est|ne devient)\s+vrai\w*\s+(?:a aucun (?:des deux passages|moment)|pour aucune des deux valeurs)|"
+    rf"n'est jamais vraie?))\Z"
+)
+
+
+@dataclass(frozen=True)
+class TraceReading:
+    both_false: bool
+    assignment_skipped: bool
+    unchanged: bool
+    causal: bool
+    incomplete_false: bool
+    mixed_types: bool
+    contradiction: bool
+
+
+def read_trace(words, question, trace_value):
+    text = words.replace("`", "")
+    clauses = [clause.strip() for clause in re.split(r"[.!?;,]|\b(?:donc|car|alors|parce que|mais)\b", text)]
+    false_claim = re.search(rf"\b{CONDITION}\s+(?:est|donne|vaut)\s+{FALSE}\b", text)
+    both_false = any(FALSE_BOTH.fullmatch(clause) for clause in clauses)
+    single_false = any(re.fullmatch(rf"(?:{CONDITION}\s+(?:est|donne|vaut)\s+)?{FALSE}", clause)
+                       for clause in clauses)
+    skipped = bool(re.search(rf"\b{ASSIGNMENT}\s+(?:ne (?:s'execute|se fait) (?:pas|jamais)|"
+                             rf"n'est pas executee|est (?:sautee|ignoree)|n'a pas lieu)\b", text)
+                   or re.search(r"\bon (?:ne fait pas|saute|ignore) (?:l'affectation|l'instruction|m\s*=\s*valeur)\b", text)
+                   or re.search(r"\bm\s+(?:n'est pas (?:modifie|reaffecte)|ne change pas)\b", text))
+    mixed_types = bool(re.search(rf"{M_VALUE}\s*(?:{FALSE}|true|vrai)\b", text))
+    contradiction = bool(re.search(rf"\b{ASSIGNMENT}\s+(?:s'execute|est executee|a lieu)\b(?!\s+(?:si|quand|lorsque)\b)", text)
+                         or re.search(rf"\b(?:pas (?:toujours )?{FALSE}|vrai\w* (?:pour|une fois)|"
+                                      rf"(?:une comparaison|{CONDITION}) (?:est|vaut) (?:vrai\w*|true)|m ne vaut pas 0)\b", text)
+                         or re.search(rf"\b{FALSE}\b[^.!?;]*\b(?:sauf|a l'exception)\b", text)
+                         or any(int(number) != 0 for number in re.findall(rf"{M_VALUE}\s*(-?\d+)\b", text)))
+    unchanged = trace_value == 0 or value_after(M_VALUE, text) == 0
+    # Une réponse au rappel causal peut s'appuyer sur la prémisse de la question.
+    causal = skipped and unchanged and (question.target == "consequence" or bool(
+        (both_false or false_claim) and re.search(r"\b(?:donc|alors|car|parce que|ainsi)\b", text)
+    ))
+    return TraceReading(both_false, skipped, unchanged, causal, single_false, mixed_types, contradiction)
 
 
 def code_matches_maximum(code, start):
@@ -213,6 +297,8 @@ def assess(progress, answer, code, facts, statement, turn):
             progress.confirmed.pop(key, None)
             progress.errors.pop(key, None)
         progress.tests.clear()
+        progress.trace_facts.clear()
+        progress.trace_question = None
     progress.code_digest = facts["structure_digest"]
     if facts["syntax"]:
         return Assessment("ambigue", "Le parseur ne permet pas encore d’examiner cette version du programme.")
@@ -238,7 +324,7 @@ def assess(progress, answer, code, facts, statement, turn):
     reference_context = not input_lists or explicit_test
     just_number = re.fullmatch(r"(-?\d+)[.! ]*", words)
     short = int(just_number[1]) if just_number else None
-    trace_value = value_after(r"\bm\s*(?:vaut|reste(?:\s+a)?|=|prend|garde)", words)
+    trace_value = value_after(M_VALUE, words.replace("`", ""))
     wrong_causal = wrong_comparison(words)
     proposal = re.search(r"(?:valeur|element|nombre).{0,32}(?:de|dans|appart\w* a|figur\w* dans) (?:la|ma|une|l')\s*(?:liste|entree)"
                          r"|premi[eè]r\w* (?:element|valeur|entier)|\btab\s*\[\s*0\s*\]", words)
@@ -249,10 +335,10 @@ def assess(progress, answer, code, facts, statement, turn):
     ) and not re.search(r"(?:est|reste) (?:valide|autorisee|admise)", words)
     found = []
 
-    def confirm(key, criterion):
+    def confirm(key, criterion, question=None):
         if key not in progress.confirmed:
             found.append(key)
-        progress.acknowledge(key, turn, excerpt, criterion)
+        progress.acknowledge(key, turn, excerpt, criterion, question)
 
     if known_case and reference_context and (
         actual == 0 and (case_named or goal == "observed") or goal == "observed" and short == 0 and progress.questions
@@ -262,9 +348,45 @@ def assess(progress, answer, code, facts, statement, turn):
         case_named or goal == "expected" or "observed" in progress.confirmed
     ):
         confirm("expected", "Valeur −2 identifiée comme résultat attendu pour [-4, -2].")
-    if known_case and not wrong_causal and compare_zero(words) and trace_value in (None, 0):
-        confirm("trace", "Comparaison correcte : aucun des deux entiers ne dépasse zéro, donc m reste inchangé.")
-        confirm("assumption", "L’élève met en évidence que le zéro de départ dépasse les éléments de ce test.")
+    context = progress.trace_question
+    trace_assessment = None
+    if goal == "trace" and context and not reference_context:
+        return Assessment("partielle", "C’est un autre essai. La question porte sur les passages de -4 et de -2.")
+    if (goal == "trace" and context and context.turn == turn - 1 and context.code_digest == progress.code_digest
+            and context.case == NEGATIVE_CASE and broken and reference_context):
+        reading = read_trace(words, context, trace_value)
+        if reading.mixed_types or reading.contradiction or wrong_causal:
+            message = ("Dans ce programme, m contient un entier. C’est le résultat de la condition qui est un booléen."
+                       if reading.mixed_types else "Ce raisonnement contredit le cas testé. Relis le test et le bloc indenté.")
+            progress.errors[goal] = Evidence(turn, excerpt, message, context)
+            return Assessment("incorrecte", message, followup="valeur_m" if reading.mixed_types else None)
+
+        def keep_trace(key, criterion):
+            progress.trace_facts.setdefault(key, Evidence(turn, excerpt, criterion, context))
+
+        if reading.causal:
+            keep_trace("comparaison_fausse", "La condition est fausse dans le test négatif.")
+            keep_trace("affectation_ignoree", "La condition fausse empêche l’affectation m = valeur.")
+            keep_trace("valeur_m", "m reste à zéro sur le test négatif.")
+            confirm("trace", "La condition est fausse, l’affectation ne s’exécute pas et m reste à zéro.", context)
+        elif context.target == "comparaison" and reading.both_false:
+            message = "Oui, la condition valeur > m est fausse pour -4 et pour -2."
+            keep_trace("comparaison_fausse", message)
+            trace_assessment = Assessment("partielle", message)
+        elif context.target == "comparaison" and reading.incomplete_false:
+            trace_assessment = Assessment("ambigue", "Précise si tu parles d’un seul passage ou des deux.", followup="portee")
+        elif context.target == "valeur_m" and (reading.both_false or reading.incomplete_false):
+            trace_assessment = Assessment("partielle", "Faux est une valeur possible de la condition. m contient un entier.",
+                                          followup="valeur_m")
+        if reading.unchanged and context.target in {"valeur_m", "tableau", "consequence"} and not reading.causal:
+            keep_trace("valeur_m", "m reste à zéro sur le test négatif.")
+            trace_assessment = Assessment("partielle", "Oui, m reste à zéro. Il reste à expliquer pourquoi.")
+        if reading.assignment_skipped and context.target in {"affectation", "tableau", "consequence"} and not reading.causal:
+            keep_trace("affectation_ignoree", "L’instruction m = valeur ne s’exécute pas.")
+            trace_assessment = Assessment("partielle", "Oui, l’affectation ne s’exécute pas. Quel effet cela a-t-il sur m ?")
+    if broken and reference_context and not wrong_causal and compare_zero(words) and trace_value in (None, 0):
+        confirm("trace", "Comparaison correcte : aucun des deux entiers ne dépasse zéro, donc m reste inchangé.", context)
+        confirm("assumption", "L’élève met en évidence que le zéro de départ dépasse les éléments de ce test.", context)
     if "assumption" in progress.confirmed and (
         corrected or proposal and proposes_change and not re.search(r"\b(?:pas|jamais|hors)\b", words)
     ):
@@ -290,6 +412,8 @@ def assess(progress, answer, code, facts, statement, turn):
         confirm("contract", "La réponse relie l’exclusion de [] à la précondition non vide.")
     if found:
         return Assessment("correcte", "Les éléments relevés dans ta réponse permettent d’avancer sur cet exercice.", tuple(found))
+    if trace_assessment:
+        return trace_assessment
 
     numeric_claim = short if short is not None else actual
     wrong = (goal == "observed" and broken and numeric_claim not in (None, 0)

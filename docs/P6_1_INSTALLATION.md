@@ -1,6 +1,6 @@
-# LANG-JEPA NSI 0.6.1 · Démarrage Windows
+# LANG-JEPA NSI · Démarrage Windows
 
-1. Télécharge le ZIP Windows x64 et extrais **tout** son contenu dans un dossier personnel où tu peux écrire. Ouvre le dossier `LANG-JEPA-NSI-Windows`. [Distribution](https://github.com/darksathili-jpg/lang-jepa-nsi/releases/tag/v0.6.1)
+1. Télécharge le ZIP Windows x64 et extrais **tout** son contenu dans un dossier personnel où tu peux écrire. Ouvre le dossier `LANG-JEPA-NSI-Windows`. [Distributions](https://github.com/darksathili-jpg/lang-jepa-nsi/releases)
 2. Pour préparer le mode expérimental, lance **Installer-Modeles.cmd** avec Internet et confirme le téléchargement. Prévois au moins 2,2 Go disponibles. La progression, la vérification des fichiers et les sondes des modèles s’affichent dans la fenêtre. Une interruption peut être suivie d’une nouvelle exécution.
 3. Lance **Demarrer.cmd**. Le lanceur affiche l’adresse et ouvre l’atelier du dossier que tu viens de lancer. Le parcours guidé est actif à l’arrivée. Sélectionne **Profil hybride (expérimental)** pour solliciter les moteurs locaux.
 4. Lance **Arreter.cmd** pour fermer le serveur et son moteur. Tu peux fermer l’onglet du navigateur quand tu veux. Pour contrôler les deux moteurs et produire un journal, lance **Verifier.cmd**.

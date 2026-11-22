@@ -85,3 +85,15 @@ MAXIMUM_GOALS = {
         ("domaine", "À quelles entrées l’énoncé garantit-il une plus grande valeur ?"),
     )),
 }
+
+# Une stratégie de traçage de référence désigne un seul type de réponse.
+TRACE_TARGETS = {"trace": "valeur_m", "condition": "comparaison", "tableau": "tableau",
+                 "ligne": "affectation", "portee": "comparaison", "separer": "valeur_m",
+                 "consequence": "consequence", "branche": "consequence", "chaine": "consequence"}
+TRACE_SCOPE = ("portee", "Peux-tu préciser le résultat de la comparaison pour -4, puis pour -2 ?")
+TRACE_VALUE = ("separer", "Quelle valeur entière contient m après ces deux passages ?")
+TRACE_CONSEQUENCES = (
+    ("consequence", "Quand la condition est fausse, que se passe-t-il pour l’instruction m = valeur, puis pour m ?"),
+    ("branche", "Relis l’indentation. Quand le test échoue, quel effet a le bloc m = valeur sur m ?"),
+    ("chaine", "Peux-tu relier le résultat du test, l’instruction m = valeur et la valeur conservée par m ?"),
+)

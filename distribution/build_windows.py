@@ -8,7 +8,6 @@ import subprocess
 import tempfile
 import zipfile
 
-from distribution.instance import LOCK, VERSION
 from distribution.transfer import extract_zip, fetch
 from tutor.catalog import ROOT
 
@@ -26,11 +25,13 @@ def main():
     args = parser.parse_args()
     args.cache.mkdir(parents=True, exist_ok=True)
     args.output.mkdir(parents=True, exist_ok=True)
-    for name in ("python", "numpy"):
-        item = LOCK[name]
-        fetch(item["url"], args.cache / item["file"], item)
     commit = subprocess.check_output(["git", "rev-parse", "--verify", args.ref + "^{commit}"], cwd=ROOT, text=True).strip()
-    package = args.output / f"LANG-JEPA-NSI-{VERSION}-Windows-x64.zip"
+    lock = json.loads(subprocess.check_output(["git", "show", f"{commit}:distribution/lock.json"], cwd=ROOT))
+    version = lock["version"]
+    for name in ("python", "numpy"):
+        item = lock[name]
+        fetch(item["url"], args.cache / item["file"], item)
+    package = args.output / f"LANG-JEPA-NSI-{version}-Windows-x64.zip"
     if package.exists():
         parser.error("Choisis un dossier de sortie neuf.")
     with tempfile.TemporaryDirectory(dir=args.output) as work:
@@ -44,10 +45,10 @@ def main():
         subprocess.run(["git", "archive", "--format=zip", "-o", str(snapshot.resolve()), commit, "--", *PAYLOAD],
                        cwd=ROOT, check=True)
         extract_zip(snapshot, app)
-        extract_zip(args.cache / LOCK["python"]["file"], runtime)
-        extract_zip(args.cache / LOCK["numpy"]["file"], runtime / "Lib" / "site-packages")
+        extract_zip(args.cache / lock["python"]["file"], runtime)
+        extract_zip(args.cache / lock["numpy"]["file"], runtime / "Lib" / "site-packages")
         (runtime / "python313._pth").write_bytes(b"python313.zip\r\n.\r\nLib\\site-packages\r\n..\\application\r\n")
-        (app / "distribution/build.json").write_text(json.dumps({"version": VERSION, "commit": commit}) + "\n",
+        (app / "distribution/build.json").write_text(json.dumps({"version": version, "commit": commit}) + "\n",
                                                       encoding="utf-8")
         for launcher in sorted((app / "distribution/windows").glob("*.cmd")):
             (full / launcher.name).write_bytes(launcher.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))
