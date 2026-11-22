@@ -1,6 +1,7 @@
 """Adaptateur conversationnel. Seule destination utilisable : le processus local géré ici."""
 
 import http.client
+import hashlib
 import json
 import os
 from copy import deepcopy
@@ -11,6 +12,7 @@ import threading
 import time
 
 from distribution.jobs import ChildJob
+from distribution.instance import LOCK
 from tutor.catalog import CATALOG, platform_key, runtime_path, verify_file
 from p5.contract import ACTIONS, SCHEMA
 
@@ -92,7 +94,8 @@ class LlamaEngine:
                        "processus": False, "inference": False}
         self.timings = {}
         if not (self.checks["executable"] and self.checks["poids"]):
-            self.state = "incomplete" if self.checks["executable"] or self.checks["poids"] else "absent"
+            partial = self.checks["executable"] or self.checks["poids"] or any(assets.glob("*.part"))
+            self.state = "incomplete" if partial else "absent"
             self.detail = "Lance Installer-Modeles.cmd pour préparer le moteur CPU et le modèle."
         elif require_runtime and not (self.runtime / "release-files.json").is_file():
             self.state = "incomplete"
@@ -118,7 +121,11 @@ class LlamaEngine:
         if not self.require_runtime:
             return
         data = json.loads(manifest.read_text(encoding="utf-8"))
-        expected = CATALOG["runtime"]["platforms"][platform_key()]
+        platform = platform_key()
+        expected = CATALOG["runtime"]["platforms"][platform]
+        canonical = json.dumps(data, sort_keys=True, separators=(",", ":")).encode()
+        if hashlib.sha256(canonical).hexdigest() != LOCK["llama"][platform]["manifest_sha256"]:
+            raise EngineError("L’inventaire vérifié de llama.cpp a changé. Consulte le guide Windows.")
         files = data.get("files")
         if data.get("archive_sha256") != expected["sha256"] or not isinstance(files, dict) or not files:
             raise IncompatibleRuntime("Le manifeste de llama.cpp ne correspond pas à cette plateforme.")

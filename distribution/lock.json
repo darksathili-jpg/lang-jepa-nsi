@@ -12,7 +12,10 @@
     "bytes": 12779090,
     "sha256": "00dc4e846108a382c5869e77c6ed514394bdeb3403461d25a829711041217d5b"
   },
-  "llama_windows_archive_bytes": 25012254,
+  "llama": {
+    "windows-x64": {"bytes": 25012254, "manifest_sha256": "9e3f01fb882c9c8a04d4aa2863139a26039d7df9b6ddc1eba6a87901f4743181"},
+    "linux-x64": {"bytes": 23189794, "manifest_sha256": "712ba4d316eb3f8b48088c45ad987ccb69341f6960802547a8dc15de22afd93d"}
+  },
   "jepa": {
     "config": "fixe-24",
     "seed": 17,

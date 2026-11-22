@@ -1,6 +1,7 @@
 """Commandes portables de préparation, de lancement, de diagnostic et d’arrêt."""
 
 import argparse
+import http.client
 import os
 from pathlib import Path
 import platform
@@ -10,7 +11,7 @@ import sys
 import time
 import webbrowser
 
-from distribution.instance import BUILD_FILE, identity, local_request, lock, publish, read, recognized
+from distribution.instance import BUILD_FILE, LOCK, identity, local_request, lock, publish, read, recognized
 from distribution.prepare import assets_for, prepare, verify_engine
 from p5.orchestration import open_experiment
 from tutor.catalog import ROOT
@@ -85,7 +86,7 @@ def verify(home, expected, state_file):
         if not status or status["state"] != "ready" or status["jepa"]["state"] != "ready":
             raise ValueError("Les deux moteurs ne sont pas prêts. Lance Installer-Modeles.cmd ou consulte les paramètres.")
         return {"llm": {key: value for key, value in status.items() if key != "jepa"}, "jepa": status["jepa"]}
-    observed = open_experiment("c", jepa).status()
+    observed = open_experiment("c", jepa, recipe=LOCK["jepa"]).status()
     if observed["state"] != "ready":
         raise ValueError(observed["detail"])
     return {"jepa": observed, "llm": verify_engine(assets)}
@@ -135,7 +136,8 @@ def main():
     except KeyboardInterrupt:
         print("Opération interrompue. Les téléchargements partiels peuvent être repris.", file=sys.stderr)
         return 130
-    except (OSError, ValueError, ImportError, URLError, subprocess.SubprocessError, zipfile.BadZipFile) as exc:
+    except (OSError, ValueError, ImportError, URLError, http.client.HTTPException,
+            subprocess.SubprocessError, zipfile.BadZipFile) as exc:
         print(f"LANG-JEPA NSI · {exc}", file=sys.stderr)
         return 1
     return 0

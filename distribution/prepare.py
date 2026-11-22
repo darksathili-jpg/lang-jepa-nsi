@@ -19,7 +19,7 @@ def assets_for(home):
 
 def prepare_jepa(destination):
     if destination.exists():
-        verified = open_experiment("c", destination).status()
+        verified = open_experiment("c", destination, recipe=LOCK["jepa"]).status()
         if verified["state"] != "ready":
             raise ValueError(f"Poids JEPA existants non utilisables : {verified['detail']}")
         return verified
@@ -43,7 +43,7 @@ def prepare_jepa(destination):
 
         manifest = save(model, bundle, {"corpus_sha256": digest, "graine": config["seed"], "epoques": config["epochs"],
                                         "numpy": numpy_version, "python": python_version()})
-        status = open_experiment("c", bundle).status()
+        status = open_experiment("c", bundle, recipe=config).status()
         if status["state"] != "ready":
             raise ValueError(f"La prédiction JEPA n’a pas été validée : {status['detail']}")
         bundle.rename(destination)
@@ -61,9 +61,7 @@ def prepare(home, source=None, *, jepa_only=False):
 
     platform = platform_key()
     runtime = CATALOG["runtime"]
-    artifact = runtime["platforms"][platform] | {"bytes": (
-        LOCK["llama_windows_archive_bytes"] if platform == "windows-x64" else 23189794
-    )}
+    artifact = runtime["platforms"][platform] | {"bytes": LOCK["llama"][platform]["bytes"]}
     model = CATALOG["models"]["smol"]
     assets.mkdir(parents=True, exist_ok=True)
     pending = 0

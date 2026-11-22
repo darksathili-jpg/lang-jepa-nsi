@@ -12,7 +12,7 @@ import socket
 import sys
 import threading
 
-from distribution.instance import identity, publish, read
+from distribution.instance import LOCK, identity, publish, read
 from p5.contract import ContractError
 from p5.orchestration import Experiment, open_experiment
 from pedagogy.catalogue import for_level
@@ -88,8 +88,8 @@ class WorkshopServer(ThreadingHTTPServer):
                 self.engine_thread = threading.Thread(target=self.engine.start, name="modele-cpu", daemon=True)
                 self.engine_thread.start()
 
-    def verify_jepa(self, directory):
-        result = open_experiment("c", directory)
+    def verify_jepa(self, directory, portable):
+        result = open_experiment("c", directory, recipe=LOCK["jepa"] if portable else None)
         self.hybrid.experiment = result
         self.experiment = result
 
@@ -245,7 +245,8 @@ def main():
                 control.update(pid=os.getpid(), port=server.server_port)
                 publish(args.control, control)
             if server.hybrid:
-                threading.Thread(target=server.verify_jepa, args=(args.jepa,), name="jepa-check", daemon=True).start()
+                threading.Thread(target=server.verify_jepa, args=(args.jepa, args.verified_runtime),
+                                 name="jepa-check", daemon=True).start()
             print(f"Professeur virtuel : {server.origin}/atelier", flush=True)
             server.serve_forever()
     except KeyboardInterrupt:

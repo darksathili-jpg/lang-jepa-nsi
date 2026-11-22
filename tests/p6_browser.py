@@ -96,7 +96,9 @@ def interactions(browser, origin):
     expect(page.locator(".token-keyword").first).to_have_text("def")
     page.get_by_role("button", name="Copier le code").click()
     expect(page.locator("#editor-feedback")).to_have_text("Code copié.")
-    assert page.evaluate("navigator.clipboard.readText()") == editor.input_value()
+    # CF_UNICODETEXT représente les sauts de ligne en CRLF sous Windows.
+    copied = page.evaluate("navigator.clipboard.readText()")
+    assert copied.replace("\r\n", "\n") == editor.input_value()
     page.get_by_role("button", name="Exécuter", exact=True).click()
     expect(page.locator("#editor-feedback")).to_contain_text("Exécution Python indisponible")
     page.get_by_role("button", name="Réinitialiser", exact=True).click()

@@ -7,8 +7,11 @@ import unittest
 from unittest.mock import patch
 import zipfile
 
+from distribution.instance import LOCK
 from distribution.instance import lock
 from distribution.transfer import extract_zip, fetch
+from p5.orchestration import open_experiment
+from tutor.engine import LlamaEngine
 
 
 class Response(io.BytesIO):
@@ -76,3 +79,24 @@ class TransferTests(unittest.TestCase):
                 nested.enter_context(lock(self.path))
         with lock(self.path):
             self.assertTrue(self.path.is_file())
+
+    def test_partial_weights_are_distinct_from_absence(self):
+        self.assertEqual(LlamaEngine(self.path.parent, "smol", 2).status()["state"], "absent")
+        self.part.write_bytes(self.payload[:3])
+        self.assertEqual(LlamaEngine(self.path.parent, "smol", 2).status()["state"], "incomplete")
+
+    def test_installed_profile_must_match_the_p5_recipe(self):
+        try:
+            from p5.jepa import save, train
+        except ModuleNotFoundError:
+            self.skipTest("NumPy est requis pour ce contrôle de profil.")
+        from p5.data import load_corpus
+
+        rows = [row for row in load_corpus() if row.partage == "train"][:5]
+        model, _ = train(rows, "fixe-24", 11, 1)
+        save(model, self.path, {"graine": 11})
+        self.assertEqual(open_experiment("c", self.path).status()["state"], "ready")
+        result = open_experiment("c", self.path, recipe=LOCK["jepa"]).status()
+        self.assertEqual(result["state"], "incompatible")
+        self.assertTrue(result["checks"]["integrite"])
+        self.assertFalse(result["checks"]["prediction"])

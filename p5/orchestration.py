@@ -80,7 +80,7 @@ class Experiment:
         return decision, question, method != default
 
 
-def open_experiment(mode, directory: Path | None):
+def open_experiment(mode, directory: Path | None, *, recipe=None):
     if mode != "c":
         return Experiment(mode)
     present = {"manifeste": bool(directory and (directory / "manifest.json").is_file()),
@@ -99,6 +99,12 @@ def open_experiment(mode, directory: Path | None):
 
         model = load(directory)
         present.update(integrite=True, chargement=True)
+        if recipe:
+            expected = {"config": recipe["config"], "graine": recipe["seed"], "epoques": recipe["epochs"],
+                        "corpus_sha256": recipe["corpus_sha256"], "numpy": "2.3.5"}
+            if any(model.metadata.get(key) != value for key, value in expected.items()):
+                return Experiment(mode, error="Ce modèle n’a pas le profil de reconstruction P5 verrouillé.",
+                                  state="incompatible", checks=present)
         loaded = Experiment(mode, model, checks=present)
         exercise = EXERCISES["maximum"]
         request = {"class": "premiere", "statement": exercise["statement"], "code": exercise["code"],

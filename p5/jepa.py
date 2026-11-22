@@ -44,12 +44,13 @@ def l2(array):
 
 
 class LatentModel:
-    def __init__(self, config, encoder, target, predictor, identity="non sauvegardé"):
+    def __init__(self, config, encoder, target, predictor, identity="non sauvegardé", *, metadata=None):
         self.config = config
         self.encoder = encoder
         self.target = target
         self.predictor = predictor
         self.identity = identity
+        self.metadata = metadata or {}
         self.candidates = None
 
     def embeddings(self, inputs):
@@ -187,4 +188,4 @@ def load(directory):
         if isinstance(exc, ContractError):
             raise
         raise ContractError("Impossible de charger les poids JEPA : " + str(exc)) from exc
-    return LatentModel(manifest["config"], **arrays, identity=f"P5 {manifest['config']} · {digest[:12]}")
+    return LatentModel(manifest["config"], **arrays, identity=f"P5 {manifest['config']} · {digest[:12]}", metadata=manifest)
