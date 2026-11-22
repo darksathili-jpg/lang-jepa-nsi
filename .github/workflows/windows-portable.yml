@@ -1,0 +1,64 @@
+name: Recette Windows portable
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/windows-portable.yml']
+  workflow_dispatch:
+    inputs:
+      modeles_reels:
+        description: Télécharger SmolLM3 et rejouer trente tours sur le runner
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    runs-on: windows-2022
+    timeout-minutes: 28
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Dépendances de recette
+        run: |
+          python -m pip install -r p5/requirements.txt
+          python -m pip install playwright pillow psutil
+          python -m playwright install chromium
+      - name: Tests et assemblage
+        run: |
+          python -m unittest discover -s tests -v || exit /b 1
+          python -m distribution.build_windows --cache results\artefacts --output results\paquet || exit /b 1
+          python -m zipfile -e results\paquet\LANG-JEPA-NSI-0.6.1-Windows-x64.zip results\installe
+      - name: Lancement sans Python externe
+        run: |
+          set PYTHONPATH=%CD%
+          python tests\portable_smoke.py --package results\installe\LANG-JEPA-NSI-Windows
+      - name: Géométrie et contrôles sur Chromium Windows
+        run: |
+          python tests\p61_browser.py --output results\windows-captures || exit /b 1
+          python design\compare.py --capture results\windows-captures\atelier-1672x941-sombre.png --output results\windows-captures
+      - name: Inférence réelle et arrêt Windows
+        if: inputs.modeles_reels
+        env:
+          NSI_NONINTERACTIVE: '1'
+        run: |
+          set PYTHONPATH=%CD%
+          set "NSI_PACKAGE=%CD%\results\installe\LANG-JEPA-NSI-Windows"
+          call "%NSI_PACKAGE%\Installer-Modeles.cmd" || exit /b 1
+          python tests\portable_recipe.py --package "%NSI_PACKAGE%" --home "%NSI_PACKAGE%" --output results\windows-mesures
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recette-windows-portable
+          path: |
+            results/paquet
+            results/windows-captures
+            results/windows-mesures
+            results/installe/LANG-JEPA-NSI-Windows/logs/prepare.json
