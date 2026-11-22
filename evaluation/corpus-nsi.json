@@ -1,0 +1,178 @@
+[
+  {
+    "id": "t-max-1",
+    "split": "train",
+    "family": "maximum",
+    "segments": {
+      "enonce": "Quand tous les relevés météo sont négatifs, déterminer la température la plus élevée.",
+      "notion": "Au cours d’un parcours, le maximum provisoire doit rester une valeur admissible.",
+      "erreur": "Le programme conserve zéro quand tous les nombres de la liste sont inférieurs à zéro.",
+      "indice": "Propose un test avec des valeurs toutes négatives et compare le résultat attendu avec le maximum provisoire."
+    }
+  },
+  {
+    "id": "t-max-2",
+    "split": "train",
+    "family": "maximum",
+    "segments": {
+      "enonce": "Trouver le plus grand écart signé dans une suite non vide.",
+      "notion": "L’affectation initiale peut changer la valeur renvoyée après une boucle bornée.",
+      "erreur": "Une sentinelle trop grande empêche toutes les mises à jour du maximum.",
+      "indice": "Trace la valeur initiale et chacune des comparaisons sur deux entiers strictement négatifs."
+    }
+  },
+  {
+    "id": "t-loop-1",
+    "split": "train",
+    "family": "boucle",
+    "segments": {
+      "enonce": "Faire diminuer un compteur de pas avant l’arrêt d’un robot fictif.",
+      "notion": "La boucle non bornée teste sa condition avant chaque passage.",
+      "erreur": "Le compteur intervient dans la condition mais garde toujours la même valeur.",
+      "indice": "Note le compteur à deux tours successifs et demande à quel moment la condition pourrait devenir fausse."
+    }
+  },
+  {
+    "id": "t-loop-2",
+    "split": "train",
+    "family": "boucle",
+    "segments": {
+      "enonce": "Suivre un décompte dans une simulation de jeu de plateau.",
+      "notion": "Pour qu’un décompte termine, une variable doit évoluer vers l’état d’arrêt.",
+      "erreur": "La boucle imprime la même donnée sans modifier la variable qui gouverne sa sortie.",
+      "indice": "Compare la valeur de la variable avant et après une itération de la boucle non bornée."
+    }
+  },
+  {
+    "id": "t-dict-1",
+    "split": "train",
+    "family": "dictionnaire",
+    "segments": {
+      "enonce": "Construire un tableau des fréquences de mots dans un texte inventé.",
+      "notion": "Un dictionnaire associe chaque clé présente à une valeur.",
+      "erreur": "Le premier mot est absent. La lecture de sa clé provoque une exception.",
+      "indice": "Teste deux occurrences du même mot et vérifie si sa clé existe avant la première lecture."
+    }
+  },
+  {
+    "id": "t-dict-2",
+    "split": "train",
+    "family": "dictionnaire",
+    "segments": {
+      "enonce": "Compter les jetons bleus et rouges ramassés dans une partie fictive.",
+      "notion": "Une clé nouvelle et une clé déjà présente nécessitent deux raisonnements distincts.",
+      "erreur": "Le compteur tente d’incrémenter une entrée du dictionnaire qui n’existe pas encore.",
+      "indice": "Distingue une couleur rencontrée pour la première fois d’une couleur rencontrée de nouveau."
+    }
+  },
+  {
+    "id": "t-rec-1",
+    "split": "train",
+    "family": "recursivite",
+    "segments": {
+      "enonce": "Écrire une fonction récursive pour compter des cases d’une rangée.",
+      "notion": "Un cas de base fournit directement une valeur renvoyée sur une petite entrée.",
+      "erreur": "La fonction rappelle systématiquement une autre copie d’elle-même sans condition d’arrêt.",
+      "indice": "Dessine les appels sur une entrée minuscule et cherche celui qui peut répondre sans nouvel appel."
+    }
+  },
+  {
+    "id": "t-rec-2",
+    "split": "train",
+    "family": "recursivite",
+    "segments": {
+      "enonce": "Calculer par récurrence la somme des cases numérotées d’un tableau.",
+      "notion": "L’argument doit avancer vers un cas de base pour que les appels cessent.",
+      "erreur": "L’appel récursif reçoit toujours le même paramètre et le cas de base reste inaccessible.",
+      "indice": "Compare les arguments des deux premiers appels récursifs et repère leur progression vers l’arrêt."
+    }
+  },
+  {
+    "id": "e-max-1",
+    "split": "test",
+    "family": "maximum",
+    "segments": {
+      "enonce": "Un programme doit annoncer la meilleure altitude mesurée sous le niveau de la mer.",
+      "notion": "Une valeur renvoyée doit appartenir aux éléments parcourus selon la spécification.",
+      "erreur": "Pour les entrées -9 et -6, la sortie est 0 alors que cette valeur ne figure pas dans les mesures.",
+      "indice": "Élève : par où commencer ? Professeur : inscris le candidat retenu avant et après le traitement de chaque altitude."
+    }
+  },
+  {
+    "id": "e-max-2",
+    "split": "test",
+    "family": "maximum",
+    "segments": {
+      "enonce": "Déterminer le plus grand entier d’un tableau de pénalités.",
+      "notion": "Une boucle bornée peut ne jamais affecter une nouvelle valeur à sa variable de type entier.",
+      "erreur": "Si toutes les pénalités sont négatives, la valeur renvoyée reste celle affectée avant le parcours.",
+      "indice": "Le contrat annonce un tableau non vide. Demande si le résultat observé est un élément de l’entrée."
+    }
+  },
+  {
+    "id": "e-loop-1",
+    "split": "test",
+    "family": "boucle",
+    "segments": {
+      "enonce": "Animer un minuteur fictif qui s’éteint après la dernière seconde.",
+      "notion": "La condition de poursuite est lue à chaque itération d’une boucle non bornée.",
+      "erreur": "Le minuteur indique trois secondes indéfiniment alors que l’affichage devrait cesser.",
+      "indice": "Sur le papier, compare deux états successifs du temps restant et explique la poursuite du calcul."
+    }
+  },
+  {
+    "id": "e-loop-2",
+    "split": "test",
+    "family": "boucle",
+    "segments": {
+      "enonce": "Un exercice affiche les étapes d’une descente vers zéro.",
+      "notion": "Un affichage ne réalise pas une affectation à la variable examinée par la condition.",
+      "erreur": "La condition est vraie au départ, et aucune instruction du corps ne fait évoluer le compteur.",
+      "indice": "Élève : la sortie se répète. Professeur : choisis une petite valeur puis repère ce qui pourrait la faire changer."
+    }
+  },
+  {
+    "id": "e-dict-1",
+    "split": "test",
+    "family": "dictionnaire",
+    "segments": {
+      "enonce": "Dans un sac fictif, totaliser les objets de chaque espèce.",
+      "notion": "Le tableau associatif contient seulement les catégories déjà enregistrées.",
+      "erreur": "Le premier exemplaire d’une espèce déclenche KeyError lors de la consultation du nombre associé.",
+      "indice": "Dessine la collection avant la découverte du premier objet puis à sa deuxième apparition."
+    }
+  },
+  {
+    "id": "e-dict-2",
+    "split": "test",
+    "family": "dictionnaire",
+    "segments": {
+      "enonce": "Produire des statistiques sur les fruits récoltés dans un jardin imaginaire.",
+      "notion": "Une clé identifie une information. Sa présence peut être testée avant sa consultation.",
+      "erreur": "L’instruction augmente une valeur associée à une clé absente du dictionnaire.",
+      "indice": "Élève : le premier passage échoue. Professeur : quelle entrée serait présente à partir de la deuxième récolte ?"
+    }
+  },
+  {
+    "id": "e-rec-1",
+    "split": "test",
+    "family": "recursivite",
+    "segments": {
+      "enonce": "Compter récursivement les arbres d’une allée en séparant le dernier.",
+      "notion": "Une fonction récursive doit reconnaître une entrée élémentaire.",
+      "erreur": "Le calcul poursuit les appels pour zéro arbre, puis pour une quantité négative.",
+      "indice": "Écris sur papier l’enchaînement des sous-problèmes et détermine le plus petit dont tu connais la réponse."
+    }
+  },
+  {
+    "id": "e-rec-2",
+    "split": "test",
+    "family": "recursivite",
+    "segments": {
+      "enonce": "Mesurer par appels récursifs la longueur d’une file fictive.",
+      "notion": "Le cas de base fournit une valeur sans nouvel appel à la fonction.",
+      "erreur": "La pile d’appels grossit parce que le paramètre est transmis sans changer.",
+      "indice": "Vérifie si le deuxième appel réduit réellement le nombre d’éléments restant à examiner."
+    }
+  }
+]

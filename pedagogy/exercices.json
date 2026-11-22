@@ -1,0 +1,187 @@
+[
+  {
+    "id": "maximum",
+    "title": "Maximum d’une liste",
+    "level": "premiere",
+    "statement": "Trouver la plus grande valeur d’une liste non vide d’entiers.",
+    "code": "def maximum(tab):\n    m = 0\n    for valeur in tab:\n        if valeur > m:\n            m = valeur\n    return m",
+    "notion": "Boucle bornée, affectation et précondition",
+    "objective": "Relier chaque valeur de m à la comparaison qui la précède et interpréter la spécification.",
+    "error": "La valeur initiale 0 peut rester inchangée sur une liste entièrement négative.",
+    "tests": [
+      {
+        "input": [
+          4,
+          7
+        ],
+        "expected": 7
+      },
+      {
+        "input": [
+          -4,
+          -2
+        ],
+        "expected": -2
+      },
+      {
+        "input": [],
+        "contract": "hors précondition"
+      }
+    ],
+    "hints": [
+      {
+        "indice": "Cherche un test court dont tu peux calculer le résultat à la main.",
+        "question": "Quelle liste et quelle valeur attendue proposes-tu ?"
+      },
+      {
+        "indice": "Essaie maintenant la liste [-4, -2]. Calcule sa plus grande valeur à la main.",
+        "question": "Quelle valeur le programme semble-t-il renvoyer pour cette entrée ?"
+      },
+      {
+        "indice": "Sur [-4, -2], relève m au départ, puis après -4 et après -2.",
+        "question": "Quelles valeurs successives de m trouves-tu ?"
+      },
+      {
+        "indice": "Une affectation dans la boucle bornée n’a lieu que lorsque la comparaison est vraie.",
+        "question": "Quelle hypothèse sur la valeur initiale explique que m ne change pas ?"
+      },
+      {
+        "indice": "Compare ta version modifiée au résultat attendu sur [-4, -2]. L’énoncé demande une liste non vide.",
+        "question": "Si l’entrée était [], faudrait-il changer la précondition ou spécifier un autre résultat ?"
+      }
+    ]
+  },
+  {
+    "id": "boucle-while",
+    "title": "Décompte",
+    "level": "premiere",
+    "statement": "Décompter jusqu’à zéro.",
+    "code": "def compte(n):\n    while n > 0:\n        print(n)\n    return n",
+    "notion": "Boucle non bornée et condition d’arrêt",
+    "objective": "Tracer un état et expliquer la progression vers la fin d’une boucle.",
+    "error": "La variable n lue dans la condition reçoit la même valeur à chaque tour.",
+    "tests": [
+      {
+        "input": 3,
+        "expected": 0
+      },
+      {
+        "input": 0,
+        "expected": 0
+      }
+    ],
+    "hints": [
+      {
+        "indice": "Pars d’un petit compteur.",
+        "question": "Qu’observes-tu avec n égal à 2 ?"
+      },
+      {
+        "indice": "Repère la variable lue dans la condition de la boucle non bornée.",
+        "question": "Quelle valeur rendrait cette condition fausse ?"
+      },
+      {
+        "indice": "Trace n pour deux passages successifs.",
+        "question": "La valeur de n change-t-elle entre ces deux passages ?"
+      },
+      {
+        "indice": "Une instruction d’affichage laisse inchangée la variable examinée.",
+        "question": "Qu’est-ce qui doit évoluer pour atteindre la sortie de la boucle ?"
+      },
+      {
+        "indice": "Vérifie un compteur nul puis un petit compteur positif.",
+        "question": "Comment expliquer que les deux essais se terminent ?"
+      }
+    ]
+  },
+  {
+    "id": "dictionnaire-comptage",
+    "title": "Compter les mots",
+    "level": "premiere",
+    "statement": "Compter les occurrences des mots.",
+    "code": "def compte(mots):\n    d = {}\n    for mot in mots:\n        d[mot] += 1\n    return d",
+    "notion": "Dictionnaire, clé et valeur",
+    "objective": "Distinguer lecture et affectation pour une clé absente.",
+    "error": "La première lecture d’une clé absente provoque KeyError.",
+    "tests": [
+      {
+        "input": [
+          "lune",
+          "lune",
+          "soleil"
+        ],
+        "expected": {
+          "lune": 2,
+          "soleil": 1
+        }
+      },
+      {
+        "input": [],
+        "expected": {}
+      }
+    ],
+    "hints": [
+      {
+        "indice": "Choisis deux mots, dont au moins une répétition.",
+        "question": "Que devrait contenir le dictionnaire à la fin ?"
+      },
+      {
+        "indice": "Observe le dictionnaire avant le premier passage.",
+        "question": "Le premier mot figure-t-il déjà parmi les clés ?"
+      },
+      {
+        "indice": "Compare la première et la deuxième occurrence du même mot.",
+        "question": "Que peux-tu lire au deuxième passage que tu ne pouvais pas lire au premier ?"
+      },
+      {
+        "indice": "Lis la valeur uniquement si tu sais ce que représente la clé à cette étape.",
+        "question": "Quels deux cas le programme doit-il distinguer ?"
+      },
+      {
+        "indice": "Ajoute au test une liste vide et une liste avec deux mots distincts.",
+        "question": "Quelles différences d’état observes-tu entre ces deux cas ?"
+      }
+    ]
+  },
+  {
+    "id": "recursivite-base",
+    "title": "Factorielle",
+    "level": "terminale",
+    "statement": "Calculer la factorielle d’un entier naturel.",
+    "code": "def fact(n):\n    return n * fact(n-1)",
+    "notion": "Récursivité et cas de base",
+    "objective": "Établir la valeur du cas de base et le rapprochement de l’argument vers ce cas.",
+    "error": "Un nouvel appel est systématique même lorsque le paramètre atteint zéro.",
+    "tests": [
+      {
+        "input": 0,
+        "expected": 1
+      },
+      {
+        "input": 3,
+        "expected": 6
+      }
+    ],
+    "hints": [
+      {
+        "indice": "Commence avec un petit entier naturel.",
+        "question": "Quels appels la fonction déclenche-t-elle à partir de 2 ?"
+      },
+      {
+        "indice": "Repère le plus petit paramètre autorisé par l’énoncé.",
+        "question": "La fonction renvoie-t-elle alors une valeur sans nouvel appel ?"
+      },
+      {
+        "indice": "Trace la suite des arguments sur une ligne par appel.",
+        "question": "Que se passe-t-il après le passage par 0 ?"
+      },
+      {
+        "indice": "Un cas de base fournit directement une valeur renvoyée.",
+        "question": "Comment décider de la valeur de ce cas à partir de la définition mathématique ?"
+      },
+      {
+        "indice": "Vérifie séparément le cas de base et une entrée positive.",
+        "question": "Pourquoi les appels devraient-ils atteindre le cas de base après ta modification ?"
+      }
+    ]
+  }
+]
