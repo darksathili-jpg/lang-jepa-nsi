@@ -2,7 +2,7 @@
 
 **Un atelier local pour apprendre Python en Première et Terminale NSI, accompagné d'un laboratoire de recherche sur LANG-JEPA.**
 
-**Windows x64 · Version portable 0.7.0.** P7 accepte des essais littéraux dans quatre familles NSI et distingue prédiction, déclaration et preuve statique. Extrais le ZIP et lance `Demarrer.cmd` pour le parcours guidé. Pour préparer les moteurs locaux, lance `Installer-Modeles.cmd` avec Internet, puis utilise l’atelier hors ligne. `Verifier.cmd` contrôle les moteurs et `Arreter.cmd` ferme l’instance. Python et NumPy sont inclus. [Télécharger le ZIP](https://raw.githubusercontent.com/darksathili-jpg/lang-jepa-nsi/main/releases/0.7.0/LANG-JEPA-NSI-0.7.0-Windows-x64.zip) · [Guide Windows](docs/P6_1_INSTALLATION.md) · [Qualification P7](docs/P7_RECETTE_FINALE.md) · [Retour à 0.6.2](docs/P7_PERFORMANCES_LOCALES.md)
+**Windows x64 · Version portable 0.7.1.** Le tuteur choisit le parcours P7 dès le premier tour pour les exercices couverts. Il valide les stratégies du maximum et demande de les vérifier sur plusieurs entrées. Extrais le ZIP et lance `Demarrer.cmd`. Pour préparer les moteurs locaux, lance `Installer-Modeles.cmd` avec Internet. `Verifier.cmd` contrôle les moteurs et `Arreter.cmd` ferme l’instance. Python et NumPy sont inclus. [Télécharger le ZIP](https://raw.githubusercontent.com/darksathili-jpg/lang-jepa-nsi/main/releases/0.7.1/LANG-JEPA-NSI-0.7.1-Windows-x64.zip) · [Guide Windows](docs/P6_1_INSTALLATION.md) · [Recette P7.1](docs/P7_1_RECETTE.md) · [Version 0.7.0](https://github.com/darksathili-jpg/lang-jepa-nsi/releases/tag/v0.7.0)
 
 Le projet propose trois expériences **distinctes** :
 

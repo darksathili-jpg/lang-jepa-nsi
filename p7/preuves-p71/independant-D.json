@@ -1,0 +1,153 @@
+{
+  "profil": "D",
+  "machine": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "corpus_sha256": "5417a67a6297222fd3219b281a113ddaeff7c16d6ae3862605dc6526c55ddc9b",
+  "threads": 2,
+  "repetitions_sensibles": 1,
+  "moteur": {
+    "state": "ready",
+    "detail": "Le modèle a répondu à une inférence sur cet ordinateur.",
+    "name": "SmolLM3-3B",
+    "revision": "4965cb60b150737b68a0408c36aeefb65078f894",
+    "quantization": "Q4_K_M",
+    "runtime": "b12600",
+    "checks": {
+      "executable": true,
+      "poids": true,
+      "integrite": true,
+      "processus": true,
+      "inference": true
+    },
+    "times": {
+      "integrity_s": 1.432,
+      "load_s": 4.698,
+      "probe_s": 2.488
+    }
+  },
+  "rss_pic_moteur": 3668606976,
+  "mesures": {
+    "objectif": {
+      "effectif": 12,
+      "vrais": 11,
+      "wilson95": [
+        0.646,
+        0.985
+      ]
+    },
+    "intention": {
+      "effectif": 12,
+      "vrais": 10,
+      "wilson95": [
+        0.552,
+        0.953
+      ]
+    },
+    "test": {
+      "effectif": 6,
+      "vrais": 6,
+      "wilson95": [
+        0.61,
+        1
+      ]
+    },
+    "preuve": {
+      "effectif": 3,
+      "vrais": 2,
+      "wilson95": [
+        0.208,
+        0.939
+      ]
+    },
+    "abusive": {
+      "effectif": 12,
+      "vrais": 0,
+      "wilson95": [
+        0,
+        0.242
+      ]
+    },
+    "statique": {
+      "effectif": 3,
+      "vrais": 3,
+      "wilson95": [
+        0.439,
+        1
+      ]
+    },
+    "abstention_statique": {
+      "effectif": 1,
+      "vrais": 1,
+      "wilson95": [
+        0.207,
+        1
+      ]
+    },
+    "precondition": {
+      "effectif": 1,
+      "vrais": 1,
+      "wilson95": [
+        0.207,
+        1
+      ]
+    },
+    "litteral_invalide": {
+      "effectif": 0,
+      "vrais": 0,
+      "wilson95": null
+    },
+    "prediction": {
+      "effectif": 0,
+      "vrais": 0,
+      "wilson95": null
+    },
+    "declaration": {
+      "effectif": 1,
+      "vrais": 1,
+      "wilson95": [
+        0.207,
+        1
+      ]
+    },
+    "execution_fictive": {
+      "effectif": 12,
+      "vrais": 0,
+      "wilson95": [
+        0,
+        0.242
+      ]
+    },
+    "divulgation": {
+      "effectif": 12,
+      "vrais": 0,
+      "wilson95": [
+        0,
+        0.242
+      ]
+    },
+    "repetition": {
+      "effectif": 12,
+      "vrais": 0,
+      "wilson95": [
+        0,
+        0.242
+      ]
+    },
+    "reponse_absente": {
+      "effectif": 12,
+      "vrais": 0,
+      "wilson95": [
+        0,
+        0.242
+      ]
+    },
+    "dialogues_objectifs_atteints": [
+      3,
+      4
+    ],
+    "mediane_s": 0.0005499999999999999,
+    "llm": {
+      "tours": 1,
+      "mediane_s": 5.7754
+    }
+  }
+}

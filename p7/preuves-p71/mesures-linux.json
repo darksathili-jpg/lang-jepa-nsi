@@ -1,0 +1,56 @@
+{
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "logical_cpu": 3,
+  "physical_ram_bytes": 10452459520,
+  "launch_s": 0.306,
+  "rss_peak_bytes": 4491530240,
+  "cpu_peak_percent_one_core": 175.00000000000003,
+  "samples": 122,
+  "p7_turns": 14,
+  "p71_turns": 14,
+  "engines": {
+    "state": "ready",
+    "detail": "Le modèle a répondu à une inférence sur cet ordinateur.",
+    "name": "SmolLM3-3B",
+    "revision": "4965cb60b150737b68a0408c36aeefb65078f894",
+    "quantization": "Q4_K_M",
+    "runtime": "b12600",
+    "checks": {
+      "executable": true,
+      "poids": true,
+      "integrite": true,
+      "processus": true,
+      "inference": true
+    },
+    "times": {
+      "integrity_s": 1.724,
+      "load_s": 4.47,
+      "probe_s": 6.533
+    },
+    "jepa": {
+      "mode": "C · JEPA expérimental + orchestrateur + SmolLM3",
+      "state": "ready",
+      "name": "P5 fixe-24 · f4e854fcb1b9",
+      "detail": "Expérimentation sur le maximum de référence.",
+      "checks": {
+        "manifeste": true,
+        "poids": true,
+        "integrite": true,
+        "chargement": true,
+        "prediction": true,
+        "selection": true
+      },
+      "times": {
+        "probe_s": 0.0491
+      }
+    }
+  },
+  "dialogue": {
+    "turns": 28,
+    "median_all_s": 0.0006,
+    "llm_requested": 0,
+    "median_llm_s": null,
+    "max_s": 0.0063
+  },
+  "active_after_stop": 0
+}
