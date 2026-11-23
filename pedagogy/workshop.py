@@ -109,8 +109,9 @@ class Workshop:
         def proof(records):
             return {key: {"tour": value.turn, "extrait": value.excerpt, "critere": value.criterion}
                     for key, value in records.items()}
-        return {"schema": 1, "notion": spec.notion, "objectif": self.goal, "objectif_libelle": LABELS[self.goal],
-                "libelles_objectifs": LABELS, "acquis": proof(self.evidence), "erreurs": proof(self.errors),
+        labels = LABELS | {"observed": "Identifier le résultat observé"} if spec.id == "maximum" else LABELS
+        return {"schema": 1, "notion": spec.notion, "objectif": self.goal, "objectif_libelle": labels[self.goal],
+                "libelles_objectifs": labels, "acquis": proof(self.evidence), "erreurs": proof(self.errors),
                 "acquis_non_demontres": [self.goal], "changements_objectif": list(self.transitions),
                 "derniere_intervention": decision, "experience_jepa": latent, "essai_actif": self.active.public() if self.active else None,
                 "essais_precedents": [case.public() for case in self.cases], "interpretation": message.public(),

@@ -199,3 +199,10 @@ class P71Tests(unittest.TestCase):
         with self.assertRaises(DialogueError):
             Dialogue(mode='guided').sessions.turn('guided', {'class':'premiere','exercise':'recursivite-base',
                 'code':'','question':'0','statement':'Trouver la plus grande valeur.'}, None)
+
+    def test_observation_in_attached_text_still_populates_teacher_evidence(self):
+        guide = Dialogue(mode='guided')
+        guide.request['code'] += '\n# commentaire de l’élève'
+        proof = guide.send('Mon programme répond toujours 0 quand les nombres sont négatifs.')['pedagogie']
+        self.assertEqual(proof['acquis']['observed']['tour'], 1)
+        self.assertEqual(proof['libelles_objectifs']['observed'], 'Identifier le résultat observé')

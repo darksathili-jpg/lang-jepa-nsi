@@ -123,7 +123,7 @@ INTENT_CUES = {
 CLAIM_CUES = {
     Intent.EXPECT: r"\b(?:devrai\w*|attendu\w*|normalement|est cense)\b",
     Intent.PREDICT: r"\b(?:je pense|je predi\w*|je m'attends|je suppose|je dirais|a mon avis)\b",
-    Intent.OBSERVE: r"\b(?:j'obtiens|j'ai obtenu|j'observe|j'ai vu|renvoie|affiche|donne|retourne)\b",
+    Intent.OBSERVE: r"\b(?:j'obtiens|j'ai obtenu|j'observe|j'ai vu|repond\w*|renvoie|affiche|donne|retourne)\b",
 }
 SOLUTION = re.compile(r"\b(?:corrige|solution|code complet|programme complet)\b")
 NUMBER = r"(?<![\w-])-?\d{1,5}(?!\w)"

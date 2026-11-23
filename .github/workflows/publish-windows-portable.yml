@@ -115,7 +115,7 @@ jobs:
           cat > release-notes.md <<EOF_NOTES
           ZIP portable Windows x64 avec CPython et NumPy embarqués. Extraire le dossier, lancer Installer-Modeles.cmd avec Internet puis Demarrer.cmd. Arreter.cmd ferme l'instance. Le guide et les checksums accompagnent le paquet.
 
-          L'archive a été construite et exécutée sur un runner Windows natif. Les deux moteurs ont répondu pendant les 30 tours de recette. Le ZIP de preuves contient les mesures, les traces synthétiques et les captures natives. Recette Windows 10/11 sur un poste cible de 16 Go à effectuer.
+          L'archive a été construite et exécutée sur un runner Windows natif. Les deux moteurs ont répondu à leur sonde et les dialogues de recette ont été vérifiés. Le ZIP de preuves contient les mesures, les traces synthétiques et les contrôles visuels natifs. Recette Windows 10/11 sur un poste cible de 16 Go à effectuer.
 
           Recette automatisée : https://github.com/$GH_REPO/actions/runs/$NSI_RUN_ID
           EOF_NOTES
