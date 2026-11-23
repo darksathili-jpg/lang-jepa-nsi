@@ -5,7 +5,8 @@ from dataclasses import asdict, dataclass
 from math import factorial
 from typing import Callable
 
-from pedagogy.progress import code_matches_maximum
+from pedagogy.maximum import initializer
+from pedagogy.progress import code_matches_maximum, maximum_shape
 
 
 SCHEMA = 1
@@ -85,6 +86,15 @@ def maximum_static(code, values):
         return Static("sentinelle", max(0, best), "Les éléments sont comparés à une valeur de départ égale à zéro.")
     if code_matches_maximum(code, "element"):
         return Static("accumulation", max(values), "La forme reconnue compare les éléments avec une valeur issue de l’entrée.")
+    shape = maximum_shape(code)
+    if shape:
+        source, target, item, initial, sequence = shape
+        start = initializer(initial)
+        if isinstance(sequence, ast.Name) and sequence.id == source and (
+            start.kind == "element" and start.source == source and start.index == -1
+            or start.kind == "minus_inf" and "float" not in {source, target, item}
+        ):
+            return Static("accumulation", max(values), "Le parcours remplace la valeur initiale par une valeur de l’entrée.")
     return None
 
 

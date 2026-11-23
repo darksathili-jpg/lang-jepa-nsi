@@ -119,7 +119,7 @@ def main():
     with sync_playwright() as playwright, args.output.open("x", encoding="utf-8") as output:
         browser = playwright.chromium.launch(executable_path=args.chromium)
         absent(browser)
-        with local_server(args.assets, "smol", "--p5", "c", "--jepa", str(args.weights), verify_shutdown=True) as origin:
+        with local_server(args.assets, "smol", "--p5", "c", "--jepa", str(args.weights), "--parcours-historique", verify_shutdown=True) as origin:
             hybrid(browser, origin, output, args.captures, case)
         browser.close()
 

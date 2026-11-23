@@ -52,12 +52,12 @@ POLICY = (
 class WorkshopServer(ThreadingHTTPServer):
     allow_reuse_address = os.name != "nt"
 
-    def __init__(self, port, engine, experiment=None, control=None, max_help=4):
+    def __init__(self, port, engine, experiment=None, control=None, max_help=4, *, case_based=True):
         super().__init__(("127.0.0.1", port), Handler)
         self.engine = engine
         self.experiment = experiment
-        self.hybrid = Sessions(experiment, max_help=max_help) if experiment and experiment.mode == "c" else None
-        self.dialogues = Sessions(experiment if self.hybrid is None else None, max_help=max_help)
+        self.hybrid = Sessions(experiment, case_based=case_based, max_help=max_help) if experiment and experiment.mode == "c" else None
+        self.dialogues = Sessions(experiment if self.hybrid is None else None, case_based=case_based, max_help=max_help)
         self.engine_thread = None
         self.engine_lock = threading.Lock()
         self.host_header = f"127.0.0.1:{self.server_port}"
@@ -210,7 +210,8 @@ def main():
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--threads", type=int, default=2)
     parser.add_argument("--aide-max", type=int, choices=(4, 5, 6), default=4, help="Plafond d’aide pédagogique P7.")
-    parser.add_argument("--p5", choices=("a", "b", "c"), help="Profil de recherche P5. L’atelier normal reste la référence P4.")
+    parser.add_argument("--p5", choices=("a", "b", "c"), help="Profil de recherche pour le reclassement expérimental.")
+    parser.add_argument("--parcours-historique", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--jepa", type=Path, help="Dossier local de poids vérifiés pour le profil C.")
     parser.add_argument("--control", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--verified-runtime", action="store_true", help=argparse.SUPPRESS)
@@ -235,11 +236,13 @@ def main():
         parser.error("Identité du lanceur invalide.")
     try:
         try:
-            server = WorkshopServer(args.port, engine, experiment, control, args.aide_max)
+            server = WorkshopServer(args.port, engine, experiment, control, args.aide_max,
+                                    case_based=not args.parcours_historique)
         except OSError as exc:
             if not control or (exc.errno != errno.EADDRINUSE and getattr(exc, "winerror", None) not in (10048, 10013)):
                 raise
-            server = WorkshopServer(0, engine, experiment, control, args.aide_max)
+            server = WorkshopServer(0, engine, experiment, control, args.aide_max,
+                                    case_based=not args.parcours_historique)
             print(f"Port {args.port} occupé par une autre instance. Nouveau port : {server.server_port}.", flush=True)
         with server:
             if control:

@@ -189,7 +189,7 @@ def main():
         layouts(browser, origin, args.output)
         interactions(browser, origin)
         if args.assets:
-            with local_server(args.assets, "smol", "--p5", "c", "--jepa", str(args.weights), verify_shutdown=True) as live:
+            with local_server(args.assets, "smol", "--p5", "c", "--jepa", str(args.weights), "--parcours-historique", verify_shutdown=True) as live:
                 live_provenance(browser, live, args.output)
         browser.close()
     print("P6 : six formats, 18 combinaisons de thème, navigation, clavier, presse-papier, états et parcours guidé.")

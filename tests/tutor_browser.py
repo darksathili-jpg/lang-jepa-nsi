@@ -167,7 +167,7 @@ def main():
                 unavailable(browser, origin, "Erreur du modèle")
         print("Recette mobile et états absent et erreur vérifiés.", flush=True)
         if args.assets:
-            with local_server(args.assets, args.model) as origin:
+            with local_server(args.assets, args.model, "--parcours-historique") as origin:
                 live(browser, origin, args.captures)
             print("Dialogue maximum vérifié dans Chromium sur quatre tours réels.", flush=True)
         browser.close()

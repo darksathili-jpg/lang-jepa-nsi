@@ -65,9 +65,14 @@ jobs:
               print("version=" + version, file=entry)
           stats = json.loads(Path("native/windows-mesures/mesures.json").read_text(encoding="utf-8"))
           assert stats["platform"].startswith("Windows")
-          assert stats["active_after_stop"] == 0 and stats["dialogue"]["turns"] == 30
+          release = tuple(map(int, version.split(".")))
+          assert stats["active_after_stop"] == 0
           assert stats["engines"]["checks"]["inference"] and stats["engines"]["jepa"]["checks"]["selection"]
-          if tuple(map(int, version.split("."))) >= (0, 7, 0):
+          if release >= (0, 7, 1):
+              assert stats["dialogue"]["turns"] == 28 and stats["p71_turns"] == 14
+          else:
+              assert stats["dialogue"]["turns"] == 30
+          if release >= (0, 7, 0):
               assert stats["p7_turns"] == 14
           for filename in ("windows-mesures/mesures.json", "windows-captures/ecarts.json",
                            "installe/LANG-JEPA-NSI-Windows/logs/prepare.json"):

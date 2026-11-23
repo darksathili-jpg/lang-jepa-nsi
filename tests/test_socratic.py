@@ -25,7 +25,7 @@ class RegressionEvidenceTests(unittest.TestCase):
 
 class SocraticTests(unittest.TestCase):
     def setUp(self):
-        self.sessions = Sessions()
+        self.sessions = Sessions(case_based=False)
         exercise = EXERCISES["maximum"]
         self.payload = {"class": "premiere", "exercise": "maximum", "statement": exercise["statement"],
                         "code": exercise["code"]}

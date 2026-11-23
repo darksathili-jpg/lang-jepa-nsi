@@ -9,8 +9,8 @@ import threading
 import time
 
 from pedagogy.progress import Progress, code_matches_maximum
-from pedagogy.interpretation import Intent, interpret
-from pedagogy.workshop import OPENERS, Workshop, select_spec, workshop_reply
+from pedagogy.interpretation import interpret
+from pedagogy.workshop import Workshop, select_spec, workshop_reply
 from tutor.analysis import analyze
 from tutor.dialogue import DialogueError, maximum_reply, normalized, respond, validate
 from tutor.guided import respond_guided
@@ -94,33 +94,28 @@ class Sessions:
             same_statement = normalized(statement) == normalized(session.statement)
             history = list(session.recent) if same_statement else []
             progress = deepcopy(session.progress) if same_statement else None
-            legacy_active = progress is not None
             workshop = deepcopy(session.workshop) if same_statement else None
             facts = analyze(code)
             experiment = self.experiment if mode == "conversation" else None
             if experiment:
                 experiment.require_model()
-            maximum = exercise == "maximum" or mode == "conversation" and (
+            model_only = bool(experiment and experiment.mode == "a")
+            historical = not self.case_based and not model_only
+            maximum = historical and (exercise == "maximum" or mode == "conversation" and (
                 progress is not None or facts["maximum_function"] and code_matches_maximum(code, "zero") and re.search(
                     r"maximum|plus grande valeur|plus grand entier", normalized(statement),
                 )
-            )
-            if experiment and experiment.mode == "a":
-                maximum = False
+            ))
             if maximum and progress is None:
                 progress = Progress(multi_test=bool(experiment))
 
             request = {"class": level, "exercise": exercise, "statement": statement,
                        "code": code, "question": question, "history": history}
             raw = None
-            spec = select_spec(exercise, statement, level, workshop) if self.case_based else None
-            message = interpret(question, spec) if spec and not (experiment and experiment.mode == "a") else None
-            explicit_test = message and Intent.TEST in message.intentions and (
-                not legacy_active and mode != "guided" or
-                re.search(rf"\b{re.escape(spec.function)}\s*\(|^\s*`?\[.*\]`?\s*$", question)
-            )
-            if workshop or message and (OPENERS.intersection(message.intentions) - {Intent.TEST} or explicit_test):
+            spec = select_spec(exercise, statement, level, workshop, guided=mode == "guided") if self.case_based and not model_only else None
+            if spec:
                 workshop = workshop or Workshop(spec.id)
+                message = interpret(question, spec)
                 answer, raw = workshop_reply(engine if mode == "conversation" else None, request, facts, spec,
                                              workshop, message, sequence + 1, experiment=experiment, max_help=self.max_help)
             elif mode == "guided":
@@ -146,7 +141,8 @@ class Sessions:
             session.workshop = workshop
             session.recent.append({
                 "learner": question,
-                "assistant": (answer["indice"] + " " + answer["question"]).strip()[:640],
+                "assistant": " ".join(filter(None, (answer.get("feedback") if spec else None,
+                                                        answer["indice"], answer["question"])))[:640],
                 "stage": answer["stage"], "digest": answer["analysis"]["digest"],
             })
             session.round += 1

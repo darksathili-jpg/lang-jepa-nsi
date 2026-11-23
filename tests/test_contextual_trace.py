@@ -28,7 +28,7 @@ class RejectedEngine:
 class Dialogue:
     def __init__(self, experiment=None, *, guided=False):
         exercise = EXERCISES["maximum"]
-        self.sessions = Sessions(experiment)
+        self.sessions = Sessions(experiment, case_based=False)
         self.mode = "guided" if guided else "conversation"
         self.request = {"class": "premiere", "statement": exercise["statement"], "code": exercise["code"]}
         if guided:

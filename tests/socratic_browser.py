@@ -34,7 +34,7 @@ def main():
     goals = ["expected", "trace", "trace", "strategy", "strategy", "strategy", "strategy", "strategy",
              "verification", "verification", "verification", "contract", None, None]
     with (args.output.open("x", encoding="utf-8") as output, sync_playwright() as playwright,
-          local_server(args.assets, "smol") as origin):
+          local_server(args.assets, "smol", "--parcours-historique") as origin):
         browser = playwright.chromium.launch(executable_path=args.chromium)
         page = browser.new_page(viewport={"width": 1360, "height": 950})
         external, errors = protect_page(page, origin)

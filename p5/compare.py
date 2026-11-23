@@ -37,7 +37,7 @@ def replay(mode, engine, model, donors, case):
     exercise = EXERCISES["maximum"]
     original = exercise["code"]
     corrected = original.replace("m = 0", "m = tab[0]")
-    sessions = Sessions(Experiment(mode, model, donors=donors))
+    sessions = Sessions(Experiment(mode, model, donors=donors), case_based=False)
     token, turn = None, 0
     seen = []
     for index, step in enumerate(case["tours"], 1):

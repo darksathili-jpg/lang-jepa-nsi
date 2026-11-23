@@ -2,6 +2,7 @@
 
 from collections import deque
 from dataclasses import asdict, dataclass, field, replace
+from enum import StrEnum
 import json
 import re
 import time
@@ -10,6 +11,7 @@ from p5.contract import Decision, Situation
 from pedagogy.cases import SPECS, TestCase
 from pedagogy.catalogue import EXERCISES
 from pedagogy.interpretation import Intent, interpret, verified_interpretation
+from pedagogy.maximum import check_initialization, negative_infinity, proposal, read_order
 from pedagogy.progress import Evidence, normalize
 from tutor.curriculum import STAGES
 from tutor.engine import EngineError
@@ -21,7 +23,29 @@ LABELS = {"observed": "Identifier le comportement", "expected": "Déterminer le 
           "contract": "Examiner la précondition"}
 STAGE = {"observed": 1, "expected": 2, "trace": 3, "assumption": 4,
          "strategy": 4, "verification": 4, "contract": 5}
-OPENERS = {Intent.EXPLAIN, Intent.DEFINE, Intent.TEST}
+class Target(StrEnum):
+    TEST = "essai"
+    PREDICTION = "prediction"
+    EXPECTED = "attendu"
+    CONDITION = "condition"
+    CAUSE = "justification"
+    INITIAL_VALUE = "valeur_initiale"
+    EXCLUDED_RESULT = "resultat_exclu"
+    VERIFICATION = "programme_et_essais"
+    CONTRACT = "contrat"
+
+
+@dataclass(frozen=True)
+class Question:
+    action: str
+    target: Target
+    text: str
+
+
+EXCLUDED_RESULT = Question("justifier", Target.EXCLUDED_RESULT,
+                           "Quels choix peux-tu exclure si le résultat doit être un élément de l’entrée ?")
+
+
 CORRECTION_PRINCIPLES = {
     "maximum": "Pars d’une valeur de l’entrée et conserve la plus grande des valeurs déjà examinées.",
     "boucle-while": "Fais décroître le compteur à chaque passage jusqu’à rendre la condition fausse.",
@@ -30,9 +54,12 @@ CORRECTION_PRINCIPLES = {
 }
 
 
-def select_spec(exercise, statement, level, existing=None):
+def select_spec(exercise, statement, level, existing=None, *, guided=False):
     if existing:
         return SPECS[existing.exercise]
+    if guided:
+        spec = SPECS.get(exercise)
+        return spec if spec and spec.level == level else None
     actual = normalize(statement)
     for key, spec in SPECS.items():
         if spec.level == level and (key == exercise or actual == normalize(EXERCISES[key]["statement"])):
@@ -57,8 +84,11 @@ class Workshop:
     asked: deque = field(default_factory=lambda: deque(maxlen=28))
     transitions: deque = field(default_factory=lambda: deque(maxlen=32))
     goal: str = "observed"
-    target: str | None = None
+    target: Target | None = None
     target_turn: int = 0
+    strategy_code: str | None = None
+    strategy_excerpt: str | None = None
+    verified_cases: dict[tuple[int, ...], Evidence] = field(default_factory=dict)
     support: int = 1
     solution_requests: int = 0
 
@@ -85,7 +115,12 @@ class Workshop:
                 "derniere_intervention": decision, "experience_jepa": latent, "essai_actif": self.active.public() if self.active else None,
                 "essais_precedents": [case.public() for case in self.cases], "interpretation": message.public(),
                 "clarification": clarification, "niveau_aide": self.support,
-                "questions": [{"tour": turn, "strategie": action, "texte": question} for _, turn, action, question in self.asked],
+                "proposition_validee": {"code": self.strategy_code, "extrait": self.strategy_excerpt} if self.strategy_code else None,
+                "essais_verifies": [{"entree": value, "tour": proof.turn, "critere": proof.criterion}
+                                     for value, proof in self.verified_cases.items()],
+                "question_cible": self.target,
+                "questions": [{"tour": turn, "strategie": q.action, "texte": q.text, "cible": q.target}
+                              for _, turn, q in self.asked],
                 "evaluation": {"statut": status, "commentaire": feedback, "methode": "Critères de l’exercice et analyse statique"}}
 
 
@@ -94,7 +129,8 @@ def trace_facts(text, static):
     words = normalize(text.replace("`", ""))
     if static.kind == "sentinelle":
         bad = bool(re.search(r"\bm\s*(?:vaut|=)\s*(?:false|faux|true|vrai)\b|\bpas (?:toujours )?fauss?e?s?\b|"
-                             r"l'affectation s'execute\b(?!\s+(?:si|quand)\b)", words))
+                             r"l'affectation s'execute\b(?!\s+(?:si|quand)\b)", words)
+                   or any(int(value) != 0 for value in re.findall(r"\bm\s*(?:vaut|reste (?:a )?|=)\s*(-?\d+)\b", words)))
         false = bool(re.fullmatch(r"(?:toujours )?(?:false|faux|fausse)[.! ]*", words)
                      or re.search(r"\b(?:condition|conditions|comparaison|comparaisons)\s+(?:est|sont)\s+(?:toujours )?fausses?\b"
                                   r"|\baucun\w*.{0,22}ne depasse\w* 0\b", words))
@@ -118,33 +154,45 @@ def trace_facts(text, static):
 def ask(state, spec):
     case = state.active
     value = rendered(case.entree) if case else ""
+    if state.goal == "verification" and state.strategy_code:
+        if state.code == state.strategy_code:
+            if "sortie_element" not in state.evidence:
+                return [EXCLUDED_RESULT]
+            return [Question("confronter", Target.VERIFICATION,
+                             "Après avoir modifié le programme, quelles entrées utiliseras-tu pour le vérifier ?")]
+        if not case or case.entree in state.verified_cases:
+            return [Question("confronter", Target.VERIFICATION,
+                             "Quel autre essai distinct peux-tu proposer pour cette version ?")]
     if not case:
-        return [("confronter", "Quel petit test choisirais-tu pour observer la sortie du programme ?"),
-                ("clarifier", f"Quelle entrée simple veux-tu examiner avec {spec.function} ?"),
-                ("tracer", "Quels arguments écrirais-tu pour un premier essai ?")]
+        return [Question("confronter", Target.TEST, "Quel petit test choisirais-tu pour observer la sortie du programme ?"),
+                Question("clarifier", Target.TEST, f"Quelle entrée simple veux-tu examiner avec {spec.function} ?"),
+                Question("tracer", Target.TEST, "Quels arguments écrirais-tu pour un premier essai ?")]
     if not case.precondition or state.goal == "contract":
-        return [("justifier", f"Que dit le contrat de l’exercice sur l’entrée {value} ?"),
-                ("clarifier", "Quelle précondition faut-il vérifier avant de choisir cet essai ?")]
+        return [Question("justifier", Target.CONTRACT, f"Que dit le contrat de l’exercice sur l’entrée {value} ?"),
+                Question("clarifier", Target.CONTRACT, "Quelle précondition faut-il vérifier avant de choisir cet essai ?")]
     if state.goal in {"observed", "verification"}:
-        return [("confronter", f"Pour {value}, quel résultat prédis-tu avec cette version du programme ?"),
-                ("tracer", f"Quelle sortie prévois-tu en suivant le programme sur {value} ?"),
-                ("clarifier", "Quel résultat prévois-tu, ou quel comportement observes-tu ?")]
+        return [Question("confronter", Target.PREDICTION, f"Pour {value}, quel résultat prédis-tu avec cette version du programme ?"),
+                Question("tracer", Target.PREDICTION, f"Quelle sortie prévois-tu en suivant le programme sur {value} ?"),
+                Question("clarifier", Target.PREDICTION, "Quel résultat prévois-tu en suivant les instructions ?")]
     if state.goal == "expected":
-        return [("justifier", f"D’après l’énoncé, quel résultat devrait-on obtenir pour {value} ?"),
-                ("confronter", "La réponse attendue et ta prévision sont-elles compatibles ?")]
+        return [Question("justifier", Target.EXPECTED, f"D’après l’énoncé, quel résultat devrait-on obtenir pour {value} ?"),
+                Question("confronter", Target.EXPECTED, f"Quel maximum attendu retiens-tu pour {value} ?")]
     if state.goal == "assumption":
-        return [("justifier", "Quelle hypothèse de départ explique cet écart ?"), ("confronter", spec.suggestion)]
+        return [Question("justifier", Target.CAUSE, "Quelle hypothèse de départ explique cet écart ?"),
+                Question("confronter", Target.INITIAL_VALUE, spec.suggestion)]
     if state.goal == "strategy":
-        return [("confronter", spec.suggestion), ("tracer", "Comment vérifierais-tu ta nouvelle méthode sur un autre essai ?")]
+        return [Question("confronter", Target.INITIAL_VALUE, spec.suggestion),
+                Question("clarifier", Target.INITIAL_VALUE, "Quelle valeur proposerais-tu comme point de départ, et pourquoi ?")]
     if case.statique and case.statique.kind == "sentinelle" and max(case.entree) <= 0:
         if "comparaison" not in state.evidence:
-            return [("tracer", "Quand la valeur examinée est négative et que m vaut 0, que vaut valeur > m ?"),
-                    ("confronter", f"Sur {value}, un élément peut-il rendre valeur > m vraie ?"),
-                    ("clarifier", "Regarde la condition seule. Est-elle vraie pour une valeur négative face à zéro ?")]
-        return [("justifier", "Puisque la condition est fausse, que devient l’affectation et quelle valeur conserve m ?"),
-                ("tracer", "Suis le bloc indenté. Quelle instruction est sautée et avec quel effet sur m ?")]
-    return [("tracer", spec.suggestion), ("clarifier", "Sur cet essai, quel changement d’état repères-tu ?"),
-            ("justifier", "Quelle ligne de ton programme appuie cette observation ?")]
+            return [Question("tracer", Target.CONDITION, "Quand la valeur examinée est négative et que m vaut 0, que vaut valeur > m ?"),
+                    Question("confronter", Target.CONDITION, f"Sur {value}, un élément peut-il rendre valeur > m vraie ?"),
+                    Question("clarifier", Target.CONDITION, "Regarde la condition seule. Est-elle vraie pour une valeur négative face à zéro ?")]
+        return [Question("justifier", Target.CAUSE, "Puisque la condition est fausse, que devient l’affectation et quelle valeur conserve m ?"),
+                Question("tracer", Target.CAUSE, "Suis le bloc indenté. Quelle instruction est sautée et avec quel effet sur m ?")]
+    return [Question("tracer", Target.CAUSE, spec.suggestion),
+            Question("clarifier", Target.CAUSE, "Sur cet essai, quel changement d’état repères-tu ?"),
+            Question("justifier", Target.CAUSE, "Quelle ligne de ton programme appuie cette observation ?")]
 
 
 def explain(spec, case, strong=False):
@@ -159,11 +207,11 @@ def explain(spec, case, strong=False):
 
 def choose(state, spec, experiment, request, turn):
     scope = (state.code, state.active.entree if state.active else None, state.goal,
-             "comparaison" in state.evidence)
-    options = [(action, text) for action, text in ask(state, spec)
-               if not any(asked_scope == scope and text == old for asked_scope, _, _, old in state.asked)]
-    if not options:
-        return "", None, None
+             "comparaison" in state.evidence, "sortie_element" in state.evidence)
+    candidates = [q for q in ask(state, spec) if not any(asked_scope == scope and q == old for asked_scope, _, old in state.asked)]
+    if not candidates:
+        return None, None, None
+    options = [(q.action, q.text) for q in candidates]
     decision = latent = None
     if experiment and spec.id == "maximum" and (
         state.active is None or state.active.statique and state.active.statique.kind == "sentinelle"
@@ -172,7 +220,7 @@ def choose(state, spec, experiment, request, turn):
         situation = Situation(request["class"], spec.notion, request["statement"], case_summary,
                              request["question"], tuple(h["learner"][:280] for h in request["history"]),
                              tuple(e.criterion for e in state.evidence.values()), tuple(e.criterion for e in state.errors.values()),
-                             LABELS[state.goal], tuple(t[:280] for _, _, _, t in list(state.asked)[-6:]))
+                             LABELS[state.goal], tuple(q.text[:280] for _, _, q in list(state.asked)[-6:]))
         ranked, source, scores = experiment.rank(situation, options, turn)
         action, question = ranked[0]
         model = experiment.model.identity if scores is not None else None
@@ -184,8 +232,52 @@ def choose(state, spec, experiment, request, turn):
                   "scores": scores, "retenue": question, "modele": model, "justification": reason}
     else:
         action, question = options[0]
-    state.asked.append((scope, turn, action, question))
-    return question, decision, latent
+    selected = next(q for q in candidates if (q.action, q.text) == (action, question))
+    state.asked.append((scope, turn, selected))
+    return selected, decision, latent
+
+
+def acknowledge_strategy(state, candidate, request, turn):
+    result = check_initialization(candidate, request["code"], request["statement"])
+    text = request["question"]
+    if result == "valid":
+        state.strategy_code = state.code
+        state.strategy_excerpt = text
+        state.verified_cases.clear()
+        state.confirm("strategy", turn, text, "Initialisation cohérente avec le parcours et la précondition.")
+        state.goal = "verification"
+        feedback = ("Cette valeur de départ appartient à l’entrée, puisque la liste est non vide."
+                    if candidate.kind == "element" else
+                    "Moins l’infini peut servir de valeur initiale. Une liste non vide d’entiers garantit qu’un élément le remplacera.")
+        return "correcte", feedback, "Modifie le programme, puis vérifie-le sur deux entrées distinctes, dont une liste de nombres négatifs."
+    explanations = {
+        "precondition": "Il faut préciser le contrat pour la liste vide. Aucun élément de cette liste ne peut fournir la valeur renvoyée.",
+        "binding": "Vérifie les noms. Il faut modifier l’accumulateur en utilisant le paramètre de cette fonction.",
+        "index": "Cet indice n’est pas garanti pour une liste à un seul élément. Essaie un singleton.",
+        "constant": "Une constante finie peut dépasser tous les entiers d’une liste. Cherche une liste dont tous les éléments sont plus petits.",
+        "unknown": "Je ne peux pas valider cette affectation. Précise la variable et la valeur de départ choisies.",
+    }
+    status = "ambigue" if result == "unknown" else "incorrecte"
+    if status == "incorrecte":
+        state.errors["strategy"] = Evidence(turn, text, explanations[result])
+    return status, explanations[result], ""
+
+
+def record_verification(state, case, turn, text):
+    if not (case.statique and case.statique.result == case.attendu and "expected" in state.evidence):
+        return False
+    if state.strategy_code:
+        if state.code == state.strategy_code or case.statique.kind != "accumulation":
+            return False
+        if case.entree not in state.verified_cases:
+            if len(state.verified_cases) == 2 and max(case.entree) < 0:
+                del state.verified_cases[next(iter(state.verified_cases))]
+            if len(state.verified_cases) < 2:
+                state.verified_cases[case.entree] = Evidence(turn, text, "Résultat confronté à l’analyse statique de cette version.")
+        if len(state.verified_cases) < 2 or not any(max(value) < 0 for value in state.verified_cases):
+            return False
+    state.confirm("verification", turn, text, "Résultat prévu ou déclaré cohérent avec le contrat et la forme reconnue.")
+    return True
 
 
 def handle_claims(state, message, turn, text):
@@ -226,14 +318,16 @@ def workshop_reply(engine, request, facts, spec, state, message, turn, *, experi
     text = request["question"]
     digest = facts["structure_digest"]
     before = state.goal
-    expected_role = Intent.PREDICT if state.target == "prediction" and state.target_turn == turn - 1 and state.code == digest else (
-        Intent.EXPECT if state.target == "attendu" and state.target_turn == turn - 1 and state.code == digest else None
-    )
+    target = state.target if state.target_turn == turn - 1 and state.code == digest else None
+    expected_role = {Target.PREDICTION: Intent.PREDICT, Target.EXPECTED: Intent.EXPECT}.get(target)
     if expected_role:
         message = interpret(text, spec, expected_role=expected_role)
     raw = None
     model_status = "non_sollicite"
-    if engine and message.intentions == (Intent.UNKNOWN,) and len(text.split()) >= 5 and state.target != "condition":
+    strategy = (proposal(text, initial_value=target == Target.INITIAL_VALUE)
+                if spec.id == "maximum" and state.goal in {"assumption", "strategy", "verification"} and not facts["syntax"] else None)
+    minus_inf = spec.id == "maximum" and negative_infinity(text)
+    if strategy is None and not minus_inf and engine and message.intentions == (Intent.UNKNOWN,) and len(text.split()) >= 5 and target != Target.CONDITION:
         task = f"Notion : {spec.notion}. Objectif : {LABELS[state.goal]}."
         if state.active:
             task += f" Entrée étudiée : {rendered(state.active.entree)[:100]}."
@@ -249,6 +343,7 @@ def workshop_reply(engine, request, facts, spec, state, message, turn, *, experi
     edited = bool(state.code and state.code != digest)
     if edited:
         state.take(spec.case(state.active.entree, state.active.auteur, request["code"], digest) if state.active else None)
+        state.verified_cases.clear()
         state.goal = "verification"
     state.code = digest
     feedback, hint, status = "", "", "partielle"
@@ -265,6 +360,21 @@ def workshop_reply(engine, request, facts, spec, state, message, turn, *, experi
         if max_help == 6 and state.solution_requests >= 3 and "trace" in state.evidence:
             hint = CORRECTION_PRINCIPLES[spec.id]
         state.support = min(max_help, max(state.support, 4 if state.solution_requests >= 2 else 3))
+    elif minus_inf and target == Target.EXCLUDED_RESULT:
+        state.confirm("sortie_element", turn, text, "Moins l’infini n’est pas un entier de l’entrée.")
+        status = "correcte"
+        feedback = "Oui, moins l’infini est exclu comme résultat final. Il peut servir de valeur initiale, à condition d’être remplacé par un élément."
+    elif strategy is not None:
+        message = replace(message, intentions=(Intent.CHANGE,))
+        status, feedback, hint = acknowledge_strategy(state, strategy, request, turn)
+    elif minus_inf:
+        if target == Target.EXPECTED or (target == Target.PREDICTION and state.active and state.active.statique):
+            status = "incorrecte"
+            feedback = "Moins l’infini ne correspond pas au résultat de ce cas. Le maximum demandé est un entier de la liste."
+        else:
+            status = "ambigue"
+            feedback = "Proposes-tu moins l’infini comme valeur initiale, ou l’exclus-tu comme résultat final ?"
+            no_question = True
     elif message.ambiguities or len(message.tests) > 1:
         status = "ambigue"
         feedback = message.ambiguities[0] if message.ambiguities else "Choisis l’un de ces essais pour que nous suivions ses résultats."
@@ -274,10 +384,22 @@ def workshop_reply(engine, request, facts, spec, state, message, turn, *, experi
             value = message.tests[0]
             if not state.active or state.active.entree != value:
                 state.take(spec.case(value, "eleve", request["code"], digest))
-                state.goal = "verification" if edited else "observed"
+                state.goal = "verification" if edited or state.strategy_code else "observed"
             feedback = f"Je retiens ton essai {rendered(value)}."
+        declaration_generale = False
+        if (not state.active and spec.id == "maximum" and state.goal == "observed" and not facts["syntax"]
+                and re.search(r"\bnegati\w*\b", normalize(text))
+                and {claim.value for claim in message.claims if claim.role == Intent.OBSERVE and type(claim.value) is int} == {0}):
+            example = spec.case(spec.example, "tuteur", request["code"], digest)
+            if example.statique and example.statique.kind == "sentinelle":
+                state.take(example)
+                state.confirm("observed", turn, text, "Observation générale cohérente avec la forme statique et un exemple du tuteur.")
+                state.goal = "expected"
+                declaration_generale = True
+                status = "correcte"
+                feedback = f"Je note que ton programme renvoie 0 sur les listes entièrement négatives. Prenons {rendered(example.entree)} comme exemple."
         if not state.active and Intent.EXPLAIN not in message.intentions and Intent.DEFINE not in message.intentions and (
-            state.target == "essai" and Intent.CONFUSED in message.intentions
+            target == Target.TEST and Intent.CONFUSED in message.intentions
         ):
             state.take(spec.case(spec.example, "tuteur", request["code"], digest))
             feedback = f"Essayons {rendered(spec.example)}."
@@ -305,30 +427,49 @@ def workshop_reply(engine, request, facts, spec, state, message, turn, *, experi
             }:
                 state.goal = "trace"
                 hint = case.statique.detail
-            if message.claims:
+            if message.claims and not declaration_generale:
+                proved_before = set(state.evidence)
                 feedback = (feedback + " " + handle_claims(state, message, turn, text)).strip()
                 case = state.active
                 if "observed" in state.evidence and state.goal in {"observed", "verification", "expected"}:
-                    state.goal = "trace" if "expected" in state.evidence else "expected"
-                    if case.statique and case.statique.result == case.attendu and "expected" in state.evidence:
-                        state.confirm("verification", turn, text, "Résultat prévu ou déclaré cohérent avec le contrat et la forme reconnue.")
+                    pending = state.strategy_code is not None
+                    if record_verification(state, case, turn, text):
                         state.goal = "contract"
-                status = "incorrecte" if "observed" in state.errors else "correcte" if "verification" in state.evidence else "partielle"
+                    elif pending and case.entree in state.verified_cases:
+                        state.goal = "verification"
+                        feedback += " Propose un second essai distinct, dont un cas entièrement négatif si tu ne l’as pas encore fait."
+                    elif not pending or state.code != state.strategy_code and "expected" not in state.evidence:
+                        state.goal = "trace" if "expected" in state.evidence else "expected"
+                status = "incorrecte" if "observed" in state.errors else "correcte" if state.evidence.keys() - proved_before else "partielle"
             if state.goal == "trace" and case.statique:
                 false, causal, wrong = trace_facts(text, case.statique)
-                target = state.target if state.target_turn == turn - 1 else None
                 negative = spec.id == "maximum" and case.statique.kind == "sentinelle" and max(case.entree) <= 0
-                if wrong:
+                order = read_order(text, case.entree) if negative else None
+                if order and order.contradiction:
+                    status = "incorrecte"
+                    feedback = "Une inégalité ne correspond pas à l’ordre de ces entiers. Vérifie le sens de chaque comparaison."
+                elif wrong:
                     feedback = "La comparaison produit un booléen. La variable garde une valeur entière. Vérifie le bloc concerné."
                     status = "incorrecte"
+                elif order and order.covered == set(case.entree):
+                    state.confirm("comparaison", turn, text, "L’ordre est établi pour toutes les valeurs de l’essai.")
+                    if causal:
+                        state.confirm("trace", turn, text, "L’ordre justifie l’absence d’affectation et la valeur conservée.")
+                    examples = ", puis ".join(f"{entry} > 0" for entry in case.entree[:3])
+                    feedback = (f"Tes inégalités établissent le bon ordre. Avec valeur > m, Python teste {examples} à partir de m = 0. "
+                                "Ces tests sont faux : l’affectation ne s’exécute pas et m reste à 0.")
+                    state.goal = "strategy"
+                    status = "correcte"
                 elif causal and (case.statique.kind != "sentinelle" or negative and (false or "comparaison" in state.evidence)):
                     state.confirm("trace", turn, text, "Le raisonnement concorde avec la forme statiquement reconnue pour cet essai.")
                     feedback = "Ton explication relie la condition, les instructions et l’effet sur cet essai." if negative else "Ton explication concorde avec le comportement analysé."
                     state.goal = "assumption"
                     status = "correcte"
-                elif false and negative and target == "condition":
+                elif false and negative and target == Target.CONDITION:
                     state.confirm("comparaison", turn, text, "La comparaison avec zéro est fausse dans le cas négatif proposé.")
                     feedback = "Oui, la comparaison est fausse sur ce cas. Cherchons la conséquence sur les instructions."
+                elif order and order.covered:
+                    feedback = "Tu as établi l’ordre pour une partie de l’essai. Examine les autres valeurs avant de tirer une conclusion."
             if state.goal in {"assumption", "strategy"} and Intent.CHANGE in message.intentions:
                 state.goal = "verification"
                 feedback = "Vérifions ton idée sur le code modifié et une nouvelle entrée."
@@ -343,20 +484,12 @@ def workshop_reply(engine, request, facts, spec, state, message, turn, *, experi
         if not feedback:
             feedback = "Précise ce que tu veux tester ou la difficulté que tu rencontres."
             status = "ambigue"
-    question, decision, latent = ("", None, None) if no_question else choose(state, spec, experiment, request, turn)
+    selected, decision, latent = (None, None, None) if no_question else choose(state, spec, experiment, request, turn)
+    question = selected.text if selected else ""
     if not question and not no_question:
         state.support = min(max_help, state.support + 1)
-        hint = explain(spec, state.active, strong=state.support >= 4)
-    if state.goal == "trace" and question and "comparaison" not in state.evidence and (
-        "valeur > m" in question or "Est-elle vraie" in question
-    ):
-        state.target = "condition"
-    elif question and state.active is None:
-        state.target = "essai"
-    elif question and state.goal in {"observed", "verification"}:
-        state.target = "prediction"
-    else:
-        state.target = "attendu" if question and state.goal == "expected" else None
+        hint = hint or explain(spec, state.active, strong=state.support >= 4)
+    state.target = selected.target if selected else None
     state.target_turn = turn
     if before != state.goal:
         state.transitions.append({"tour": turn, "avant": before, "apres": state.goal, "motif": feedback.strip()})

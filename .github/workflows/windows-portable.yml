@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       modeles_reels:
-        description: Télécharger SmolLM3 et rejouer trente tours sur le runner
+        description: Préparer SmolLM3 et JEPA et rejouer les dialogues P7 et P7.1
         type: boolean
         default: false
 
@@ -53,7 +53,7 @@ jobs:
           set PYTHONPATH=%CD%
           set "NSI_PACKAGE=%CD%\results\installe\LANG-JEPA-NSI-Windows"
           call "%NSI_PACKAGE%\Installer-Modeles.cmd" || exit /b 1
-          python tests\portable_recipe.py --package "%NSI_PACKAGE%" --home "%NSI_PACKAGE%" --output results\windows-mesures --context --p7
+          python tests\portable_recipe.py --package "%NSI_PACKAGE%" --home "%NSI_PACKAGE%" --output results\windows-mesures --p71
       - uses: actions/upload-artifact@v4
         if: always()
         with:

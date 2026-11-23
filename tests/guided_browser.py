@@ -74,7 +74,7 @@ def main():
         args.captures.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as playwright, tempfile.TemporaryDirectory() as empty:
         browser = playwright.chromium.launch(executable_path=args.chromium)
-        with local_server(Path(empty), "smol") as origin:
+        with local_server(Path(empty), "smol", "--parcours-historique") as origin:
             complete(browser, origin, args.captures)
             mobile(browser, origin, args.captures)
         browser.close()

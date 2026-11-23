@@ -94,7 +94,7 @@ def main():
         args.captures.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as playwright, args.output.open("x", encoding="utf-8") as output:
         browser = playwright.chromium.launch(executable_path=args.chromium)
-        with local_server(args.assets, "smol", "--p5", "c", "--jepa", str(args.weights)) as origin:
+        with local_server(args.assets, "smol", "--p5", "c", "--jepa", str(args.weights), "--parcours-historique") as origin:
             replay(browser, origin, output, before=args.before, captures=args.captures)
         browser.close()
 

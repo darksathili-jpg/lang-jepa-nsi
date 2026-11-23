@@ -1,0 +1,7 @@
+[
+  "mon programme renvoie 0 quand la liste passée en paramètre ne contient que des nombres négatifs",
+  "-2",
+  "a chaque fois 0>-4 et 0>-2",
+  "m=tab[0]",
+  "- inf"
+]

@@ -253,12 +253,12 @@ def read_trace(words, question, trace_value):
     return TraceReading(both_false, skipped, unchanged, causal, single_false, mixed_types, contradiction)
 
 
-def code_matches_maximum(code, start):
-    """Reconnaître une forme d'accumulation sur l'AST sans exécuter le programme."""
+def maximum_shape(code):
+    """Reconnaître les noms, l’initialisation et le parcours de l’accumulateur."""
     try:
         body = ast.parse(code).body
     except (SyntaxError, ValueError, RecursionError):
-        return False
+        return None
     match body:
         case [ast.FunctionDef(name="maximum", decorator_list=[], returns=None, args=ast.arguments(
             posonlyargs=[], args=[ast.arg(arg=tab, annotation=None)], vararg=None, kwonlyargs=[], kwarg=None, defaults=[]
@@ -272,21 +272,29 @@ def code_matches_maximum(code, start):
             ]),
             ast.Return(value=ast.Name(id=result)),
         ])]:
-            if len({tab, acc, item}) != 3 or (lhs, rhs, updated, value, result) != (item, acc, acc, item, acc):
-                return False
-            if start == "zero":
-                return (isinstance(initial, ast.Constant) and type(initial.value) is int
-                        and initial.value == 0 and isinstance(sequence, ast.Name) and sequence.id == tab)
-            match initial:
-                case ast.Subscript(value=ast.Name(id=source), slice=ast.Constant(value=index)) if (
-                    source == tab and type(index) is int and index == 0
-                ):
-                    match sequence:
-                        case ast.Name(id=source):
-                            return source == tab
-                        case ast.Subscript(value=ast.Name(id=source),
-                                           slice=ast.Slice(lower=ast.Constant(value=index), upper=None, step=None)):
-                            return source == tab and type(index) is int and index == 1
+            if len({tab, acc, item}) == 3 and (lhs, rhs, updated, value, result) == (item, acc, acc, item, acc):
+                return tab, acc, item, initial, sequence
+    return None
+
+
+def code_matches_maximum(code, start):
+    shape = maximum_shape(code)
+    if not shape:
+        return False
+    tab, _, _, initial, sequence = shape
+    whole = isinstance(sequence, ast.Name) and sequence.id == tab
+    if start == "zero":
+        return whole and isinstance(initial, ast.Constant) and type(initial.value) is int and initial.value == 0
+    match initial:
+        case ast.Subscript(value=ast.Name(id=source), slice=ast.Constant(value=index)) if (
+            source == tab and type(index) is int and index == 0
+        ):
+            if whole:
+                return True
+            match sequence:
+                case ast.Subscript(value=ast.Name(id=source),
+                                   slice=ast.Slice(lower=ast.Constant(value=index), upper=None, step=None)):
+                    return source == tab and type(index) is int and index == 1
     return False
 
 
