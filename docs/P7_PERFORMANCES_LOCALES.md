@@ -6,6 +6,8 @@ Les essais Linux dans Chromium et le benchmark ont été lancés dans un espace 
 
 La cible indicative est une médiane de moins de 15 secondes pour les tours sollicitant le LLM. Le test final Linux B a mesuré 41,42 s sur un seul appel, pendant d’autres recettes concurrentes. Cette observation indique qu’une mesure de charge sur le poste réel reste nécessaire. [Test final Linux](../p7/preuves/test-final-B.json)
 
+La recette d’ensemble sous Linux a mesuré 53 tours en Chromium, dont 30 de régression hybride, 9 contextuels et 14 P7. Le démarrage a pris 0,313 s, le chargement de SmolLM3 2,02 s et les dix appels de la régression hybride 12,64 s en médiane. Le pic de la somme des RSS de Python, llama.cpp et Chromium est de 4,38 Gio. Le pic CPU cumulé correspond à 214,1 % d’un cœur logique. Aucun processus n’est resté actif après l’arrêt. [Mesures et sondes Linux](../p7/preuves/mesures-portable-linux.json)
+
 Extracteur, contrôle des empreintes, runtime embarqué, diagnostic et arrêt reprennent la distribution P6.2. Une fois les modèles préparés, le démarrage fonctionne avec les fichiers locaux. Le redistribuable Visual C++ x64 officiel reste une dépendance système s’il est absent. [Installation et diagnostic](P6_1_INSTALLATION.md)
 
 `Exécuter` reste indisponible. Un processus avec délai ne fournit aucune isolation vérifiée. Un interpréteur Python dans un Web Worker nécessiterait des contrôles démontrés sur les capacités Web, la mémoire, les interruptions et le réseau, avant d’être exposé au code libre. La recette P7 utilise des analyses de formes AST et des oracles mathématiques déterministes.
