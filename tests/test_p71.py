@@ -206,3 +206,15 @@ class P71Tests(unittest.TestCase):
         proof = guide.send('Mon programme répond toujours 0 quand les nombres sont négatifs.')['pedagogie']
         self.assertEqual(proof['acquis']['observed']['tour'], 1)
         self.assertEqual(proof['libelles_objectifs']['observed'], 'Identifier le résultat observé')
+
+    def test_expected_result_reformulation_applies_to_a_while_loop(self):
+        exercise = EXERCISES['boucle-while']
+        sessions = Sessions()
+        payload = {'class': 'premiere', 'statement': exercise['statement'], 'code': exercise['code']}
+        session, turn = None, 0
+        for question in ('compte(0)', 'J’obtiens 0.', 'Le résultat attendu devrait être 3.'):
+            reply = sessions.turn('conversation', payload | {'question': question, 'session': session, 'turn': turn}, None)
+            session, turn = reply['session'], reply['turn']
+        self.assertEqual(reply['pedagogie']['question_cible'], 'attendu')
+        self.assertIn('renvoyée', reply['question'])
+        self.assertNotIn('maximum', reply['question'])

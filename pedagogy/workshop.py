@@ -177,7 +177,7 @@ def ask(state, spec):
                 Question("clarifier", Target.PREDICTION, "Quel résultat prévois-tu en suivant les instructions ?")]
     if state.goal == "expected":
         return [Question("justifier", Target.EXPECTED, f"D’après l’énoncé, quel résultat devrait-on obtenir pour {value} ?"),
-                Question("confronter", Target.EXPECTED, f"Quel maximum attendu retiens-tu pour {value} ?")]
+                Question("confronter", Target.EXPECTED, f"Quelle valeur devrait être renvoyée pour {value} d’après le contrat ?")]
     if state.goal == "assumption":
         return [Question("justifier", Target.CAUSE, "Quelle hypothèse de départ explique cet écart ?"),
                 Question("confronter", Target.INITIAL_VALUE, spec.suggestion)]

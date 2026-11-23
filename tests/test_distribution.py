@@ -1,7 +1,10 @@
 import contextlib
 import hashlib
 import io
+import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -9,9 +12,26 @@ import zipfile
 
 from distribution.instance import LOCK
 from distribution.instance import lock
+from distribution.jobs import stop_waiter
 from distribution.transfer import extract_zip, fetch
 from p5.orchestration import open_experiment
 from tutor.engine import LlamaEngine
+
+
+class ShutdownTests(unittest.TestCase):
+    @unittest.skipUnless(hasattr(os, "pidfd_open"), "Descripteur de processus Linux requis.")
+    def test_stop_waiter_waits_for_actual_exit(self):
+        with subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"]) as process:
+            try:
+                with stop_waiter(process.pid) as wait:
+                    with self.assertRaisesRegex(ValueError, "sortie du serveur"):
+                        wait(0)
+                    process.terminate()
+                    wait(5)
+                    self.assertIsNotNone(process.poll())
+            finally:
+                if process.poll() is None:
+                    process.kill()
 
 
 class Response(io.BytesIO):

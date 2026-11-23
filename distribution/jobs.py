@@ -1,6 +1,8 @@
 """Encadre le moteur Windows par un Job Object pour libérer ses descendants."""
 
+import errno
 import os
+import select
 from contextlib import contextmanager
 
 
@@ -59,7 +61,26 @@ class ChildJob:
 
 @contextmanager
 def stop_waiter(pid):
-    """Ouvrir le processus authentifié avant l’arrêt et attendre sa sortie sur Windows."""
+    """Attendre la sortie du processus authentifié avec un descripteur stable."""
+    if hasattr(os, "pidfd_open"):
+        try:
+            fd = os.pidfd_open(pid)
+        except ProcessLookupError:
+            yield lambda _seconds: None
+            return
+        except OSError as exc:
+            if exc.errno not in (errno.ENOSYS, errno.EPERM, errno.EINVAL):
+                raise
+        else:
+            def wait_linux(seconds):
+                if not select.select([fd], [], [], max(0, seconds))[0]:
+                    raise ValueError("Linux n’a pas confirmé la sortie du serveur dans le délai prévu.")
+
+            try:
+                yield wait_linux
+            finally:
+                os.close(fd)
+            return
     if os.name != "nt":
         yield lambda _seconds: None
         return
