@@ -1,0 +1,170 @@
+{
+  "17": {
+    "b": {
+      "reclassements": 0,
+      "n": 12,
+      "actions": {
+        "confronter": 8,
+        "tracer": 1,
+        "justifier": 3
+      },
+      "wilson95_taux_reclassement": [
+        0,
+        0.242
+      ]
+    },
+    "c": {
+      "reclassements": 7,
+      "n": 12,
+      "actions": {
+        "clarifier": 5,
+        "justifier": 3,
+        "confronter": 2,
+        "tracer": 2
+      },
+      "wilson95_taux_reclassement": [
+        0.32,
+        0.807
+      ]
+    },
+    "neutralise": {
+      "reclassements": 0,
+      "n": 12,
+      "actions": {
+        "confronter": 8,
+        "tracer": 1,
+        "justifier": 3
+      },
+      "wilson95_taux_reclassement": [
+        0,
+        0.242
+      ]
+    },
+    "melange": {
+      "reclassements": 8,
+      "n": 12,
+      "actions": {
+        "clarifier": 5,
+        "tracer": 3,
+        "justifier": 2,
+        "confronter": 2
+      },
+      "wilson95_taux_reclassement": [
+        0.391,
+        0.862
+      ]
+    }
+  },
+  "43": {
+    "b": {
+      "reclassements": 0,
+      "n": 12,
+      "actions": {
+        "confronter": 8,
+        "tracer": 1,
+        "justifier": 3
+      },
+      "wilson95_taux_reclassement": [
+        0,
+        0.242
+      ]
+    },
+    "c": {
+      "reclassements": 7,
+      "n": 12,
+      "actions": {
+        "tracer": 5,
+        "clarifier": 2,
+        "justifier": 3,
+        "confronter": 2
+      },
+      "wilson95_taux_reclassement": [
+        0.32,
+        0.807
+      ]
+    },
+    "neutralise": {
+      "reclassements": 0,
+      "n": 12,
+      "actions": {
+        "confronter": 8,
+        "tracer": 1,
+        "justifier": 3
+      },
+      "wilson95_taux_reclassement": [
+        0,
+        0.242
+      ]
+    },
+    "melange": {
+      "reclassements": 6,
+      "n": 12,
+      "actions": {
+        "tracer": 3,
+        "confronter": 5,
+        "justifier": 2,
+        "clarifier": 2
+      },
+      "wilson95_taux_reclassement": [
+        0.254,
+        0.746
+      ]
+    }
+  },
+  "97": {
+    "b": {
+      "reclassements": 0,
+      "n": 12,
+      "actions": {
+        "confronter": 8,
+        "tracer": 1,
+        "justifier": 3
+      },
+      "wilson95_taux_reclassement": [
+        0,
+        0.242
+      ]
+    },
+    "c": {
+      "reclassements": 6,
+      "n": 12,
+      "actions": {
+        "clarifier": 4,
+        "tracer": 3,
+        "justifier": 3,
+        "confronter": 2
+      },
+      "wilson95_taux_reclassement": [
+        0.254,
+        0.746
+      ]
+    },
+    "neutralise": {
+      "reclassements": 0,
+      "n": 12,
+      "actions": {
+        "confronter": 8,
+        "tracer": 1,
+        "justifier": 3
+      },
+      "wilson95_taux_reclassement": [
+        0,
+        0.242
+      ]
+    },
+    "melange": {
+      "reclassements": 7,
+      "n": 12,
+      "actions": {
+        "clarifier": 3,
+        "tracer": 4,
+        "justifier": 3,
+        "confronter": 2
+      },
+      "wilson95_taux_reclassement": [
+        0.32,
+        0.807
+      ]
+    }
+  }
+}

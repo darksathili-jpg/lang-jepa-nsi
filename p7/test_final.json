@@ -1,0 +1,28 @@
+{
+ "schema": 1,
+ "dialogues": [
+  {"id":"stock-contradictoire","exercise":"maximum","turns":[
+   {"text":"maximum([-22, -14, 9])","intents":["proposition_essai"],"test":[-22,-14,9],"goal":"observed"},
+   {"text":"Je pense que ça renvoie 0, mais je pense que ça renvoie 9.","intents":["prediction"],"goal":"observed","forbidden":"observed"},
+   {"text":"On peut tester maximum([-5, -13]) ou maximum([4, 1]) ?","intents":["proposition_essai"],"goal":"observed"}
+  ]},
+  {"id":"porte-compteur","exercise":"boucle-while","sensible":true,
+   "initial":"def compte(tours):\n    while tours > 0:\n        print(tours)\n    return tours","turns":[
+    {"text":"Pk sa boucle encore ?","intents":["explication"],"goal":"observed"},
+    {"text":"compte(0)","intents":["proposition_essai"],"test":0,"goal":"observed","static":"retour"},
+    {"text":"Je prévois 0 et le résultat attendu devrait être 0.","intents":["prediction","resultat_attendu"],"goal":"contract","confirmed":"verification"},
+    {"text":"compte(-2)","intents":["proposition_essai"],"test":-2,"goal":"contract","precondition":false}
+  ]},
+  {"id":"etiquettes-majuscules","exercise":"dictionnaire-comptage",
+   "initial":"def compte(etiquettes):\n    effectifs = {}\n    for etiquette in etiquettes:\n        effectifs[etiquette] = effectifs.get(etiquette, 0) + 1\n    return effectifs","turns":[
+    {"text":"compte(['Oie', 'oie', 'Oie'])","intents":["proposition_essai"],"test":["Oie","oie","Oie"],"goal":"observed","static":"retour"},
+    {"text":"J’obtiens {'Oie': 2, 'oie': 1}, et le résultat attendu devrait être {'Oie': 2, 'oie': 1}.","intents":["observation","resultat_attendu"],"goal":"contract","confirmed":"verification","declared":{"Oie":2,"oie":1}}
+  ]},
+  {"id":"parite-recursive","exercise":"recursivite-base",
+   "initial":"def fact(indice):\n    if indice == 0:\n        return 1\n    return indice * fact(indice - 2)","turns":[
+    {"text":"fact(5)","intents":["proposition_essai"],"test":5,"goal":"trace","static":"base_inaccessible"},
+    {"text":"L’argument diminue de deux donc il ne peut pas atteindre zéro.","intents":["justification"],"goal":"assumption","confirmed":"trace"},
+    {"text":"fact(6)","intents":["proposition_essai"],"test":6,"goal":"observed","abstain_static":true}
+  ]}
+ ]
+}

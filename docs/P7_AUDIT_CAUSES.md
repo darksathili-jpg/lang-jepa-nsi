@@ -2,6 +2,8 @@
 
 Base `5884996`, branche `main`. Les recettes P4, P5 et P6.2 attestent la progression du maximum de référence, les contrôles du moteur et le fonctionnement du paquet sur Windows Server. La capture P7 soumet une autre entrée au même exercice.
 
+Le rejeu Chromium avec SmolLM3 et JEPA, sans réseau externe, classe la question libre `ambigue`. Il classe ensuite `maximum([-3, -4, -1])` `hors_sujet` et revient à `[-4, -2]`. [Trace du défaut](../p7/preuves/avant-chromium.jsonl) · [P4](RAPPORT-P4.md) · [P5](P5_RECETTE_FINALE.md) · [P6.2](TOUR_CONTEXTUEL.md)
+
 ```mermaid
 flowchart LR
   UI[Atelier] --> HTTP[API et validation de la requête]

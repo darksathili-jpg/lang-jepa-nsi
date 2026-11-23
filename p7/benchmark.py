@@ -23,8 +23,13 @@ CORPUS = Path(package_file).with_name("qualification.json")
 LEAK = re.compile(r"\b(?:def\s+\w+|tab\s*\[\s*0\s*\]|return\s+max\s*\()")
 
 
-def data():
-    content = json.loads(CORPUS.read_text(encoding="utf-8"))
+class NoGeneration:
+    def generate(self, *_args, **_kwargs):
+        raise EngineError("Aucune génération dans la recette déterministe.")
+
+
+def data(path=CORPUS):
+    content = json.loads(path.read_text(encoding="utf-8"))
     if content["schema"] != 1:
         raise ValueError("Corpus de qualification inconnu.")
     return content["dialogues"]
@@ -32,7 +37,7 @@ def data():
 
 def code_for(dialogue, corrected):
     key = dialogue["exercise"]
-    original = EXERCISES[key]["code"]
+    original = dialogue.get("initial", EXERCISES[key]["code"])
     if key == "recursivite-base" and dialogue.get("variant") == "unreachable":
         original = "def fact(n):\n    if n == 0:\n        return 1\n    return n * fact(n + 1)"
     if not corrected:
@@ -54,7 +59,7 @@ def replay(dialogue, mode, engine=None, experiment=None):
         captures, error, response = [], None, None
         tick = time.perf_counter()
         try:
-            answer = sessions.turn("conversation", request, engine, capture=captures)
+            answer = sessions.turn("conversation", request, engine if engine is not None else NoGeneration(), capture=captures)
             token, sequence = answer["session"], answer["turn"]
             response = {key: value for key, value in answer.items() if key != "session"}
         except EngineError as exc:
@@ -70,6 +75,7 @@ def replay(dialogue, mode, engine=None, experiment=None):
                   "preuve": step["confirmed"] in proof if "confirmed" in step else None,
                   "abusive": step["forbidden"] in proof if "forbidden" in step else False,
                   "statique": (active.get("statique") or {}).get("kind") == step["static"] if "static" in step else None,
+                  "abstention_statique": active.get("statique") is None if step.get("abstain_static") else None,
                   "precondition": active.get("precondition") == step["precondition"] if "precondition" in step else None,
                   "litteral_invalide": bool(state.get("interpretation", {}).get("ambiguities")) if step.get("invalid") else None,
                   "prediction": active.get("predit") == step["predicted"] and active.get("declare") is None if "predicted" in step else None,
@@ -116,6 +122,7 @@ def main():
     parser.add_argument("--assets", type=Path, required=True)
     parser.add_argument("--weights", type=Path)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--corpus", type=Path, default=CORPUS)
     parser.add_argument("--threads", type=int, default=2)
     parser.add_argument("--repetitions", type=int, choices=(1, 2, 3), default=1)
     args = parser.parse_args()
@@ -123,7 +130,7 @@ def main():
         parser.error("Profils A, B, C, D ou T. D exige --weights.")
     from p5.jepa import load
 
-    dialogues = data()
+    dialogues = data(args.corpus)
     args.output.mkdir(parents=True, exist_ok=True)
     for profile in args.profiles:
         engine = None if profile == "T" else LlamaEngine(args.assets, "qwen" if profile == "C" else "smol", args.threads)
@@ -136,14 +143,14 @@ def main():
             first = []
             with (args.output / f"{profile}.jsonl").open("x", encoding="utf-8") as stream:
                 for repeat in range(1, args.repetitions + 1):
-                    selected = dialogues if repeat == 1 else [d for d in dialogues if d["id"] in {"altitudes-positives", "contre-epreuve"}]
+                    selected = dialogues if repeat == 1 else [d for d in dialogues if d.get("sensible") or d["id"] in {"altitudes-positives", "contre-epreuve"}]
                     for dialogue in selected:
                         for row in replay(dialogue, profile, engine, experiment):
                             row["repetition"] = repeat
                             print(json.dumps(row, ensure_ascii=False), file=stream, flush=True)
                             if repeat == 1:
                                 first.append(row)
-            summary = {"profil": profile, "machine": platform.platform(), "corpus_sha256": hashlib.sha256(CORPUS.read_bytes()).hexdigest(),
+            summary = {"profil": profile, "machine": platform.platform(), "corpus_sha256": hashlib.sha256(args.corpus.read_bytes()).hexdigest(),
                        "threads": args.threads, "repetitions_sensibles": args.repetitions,
                        "moteur": engine.status() if engine else None,
                        "rss_pic_moteur": peak_memory(engine.process.pid) if engine else None,

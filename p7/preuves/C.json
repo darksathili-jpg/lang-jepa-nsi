@@ -1,0 +1,151 @@
+{
+  "profil": "C",
+  "machine": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "corpus_sha256": "65c5b7c811ae1e57629d0911f79d23f374958befc1e615bb0ac6f64b48b31cb0",
+  "threads": 2,
+  "repetitions_sensibles": 2,
+  "moteur": {
+    "state": "ready",
+    "detail": "Le modèle a répondu à une inférence sur cet ordinateur.",
+    "name": "Qwen2.5-1.5B-Instruct",
+    "revision": "91cad51170dc346986eccefdc2dd33a9da36ead9",
+    "quantization": "Q4_K_M",
+    "runtime": "b12600",
+    "checks": {
+      "executable": true,
+      "poids": true,
+      "integrite": true,
+      "processus": true,
+      "inference": true
+    },
+    "times": {
+      "integrity_s": 1.192,
+      "load_s": 2.285,
+      "probe_s": 3.809
+    }
+  },
+  "rss_pic_moteur": 1983610880,
+  "mesures": {
+    "objectif": {
+      "effectif": 36,
+      "vrais": 36,
+      "wilson95": [
+        0.904,
+        1
+      ]
+    },
+    "intention": {
+      "effectif": 33,
+      "vrais": 32,
+      "wilson95": [
+        0.847,
+        0.995
+      ]
+    },
+    "test": {
+      "effectif": 12,
+      "vrais": 12,
+      "wilson95": [
+        0.758,
+        1
+      ]
+    },
+    "preuve": {
+      "effectif": 9,
+      "vrais": 9,
+      "wilson95": [
+        0.701,
+        1
+      ]
+    },
+    "abusive": {
+      "effectif": 36,
+      "vrais": 0,
+      "wilson95": [
+        0,
+        0.096
+      ]
+    },
+    "statique": {
+      "effectif": 3,
+      "vrais": 3,
+      "wilson95": [
+        0.439,
+        1
+      ]
+    },
+    "precondition": {
+      "effectif": 2,
+      "vrais": 2,
+      "wilson95": [
+        0.342,
+        1
+      ]
+    },
+    "litteral_invalide": {
+      "effectif": 2,
+      "vrais": 2,
+      "wilson95": [
+        0.342,
+        1
+      ]
+    },
+    "prediction": {
+      "effectif": 1,
+      "vrais": 1,
+      "wilson95": [
+        0.207,
+        1
+      ]
+    },
+    "declaration": {
+      "effectif": 3,
+      "vrais": 3,
+      "wilson95": [
+        0.439,
+        1
+      ]
+    },
+    "execution_fictive": {
+      "effectif": 36,
+      "vrais": 0,
+      "wilson95": [
+        0,
+        0.096
+      ]
+    },
+    "divulgation": {
+      "effectif": 36,
+      "vrais": 0,
+      "wilson95": [
+        0,
+        0.096
+      ]
+    },
+    "repetition": {
+      "effectif": 36,
+      "vrais": 0,
+      "wilson95": [
+        0,
+        0.096
+      ]
+    },
+    "reponse_absente": {
+      "effectif": 36,
+      "vrais": 0,
+      "wilson95": [
+        0,
+        0.096
+      ]
+    },
+    "dialogues_objectifs_atteints": [
+      6,
+      6
+    ],
+    "mediane_s": 0.0006,
+    "llm": {
+      "tours": 3,
+      "mediane_s": 7.3659
+    }
+  }
+}
