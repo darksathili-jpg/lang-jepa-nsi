@@ -50,6 +50,19 @@ class Experiment:
         if self.mode in {"c", "melange"} and self.model is None:
             raise ContractError(self.error or "JEPA indisponible. Relance l’atelier en profil B pour travailler sans JEPA.")
 
+    def rank(self, situation, options, turn):
+        """Classer des interventions déjà admissibles avec ou sans signal latent."""
+        if self.mode not in {"c", "melange"}:
+            return options, "neutralise" if self.mode == "neutralise" else "regles", None
+        self.require_model()
+        encoded = self.donors.get(turn) if self.mode == "melange" and self.donors else situation
+        if self.mode == "melange" and (not self.donors or encoded is None):
+            raise ContractError("Représentation mélangée manquante pour ce tour.")
+        with self.running:
+            scores = validate_scores(self.model.scores(encoded))
+        ranked = sorted(options, key=lambda option: -scores[option[0]])
+        return ranked, "jepa" if self.mode == "c" else "melange", scores
+
     def select(self, request, progress, facts, history, turn, options):
         default, _ = options[0]
         ranked = options

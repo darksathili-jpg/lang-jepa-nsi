@@ -172,6 +172,22 @@ function showTeacherState(state, jepa) {
   const decision = state.derniere_intervention;
   add('Dernière intervention', decision ? [`${decision.approche} · ${decision.justification}`] : []);
   add('Contribution JEPA', [jepa]);
+  const test = state.essai_actif;
+  if (test) {
+    const describe = (label, value) => `${label} · ${JSON.stringify(value)}`;
+    const values = [describe('Entrée', test.entree), `Proposition · ${test.auteur}`];
+    if (test.precondition) values.push(describe('Résultat mathématique attendu', test.attendu));
+    if (test.predit !== null) values.push(describe('Prédiction', test.predit));
+    if (test.declare !== null) values.push(describe('Résultat déclaré', test.declare));
+    if (test.statique?.result !== null && test.statique) values.push(describe('Analyse statique', test.statique.result));
+    if (test.statique?.detail) values.push(test.statique.detail);
+    add('Essai actif', values);
+  }
+  if (state.experience_jepa) {
+    const format = (ranking) => ranking.map(([action, question]) => `${action} · ${question}`).join(' → ');
+    add('Classement expérimental', ['Règles · ' + format(state.experience_jepa.classement_regles),
+      'Signal latent · ' + format(state.experience_jepa.classement_experimental)]);
+  }
 }
 
 function applyExercise(preview = false) {
@@ -210,10 +226,11 @@ function showStage(stage, state, example = false) {
   els['active-stage'].textContent = 'Niveau d’aide ' + stage + '/5 · ' + labels[stage - 1];
   els['progress-example'].hidden = !example;
   if (example) return;
-  const acquisitions = ['Résultat observé', 'Résultat attendu', 'Comportement de m', 'Correction', 'Cas limites'];
+  const acquisitions = state?.schema ? ['Comportement', 'Résultat attendu', 'Justification', 'Vérification', 'Contrat']
+    : ['Résultat observé', 'Résultat attendu', 'Comportement de m', 'Correction', 'Cas limites'];
   const goals = {observed: 0, expected: 1, trace: 2, assumption: 2, strategy: 3, verification: 3, contract: 4};
   const current = state ? goals[state.objectif] : stage - 1;
-  const proved = state ? [state.acquis.observed, state.acquis.expected, state.acquis.trace && state.acquis.assumption,
+  const proved = state ? [state.acquis.observed, state.acquis.expected, state.schema ? state.acquis.trace : state.acquis.trace && state.acquis.assumption,
     state.acquis.verification, state.acquis.contract] : [];
   [...els.stages.children].forEach((step, i) => {
     const name = state ? acquisitions[i] : labels[i];
@@ -424,7 +441,8 @@ els.compose.addEventListener('submit', async (event) => {
     const {jepa, source} = displayProvenance(data);
     const decision = data.pedagogie?.derniere_intervention;
     const latent = decision?.source === 'jepa' ? 'JEPA sollicité. ' + jepa : 'JEPA non sollicité.';
-    const llm = {affiche: 'LLM sollicité, formulation affichée.', ecarte: 'LLM sollicité, formulation écartée.',
+    const llm = {affiche: 'LLM sollicité, formulation affichée.', ecarte: 'Proposition du LLM écartée.',
+      interpretation_verifiee: 'Interprétation proposée par le LLM et vérifiée par les règles.',
       indisponible: 'LLM sollicité, intervention indisponible.'};
     els['diagnostic-turn'].textContent = [latent, llm[data.generation] ?? 'LLM non sollicité.',
       data.question ? 'Question retenue : ' + data.question : 'Aucune nouvelle question.'].join(' ');

@@ -50,6 +50,7 @@ jobs:
         id: package
         env:
           NSI_COMMIT: ${{ steps.verdict.outputs.commit }}
+          NSI_EXPORT: ${{ inputs.export }}
         run: |
           python - <<'PY'
           import json, os, re, zipfile
@@ -66,14 +67,17 @@ jobs:
           assert stats["platform"].startswith("Windows")
           assert stats["active_after_stop"] == 0 and stats["dialogue"]["turns"] == 30
           assert stats["engines"]["checks"]["inference"] and stats["engines"]["jepa"]["checks"]["selection"]
+          if tuple(map(int, version.split("."))) >= (0, 7, 0):
+              assert stats["p7_turns"] == 14
           for filename in ("windows-mesures/mesures.json", "windows-captures/ecarts.json",
                            "installe/LANG-JEPA-NSI-Windows/logs/prepare.json"):
               evidence = Path("native") / filename
               print(filename, json.dumps(json.loads(evidence.read_text(encoding="utf-8")), ensure_ascii=False))
           with zipfile.ZipFile(f"LANG-JEPA-NSI-{version}-Preuves-Windows.zip", "w", zipfile.ZIP_DEFLATED) as proof:
+              compact = os.environ["NSI_EXPORT"] == "true"
               for directory in ("windows-captures", "windows-mesures", "installe"):
                   for file in sorted((Path("native") / directory).rglob("*")):
-                      if file.is_file():
+                      if file.is_file() and (not compact or directory != "windows-captures" or file.suffix == ".json"):
                           proof.write(file, file.relative_to("native").as_posix())
           PY
           (cd native/paquet && sha256sum --check SHA256SUMS.txt)

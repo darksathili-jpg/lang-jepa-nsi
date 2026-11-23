@@ -17,6 +17,7 @@ from playwright.sync_api import sync_playwright
 from context_browser import replay as contextual_replay
 from distribution.instance import local_request, read
 from hybrid_browser import hybrid
+from p7_browser import replay as p7_replay
 from p5.compare import read_dialogues
 
 
@@ -51,6 +52,7 @@ def main():
     parser.add_argument("--package", type=Path)
     parser.add_argument("--chromium", type=Path)
     parser.add_argument("--context", action="store_true")
+    parser.add_argument("--p7", action="store_true")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
 
@@ -86,6 +88,11 @@ def main():
                 with contextual_path.open("x", encoding="utf-8") as contextual:
                     contextual_replay(browser, origin, contextual)
                 stats["contextual_turns"] = len(contextual_path.read_text(encoding="utf-8").splitlines())
+            if args.p7:
+                workshop_path = args.output / "p7-atelier.jsonl"
+                with workshop_path.open("x", encoding="utf-8") as workshop:
+                    p7_replay(browser, origin, workshop)
+                stats["p7_turns"] = len(workshop_path.read_text(encoding="utf-8").splitlines())
             browser.close()
         stats["engines"] = local_request(state["port"], "/api/engines")
     finally:

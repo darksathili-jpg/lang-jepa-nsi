@@ -70,6 +70,17 @@ _decision_schema["properties"].update({"schema": {"type": "integer", "enum": [SC
                                       "approche": {"type": "string", "enum": list(ACTIONS)}})
 _decision_schema["required"].extend(("schema", "approche"))
 
+INTENT_FORMAT = {
+    "type": "json_schema",
+    "json_schema": {"name": "learner_intent", "strict": True, "schema": {
+        "type": "object", "properties": {
+            "schema": {"type": "integer", "enum": [1]},
+            "intention": {"type": "string", "enum": ["explication", "definition", "indice", "incomprehension", "abstention"]},
+            "citation": {"type": "string", "maxLength": 120},
+        }, "required": ["schema", "intention", "citation"], "additionalProperties": False,
+    }},
+}
+
 
 class LlamaEngine:
     def __init__(self, assets, model_key, threads, executable=None, *, require_runtime=False):
@@ -227,7 +238,7 @@ class LlamaEngine:
             )
             self.close()
 
-    def generate(self, messages, contract=False, *, hint=False, decision=False):
+    def generate(self, messages, contract=False, *, hint=False, decision=False, interpretation=False):
         self.status()
         if self.state != "ready":
             raise EngineError(self.detail)
@@ -238,7 +249,7 @@ class LlamaEngine:
             status, data = self._request("/v1/chat/completions", {
                 "model": self.key, "messages": messages, "temperature": 0, "seed": 42,
                 "max_tokens": 85 if hint else 160,
-                "response_format": (DECISION_FORMAT if decision else HINT_FORMAT if hint else
+                "response_format": (INTENT_FORMAT if interpretation else DECISION_FORMAT if decision else HINT_FORMAT if hint else
                                     CONTRACT_FORMAT if contract else REPLY_FORMAT),
                 "cache_prompt": False,
             }, timeout=110)

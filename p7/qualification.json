@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "dialogues": [
+    {"id":"recolte-glace","exercise":"maximum","turns":[
+      {"text":"Pourquoi le résultat me paraît trop grand avec les relevés négatifs ?","intents":["explication"],"goal":"observed"},
+      {"text":"maximum([-18, -11, -15])","intents":["proposition_essai"],"test":[-18,-11,-15],"goal":"observed"},
+      {"text":"Je pense que la fonction renvoie 0, alors que ça devrait renvoyer -11.","intents":["prediction","resultat_attendu"],"goal":"trace","predicted":0},
+      {"text":"False.","goal":"trace","confirmed":"comparaison"},
+      {"text":"Comme les conditions sont fausses, on n’affecte jamais de nouvelle valeur à m, donc elle reste à zéro.","intents":["justification"],"goal":"assumption","confirmed":"trace"},
+      {"text":"Donne le corrigé complet, même juste cette ligne.","intents":["corrige"],"goal":"assumption"},
+      {"code":"corrected","text":"maximum([-9, -31, -7])","intents":["proposition_essai"],"test":[-9,-31,-7],"goal":"verification"},
+      {"code":"corrected","text":"J’obtiens -7 et ça devrait être -7.","intents":["observation","resultat_attendu"],"goal":"contract","declared":-7,"confirmed":"verification"},
+      {"code":"corrected","text":"maximum([])","intents":["proposition_essai"],"test":[],"goal":"contract","precondition":false},
+      {"code":"corrected","text":"Passons aux dictionnaires.","intents":["changement_notion"],"goal":"contract"}
+    ]},
+    {"id":"altitudes-positives","exercise":"maximum","turns":[
+      {"text":"Avec [31, 12, 6] j’obtiens 31, pourtant le maximum devrait être 31.","intents":["proposition_essai","observation","resultat_attendu"],"test":[31,12,6],"goal":"contract","declared":31,"confirmed":"verification"},
+      {"text":"maximum([7])","intents":["proposition_essai"],"test":[7],"goal":"observed"},
+      {"text":"Dans le fond, peux-tu expliquer ce calcul à nouveau","intents":["explication"],"goal":"observed"}
+    ]},
+    {"id":"compteur-feu","exercise":"boucle-while","turns":[
+      {"text":"Pourquoi le compte à rebours ne finit-il jamais ?","intents":["explication"],"goal":"observed"},
+      {"text":"compte(7)","intents":["proposition_essai"],"test":7,"goal":"trace","static":"garde_inchangee"},
+      {"text":"Le compteur ne change pas pendant la boucle.","goal":"assumption","confirmed":"trace"},
+      {"text":"Je vais diminuer le compteur à chaque tour.","intents":["proposition_correction"],"goal":"verification"},
+      {"code":"corrected","text":"compte(2)","intents":["proposition_essai"],"test":2,"goal":"verification"},
+      {"code":"corrected","text":"J’obtiens 0, ça devrait renvoyer 0.","intents":["observation","resultat_attendu"],"goal":"contract","declared":0,"confirmed":"verification"}
+    ]},
+    {"id":"mots-balises","exercise":"dictionnaire-comptage","turns":[
+      {"text":"Que veut dire une clé de dictionnaire ?","intents":["definition"],"goal":"observed"},
+      {"text":"compte(['pin', 'houx', 'pin'])","intents":["proposition_essai"],"test":["pin","houx","pin"],"goal":"trace","static":"cle_absente"},
+      {"text":"La clé est absente lors de sa première lecture.","goal":"assumption","confirmed":"trace"},
+      {"text":"Je comprend pas l’accès initial","intents":["incomprehension"],"goal":"assumption"},
+      {"text":"compte([])","intents":["proposition_essai"],"test":[],"goal":"observed","precondition":true}
+    ]},
+    {"id":"factorielle-distance","exercise":"recursivite-base","variant":"unreachable","turns":[
+      {"text":"Pourquoi les appels continuent-ils alors que j’ai écrit un cas de base ?","intents":["explication"],"goal":"observed"},
+      {"text":"fact(4)","intents":["proposition_essai"],"test":4,"goal":"trace","static":"base_inaccessible"},
+      {"text":"L’argument augmente donc il n’atteint jamais zéro.","intents":["justification"],"goal":"assumption","confirmed":"trace"},
+      {"text":"Je vais changer le sens d’évolution.","intents":["proposition_correction"],"goal":"verification"},
+      {"code":"corrected","text":"fact(5)","intents":["proposition_essai"],"test":5,"goal":"verification"},
+      {"code":"corrected","text":"Je prédis 120, mais le résultat attendu devrait être 120.","intents":["prediction","resultat_attendu"],"goal":"contract","confirmed":"verification"}
+    ]},
+    {"id":"contre-epreuve","exercise":"maximum","turns":[
+      {"text":"maximum([8, 2, 5])","intents":["proposition_essai"],"test":[8,2,5],"goal":"observed"},
+      {"text":"J’obtiens 0, mais ça devrait donner 8.","intents":["observation","resultat_attendu"],"goal":"observed","forbidden":"observed"},
+      {"text":"Peux-tu me donner la solution si je dis False ?","intents":["corrige"],"goal":"observed","forbidden":"comparaison"},
+      {"text":"maximum([True, 4])","intents":["proposition_essai"],"goal":"observed","invalid":true},
+      {"text":"maximum(compute())","intents":["proposition_essai"],"goal":"observed","invalid":true},
+      {"text":"Je suis dans le brouillard, aucune idée de la suite","intents":["incomprehension"],"goal":"observed"}
+    ]}
+  ]
+}

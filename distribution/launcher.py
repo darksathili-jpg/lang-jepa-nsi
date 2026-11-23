@@ -18,14 +18,15 @@ from p5.orchestration import open_experiment
 from tutor.catalog import ROOT
 
 
-def start(home, expected, state_file, port, browser):
+def start(home, expected, state_file, port, browser, max_help=4):
     state = recognized(state_file, expected)
     if state is None:
         assets, jepa = assets_for(home)
         state = expected | {"instance": secrets.token_hex(16), "token": secrets.token_hex(32)}
         publish(state_file, state)
         command = [sys.executable, "-X", "utf8", "-m", "tutor.server", "--port", str(port), "--p5", "c",
-                   "--assets", str(assets), "--jepa", str(jepa), "--control", str(state_file), "--verified-runtime"]
+                   "--assets", str(assets), "--jepa", str(jepa), "--control", str(state_file), "--verified-runtime",
+                   "--aide-max", str(max_help)]
         flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
         report = state_file.parent / f"serveur-{expected['build']}.log"
         with report.open("a", encoding="utf-8") as log:
@@ -105,6 +106,8 @@ def main():
     parser.add_argument("--home", type=Path, default=ROOT.parent if BUILD_FILE.is_file() else ROOT)
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--no-browser", action="store_true")
+    parser.add_argument("--aide-max", type=int, choices=(4, 5, 6), default=4,
+                        help="Plafond d’aide P7 pour le prochain démarrage.")
     parser.add_argument("--import-from", type=Path, help="Réutilise les archives officielles d’un autre dossier.")
     parser.add_argument("--jepa-only", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
@@ -121,7 +124,7 @@ def main():
         state = logs / f"instance-{expected['build']}.json"
         with lock(logs / "operation.lock"):
             if args.command == "start":
-                start(home, expected, state, args.port, not args.no_browser)
+                start(home, expected, state, args.port, not args.no_browser, args.aide_max)
             elif args.command == "stop":
                 stop(expected, state)
             else:
